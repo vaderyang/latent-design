@@ -1,0 +1,84 @@
+/* ===========================================================================
+   Latent · 潜 — App Attention Grammar (the MACRO layer)
+   ---------------------------------------------------------------------------
+   The three-zone model, scaled from a card board to a whole application.
+   Every agentic product composes five attention zones; their visual weight is
+   the design language's hard rule, not a layout preference:
+
+     ① Stage (Understanding) — the lit primary plane: the agent's evolving,
+        evidence-anchored understanding. Highest attention.
+     ② Artifact              — the work product being made/operated (code,
+        canvas, video, document, data). Co-present, neutral. NOT the agent's
+        voice.
+     · Activity              — peripheral, auditable stream of tool calls / jobs
+        / terminal. Recedes; collapsible.
+     · Context               — navigation / files / history. Recessive.
+     ③ Intervention          — human controls. First-class, always reachable.
+
+   Attention weight:  Stage > Artifact > { Context, Activity };  Intervention
+   always reachable. The macro inversion: incumbent agent apps put the Activity
+   stream (tool calls) where the Stage should be — this grammar moves
+   Understanding to the stage and demotes Activity to the periphery.
+
+   Each app sets its own `grid-template-areas` over these named zones; the role
+   styling (what is lit vs what recedes) is fixed here.
+   Requires @latent/tokens/css.
+   =========================================================================== */
+
+.app-frame{
+  height:100vh;width:100%;overflow:hidden;
+  background:var(--d-900);color:var(--ink-200);
+  display:grid;font-family:var(--ui);font-size:14px;
+}
+
+/* ---- top chrome ---- */
+.app-topbar{
+  grid-area:top;display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:0 18px;border-bottom:1px solid var(--line);min-width:0;
+  background:linear-gradient(180deg,var(--d-700),var(--d-800));
+}
+.app-topbar .brand{font-family:var(--voice);font-size:15px;color:var(--ink-100);display:flex;gap:10px;align-items:center;white-space:nowrap}
+.app-topbar .brand .mk{font-family:var(--mono);font-size:10.5px;color:var(--hypo);border:1px solid var(--hypo-line);border-radius:6px;padding:2px 7px}
+.app-topbar .tcrumb{font-family:var(--mono);font-size:11px;color:var(--ink-400);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
+.app-topbar .tright{display:flex;gap:12px;align-items:center;padding-right:150px}
+
+/* ---- zone base + sticky role label ---- */
+.zone{min-width:0;min-height:0;overflow:auto;position:relative}
+.zone-head{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-500);padding:11px 14px 9px;position:sticky;top:0;background:inherit;z-index:1}
+.zone-head .zn{color:var(--ink-300)}
+
+/* ---- ① STAGE — understanding plane: lit, primary ---- */
+.zone-stage{grid-area:stage;display:flex;flex-direction:column;padding:16px 18px;
+  background:linear-gradient(180deg,var(--d-700),var(--d-800));
+  border-left:1px solid var(--hypo-line);box-shadow:inset 1px 0 0 var(--hypo-dim)}
+
+/* names the inversion, on the stage */
+.zone-note{font-size:11.5px;line-height:1.5;color:var(--ink-300);background:var(--hypo-dim);
+  border-left:2px solid var(--hypo-line);border-radius:0 8px 8px 0;padding:9px 12px;margin-bottom:14px}
+.zone-note b{color:var(--hypo);font-style:normal}
+
+/* ---- ② ARTIFACT — the work product: co-present, neutral ---- */
+.zone-artifact{grid-area:art;background:var(--d-850);border-left:1px solid var(--line);display:flex;flex-direction:column}
+
+/* ---- peripheral: ACTIVITY + CONTEXT recede ---- */
+.zone-activity{grid-area:act;background:var(--d-900);border-top:1px solid var(--line);
+  font-family:var(--mono);font-size:11px;color:var(--activity)}
+.zone-context{grid-area:ctx;background:var(--d-900);border-right:1px solid var(--line);
+  font-family:var(--mono);font-size:11.5px;color:var(--ink-400)}
+
+/* ---- ③ INTERVENTION — reuse .interv / .ibtn from component styles ---- */
+.zone-intervene{grid-area:intervene;background:var(--d-800);border-top:1px solid var(--line);padding:12px 16px}
+
+/* peripheral list rows shared by activity/context */
+.app-row{display:flex;gap:9px;align-items:center;padding:5px 14px;white-space:nowrap}
+.app-row .dot{width:6px;height:6px;border-radius:50%;background:var(--activity);flex:none}
+.app-row.muted{color:var(--ink-600)}
+.app-tree-row{padding:4px 14px;color:var(--ink-400);cursor:default}
+.app-tree-row.dir{color:var(--ink-300)}
+.app-tree-row.active{color:var(--hypo);background:var(--hypo-dim)}
+
+@media(max-width:900px){
+  .app-frame{height:auto;min-height:100vh;display:block}
+  .zone{height:auto;max-height:none}
+}

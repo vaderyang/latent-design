@@ -1,0 +1,65 @@
+/* Latent · 潜 — design tokens (CSS custom properties), themeable.
+   Variable NAMES are semantic roles; three themes swap their VALUES:
+     • dark  (default)         — bathymetric deep blue
+     • light                   — cool paper
+     • kami                    — warm parchment + ink-blue (Kami-inspired)
+   Set the theme via <html data-theme="dark|light|kami">. Components reference
+   only these variables, so theming is pure value substitution.
+   Color carries epistemic meaning, never decoration. */
+
+/* type + layout are theme-invariant */
+:root{
+  --voice:'Fraunces','Noto Serif SC',Georgia,'Songti SC',serif;
+  --ui:'Hanken Grotesk','Noto Sans SC',system-ui,-apple-system,sans-serif;
+  --mono:'IBM Plex Mono','Noto Sans Mono',ui-monospace,monospace;
+  --maxw:1080px;
+}
+
+/* ---------------- DARK (default) — depth = rising toward the surface ---------------- */
+:root,
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --d-900:#080B11; --d-850:#0A0E15; --d-800:#0C1119; --d-700:#101824;
+  --d-600:#15202E; --d-550:#1A2735; --d-500:#1F2E3F;
+  --line:rgba(126,158,190,.12); --line-2:rgba(126,158,190,.20);
+  --ink-100:#ECF1F7; --ink-200:#CBD6E2; --ink-300:#A6B4C4; --ink-400:#8B99AC;
+  --ink-500:#74859A; --ink-600:#5C6E82;
+  --grounded:#E7B45C; --grounded-dim:rgba(231,180,92,.15); --grounded-line:rgba(231,180,92,.40);
+  --hypo:#54C7C0; --hypo-dim:rgba(84,199,192,.13); --hypo-line:rgba(84,199,192,.38);
+  --open:#9C8CCB; --open-dim:rgba(156,140,203,.13); --open-line:rgba(156,140,203,.35);
+  --refuted:#5C6B7A; --refuted-dim:rgba(92,107,122,.10);
+  --inflect:#6E93DD; --inflect-dim:rgba(110,147,221,.16); --inflect-line:rgba(110,147,221,.45);
+  --activity:#6E7C8E;
+}
+
+/* ---------------- LIGHT — cool paper ---------------- */
+:root[data-theme="light"]{
+  color-scheme:light;
+  --d-900:#EEF2F8; --d-850:#FFFFFF; --d-800:#F4F7FB; --d-700:#FFFFFF;
+  --d-600:#E9EFF6; --d-550:#E1E9F2; --d-500:#D8E2EE;
+  --line:rgba(30,50,78,.14); --line-2:rgba(30,50,78,.22);
+  --ink-100:#0F1828; --ink-200:#27344A; --ink-300:#3F4E62; --ink-400:#566275;
+  --ink-500:#6B7889; --ink-600:#8A95A3;
+  --grounded:#8A5E0E; --grounded-dim:rgba(154,106,18,.12); --grounded-line:rgba(154,106,18,.42);
+  --hypo:#0E7E7A; --hypo-dim:rgba(14,126,122,.12); --hypo-line:rgba(14,126,122,.40);
+  --open:#5B47A6; --open-dim:rgba(91,71,166,.12); --open-line:rgba(91,71,166,.38);
+  --refuted:#677484; --refuted-dim:rgba(103,116,132,.13);
+  --inflect:#3E66C0; --inflect-dim:rgba(62,102,192,.12); --inflect-line:rgba(62,102,192,.42);
+  --activity:#6A7889;
+}
+
+/* ---------------- KAMI — warm parchment + ink-blue ---------------- */
+:root[data-theme="kami"]{
+  color-scheme:light;
+  --d-900:#EFE6D0; --d-850:#FBF6E9; --d-800:#F5EEDB; --d-700:#FBF6E9;
+  --d-600:#EDE3CB; --d-550:#E7DCC1; --d-500:#E0D4B5;
+  --line:rgba(94,78,50,.18); --line-2:rgba(94,78,50,.28);
+  --ink-100:#23303B; --ink-200:#3A4654; --ink-300:#4A5460; --ink-400:#5B5848;
+  --ink-500:#6E6A58; --ink-600:#8A836E;
+  --grounded:#8A5D10; --grounded-dim:rgba(138,93,16,.14); --grounded-line:rgba(138,93,16,.42);
+  --hypo:#2A6669; --hypo-dim:rgba(42,102,105,.14); --hypo-line:rgba(42,102,105,.42);
+  --open:#5E4A88; --open-dim:rgba(94,74,136,.14); --open-line:rgba(94,74,136,.40);
+  --refuted:#7A7360; --refuted-dim:rgba(122,115,96,.14);
+  --inflect:#3F5DA0; --inflect-dim:rgba(63,93,160,.15); --inflect-line:rgba(63,93,160,.42);
+  --activity:#7D7460;
+}

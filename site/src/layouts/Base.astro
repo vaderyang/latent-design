@@ -1,0 +1,113 @@
+---
+import "@latent/tokens/css";
+import "@latent/react/styles";
+import "../styles/chrome.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+const {
+  title = "Latent · 潜 — An Agentic Design Language",
+  description = "注意力跟随理解，而非活动。An agentic design language where cognition is the lit primary plane and tool calls recede to an auditable rail.",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="zh">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..500&family=Hanken+Grotesk:wght@300..700&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+    <script is:inline>
+      // set theme before paint to avoid a flash; ?theme= overrides + persists
+      (function () {
+        var valid = { dark: 1, light: 1, kami: 1 };
+        var t = "dark";
+        try {
+          var q = new URLSearchParams(location.search).get("theme");
+          if (q && valid[q]) {
+            t = q;
+            localStorage.setItem("latent-theme", t);
+          } else {
+            t = localStorage.getItem("latent-theme") || "dark";
+            if (!valid[t]) t = "dark";
+          }
+        } catch (e) {}
+        document.documentElement.dataset.theme = t;
+      })();
+    </script>
+  </head>
+  <body>
+    <div class="bg">
+      <svg viewBox="0 0 1200 900" preserveAspectRatio="xMidYMid slice" fill="none">
+        <g stroke="rgba(84,199,192,0.5)" stroke-width="0.75">
+          <path d="M-50 220 Q 300 160 600 230 T 1250 210" opacity=".5"></path>
+          <path d="M-50 300 Q 320 240 600 310 T 1250 290" opacity=".42"></path>
+          <path d="M-50 390 Q 340 320 600 400 T 1250 380" opacity=".34"></path>
+          <path d="M-50 490 Q 300 410 600 500 T 1250 480" opacity=".27"></path>
+          <path d="M-50 600 Q 360 510 600 610 T 1250 590" opacity=".2"></path>
+          <path d="M-50 720 Q 320 620 600 730 T 1250 710" opacity=".14"></path>
+        </g>
+        <g stroke="rgba(156,140,203,0.4)" stroke-width="0.5">
+          <ellipse cx="880" cy="420" rx="120" ry="46" opacity=".3"></ellipse>
+          <ellipse cx="880" cy="420" rx="200" ry="78" opacity=".2"></ellipse>
+          <ellipse cx="880" cy="420" rx="290" ry="116" opacity=".12"></ellipse>
+        </g>
+      </svg>
+    </div>
+    <div class="grain"></div>
+
+    <div class="theme-toggle" role="group" aria-label="主题">
+      <button type="button" data-theme-set="dark">Dark</button>
+      <button type="button" data-theme-set="light">Light</button>
+      <button type="button" data-theme-set="kami">Kami</button>
+    </div>
+    <script is:inline>
+      (function () {
+        var root = document.documentElement;
+        var btns = document.querySelectorAll(".theme-toggle [data-theme-set]");
+        function sync(t) {
+          btns.forEach(function (b) {
+            b.classList.toggle("active", b.getAttribute("data-theme-set") === t);
+          });
+        }
+        sync(root.dataset.theme || "dark");
+        btns.forEach(function (b) {
+          b.addEventListener("click", function () {
+            var t = b.getAttribute("data-theme-set");
+            root.dataset.theme = t;
+            try {
+              localStorage.setItem("latent-theme", t);
+            } catch (e) {}
+            sync(t);
+          });
+        });
+      })();
+    </script>
+
+    <slot />
+
+    <script>
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add("in");
+              io.unobserve(e.target);
+            }
+          });
+        },
+        { threshold: 0.12 },
+      );
+      document.querySelectorAll(".fade").forEach((el) => io.observe(el));
+    </script>
+  </body>
+</html>

@@ -1,0 +1,22 @@
+{
+  "name": "@latent/tokens",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Latent design tokens — epistemic color, three voices, four motions, bathymetric depth.",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./css": "./tokens.css",
+    "./tokens.json": "./tokens.json"
+  },
+  "files": [
+    "src",
+    "tokens.css",
+    "tokens.json"
+  ],
+  "scripts": {
+    "build": "bun scripts/gen-tokens-json.ts"
+  }
+}

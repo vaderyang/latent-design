@@ -1,0 +1,106 @@
+{
+  "schemaVersion": "0.2",
+  "latentLevel": "high",
+  "persona": "operator",
+  "task": {
+    "title": "收件箱代理 · 替你处理今早 42 封邮件",
+    "goal": "按你的偏好分拣并处理收件箱；需你拍板的暂停等你",
+    "context": "Ambient agent · 后台运行 · 你回来查看",
+    "status": "已处理 35 / 暂停 2"
+  },
+  "userStory": {
+    "who": "你 · 上午刚打开电脑",
+    "trigger": "收件箱代理在后台跑了一早上",
+    "goal": "快速掌握它替你做了什么、还有什么需要你",
+    "reads": "它替你执行的可审计动作、隔离的风险项、以及它不敢替你决定、暂停等你的事",
+    "acts": "批准暂停的 2 封草稿 / 查看隔离的钓鱼邮件 / 撤销任何自动操作"
+  },
+  "observablePrimitives": [
+    { "id": "op:mail:inbox", "kind": "tool-result", "label": "今早收件箱（42 封）" },
+    { "id": "op:rule:prefs", "kind": "prior-decision", "label": "你的分拣偏好（历史规则）" },
+    { "id": "op:auth:dkim", "kind": "tool-result", "label": "发件域 DKIM/SPF 校验结果" }
+  ],
+  "toolCalls": [
+    { "id": "tc:scan", "ts": "08:31", "fn": "scan_inbox", "summary": "42 封 · 按规则分类", "producedPrimitives": ["op:mail:inbox"] },
+    { "id": "tc:archive", "ts": "08:32", "fn": "archive", "summary": "归档 28 封通讯/促销", "producedPrimitives": ["op:mail:inbox"] },
+    { "id": "tc:reply", "ts": "08:33", "fn": "send_reply", "summary": "代回 3 封例行确认", "producedPrimitives": ["op:mail:inbox"] },
+    { "id": "tc:dkim", "ts": "08:34", "fn": "verify_sender", "summary": "1 封 DKIM 失败", "producedPrimitives": ["op:auth:dkim"] },
+    { "id": "tc:draft", "ts": "08:35", "fn": "draft_reply", "summary": "草拟 2 封待你批准", "producedPrimitives": ["op:mail:inbox"] }
+  ],
+  "nodes": [
+    {
+      "id": "n:triage",
+      "state": "grounded",
+      "kind": "observation",
+      "title": "42 封：28 封通讯/促销、9 封需你本人、5 封我可代办",
+      "confidence": { "value": 0.9, "source": "self_consistency" },
+      "evidence": [
+        { "id": "ev:scan", "label": "按你的历史规则分类，命中率高", "primitives": ["op:mail:inbox", "op:rule:prefs"], "polarity": "supports" }
+      ],
+      "provenance": {
+        "mode": "verifiable",
+        "reExecCmd": "mailagent replay --inbox 2024-06-08 --explain",
+        "steps": [
+          { "toolCallId": "tc:scan", "observed": "28/9/5 分类，附每封依据", "primitives": ["op:mail:inbox"] }
+        ]
+      }
+    },
+    {
+      "id": "n:done",
+      "state": "grounded",
+      "kind": "decision",
+      "title": "已替你执行：归档 28 封通讯 + 代回 3 封例行确认",
+      "confidence": { "value": 0.86, "source": "self_consistency" },
+      "evidence": [
+        { "id": "ev:arch", "label": "28 封均匹配“通讯/促销”规则", "primitives": ["op:rule:prefs"], "polarity": "supports" },
+        { "id": "ev:rep", "label": "3 封为低风险例行确认（措辞附后）", "primitives": ["op:mail:inbox"], "polarity": "supports" }
+      ],
+      "provenance": {
+        "mode": "verifiable",
+        "reExecCmd": "mailagent audit --actions today",
+        "steps": [
+          { "toolCallId": "tc:archive", "observed": "归档 28 封，可一键撤销", "primitives": ["op:mail:inbox"] },
+          { "toolCallId": "tc:reply", "observed": "代回 3 封，正文已留存", "primitives": ["op:mail:inbox"] }
+        ]
+      }
+    },
+    {
+      "id": "n:phish",
+      "state": "hypothesis",
+      "kind": "risk",
+      "title": "供应商 X 的“发票”邮件疑似钓鱼",
+      "confidence": { "value": 0.72, "source": "self_consistency" },
+      "evidence": [
+        { "id": "ev:dkim", "label": "DKIM 失败 + 域名近似（采用相近字符）", "primitives": ["op:auth:dkim"], "polarity": "supports" }
+      ],
+      "falsification": "若 DKIM/SPF 通过且与历史发件域一致，则正常；当前 DKIM 失败 → 已隔离、未点击附件、等你确认。"
+    },
+    {
+      "id": "n:approve",
+      "state": "open",
+      "kind": "plan",
+      "title": "2 封需你拍板的回复已草拟，暂停等你点发送",
+      "needs": "你的批准：一封是合同条款让步、一封是预算确认。已起草，未发送。"
+    },
+    {
+      "id": "n:reschedule",
+      "state": "refuted",
+      "kind": "decision",
+      "title": "自动接受会议改期请求",
+      "reason": "改期与你下午的行程冲突，涉及你的日程优先级——不替你自动决定。",
+      "formerConfidence": 0.4
+    }
+  ],
+  "outcome": {
+    "nodeId": "n:done",
+    "label": "已为你处理 · Grounded",
+    "text": "35/42 已自动处理并可审计撤销；2 封待你批准、1 封疑似钓鱼已隔离。",
+    "recommendation": "请在下方处理：批准 2 封草稿、查看隔离的钓鱼邮件。"
+  },
+  "steps": [
+    { "label": "回来查看", "hint": "后台 agent 已跑完——你回来看到的是“理解了什么/替你做了什么”，不是动作流水。", "visibleNodeIds": ["n:triage", "n:done"] },
+    { "label": "替你执行", "hint": "已执行的动作作为 grounded 决定呈现，每条可审计、可撤销。", "visibleNodeIds": ["n:triage", "n:done", "n:reschedule"] },
+    { "label": "风险隔离", "hint": "疑似钓鱼作为 risk 假设浮现：已隔离、未点击、等你确认。", "visibleNodeIds": ["n:triage", "n:done", "n:phish", "n:reschedule"] },
+    { "label": "等你拍板", "hint": "高风险项不擅自决定——2 封草稿暂停在干预区等你批准。", "visibleNodeIds": ["n:triage", "n:done", "n:phish", "n:approve", "n:reschedule"] }
+  ]
+}

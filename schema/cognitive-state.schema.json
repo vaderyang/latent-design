@@ -1,0 +1,577 @@
+{
+  "$ref": "#/definitions/CognitiveState",
+  "definitions": {
+    "CognitiveState": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "string",
+          "const": "0.2"
+        },
+        "latentLevel": {
+          "type": "string",
+          "enum": [
+            "low",
+            "mid",
+            "high"
+          ]
+        },
+        "persona": {
+          "type": "string",
+          "enum": [
+            "operator",
+            "trace"
+          ],
+          "default": "operator"
+        },
+        "task": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string"
+            },
+            "goal": {
+              "type": "string",
+              "description": "what the agent is trying to accomplish"
+            },
+            "context": {
+              "type": "string"
+            },
+            "status": {
+              "type": "string",
+              "description": "e.g. severity, progress, or state badge"
+            }
+          },
+          "required": [
+            "title"
+          ],
+          "additionalProperties": false
+        },
+        "userStory": {
+          "type": "object",
+          "properties": {
+            "who": {
+              "type": "string",
+              "description": "the persona, e.g. 支付 SRE · 凌晨值班"
+            },
+            "trigger": {
+              "type": "string",
+              "description": "what brought them here"
+            },
+            "goal": {
+              "type": "string",
+              "description": "what they want to accomplish"
+            },
+            "reads": {
+              "type": "string",
+              "description": "what they SEE on this surface"
+            },
+            "acts": {
+              "type": "string",
+              "description": "what they can DO here (the real user action)"
+            }
+          },
+          "required": [
+            "who",
+            "goal",
+            "reads",
+            "acts"
+          ],
+          "additionalProperties": false
+        },
+        "observablePrimitives": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "stable id, e.g. op:pcap:core-pay-seg or op:req:user-msg"
+              },
+              "kind": {
+                "type": "string",
+                "description": "user-statement | constraint | source | prior-decision | tool-result | document | code | metric | log | pcap | …"
+              },
+              "label": {
+                "type": "string"
+              },
+              "ref": {
+                "type": "string",
+                "description": "URI/path to the raw artifact, if any"
+              }
+            },
+            "required": [
+              "id",
+              "kind",
+              "label"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "toolCalls": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "ts": {
+                "type": "string",
+                "description": "timestamp or '—'"
+              },
+              "fn": {
+                "type": "string",
+                "description": "tool name, e.g. pcap_slice / write_file / send_email"
+              },
+              "args": {
+                "type": "object",
+                "additionalProperties": {}
+              },
+              "summary": {
+                "type": "string"
+              },
+              "durationMs": {
+                "type": "number",
+                "minimum": 0
+              },
+              "producedPrimitives": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "default": [],
+                "description": "ObservablePrimitive ids this call yielded"
+              }
+            },
+            "required": [
+              "id",
+              "ts",
+              "fn"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "nodes": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string",
+                    "description": "the cognitive 'voice' line (serif)"
+                  },
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "observation",
+                      "claim",
+                      "decision",
+                      "plan",
+                      "requirement",
+                      "option",
+                      "tradeoff",
+                      "answer",
+                      "risk"
+                    ],
+                    "description": "content role; defaults to claim/answer when omitted"
+                  },
+                  "layer": {
+                    "type": "string",
+                    "enum": [
+                      "source",
+                      "observation",
+                      "evidence",
+                      "symptom",
+                      "inference",
+                      "hypothesis",
+                      "option",
+                      "decision",
+                      "claim",
+                      "requirement",
+                      "plan",
+                      "conclusion",
+                      "risk"
+                    ],
+                    "description": "optional grounding-ladder rung"
+                  },
+                  "state": {
+                    "type": "string",
+                    "const": "grounded"
+                  },
+                  "confidence": {
+                    "type": "object",
+                    "properties": {
+                      "value": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "source": {
+                        "type": "string",
+                        "enum": [
+                          "logprob",
+                          "self_consistency",
+                          "self_report",
+                          "human"
+                        ],
+                        "description": "provenance of the number itself — not a vibe"
+                      }
+                    },
+                    "required": [
+                      "value",
+                      "source"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "evidence": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "label": {
+                          "type": "string"
+                        },
+                        "primitives": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "minItems": 1,
+                          "description": "every evidence pins to ≥1 primitive (fact, source, constraint, …)"
+                        },
+                        "polarity": {
+                          "type": "string",
+                          "enum": [
+                            "supports",
+                            "refutes"
+                          ],
+                          "default": "supports",
+                          "description": "supports/favors vs refutes/against"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "label",
+                        "primitives"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "minItems": 1
+                  },
+                  "provenance": {
+                    "type": "object",
+                    "properties": {
+                      "mode": {
+                        "type": "string",
+                        "enum": [
+                          "verifiable",
+                          "asserted"
+                        ]
+                      },
+                      "reExecCmd": {
+                        "type": "string",
+                        "description": "present iff mode === 'verifiable'"
+                      },
+                      "steps": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "toolCallId": {
+                              "type": "string",
+                              "description": "→ ToolCall.id"
+                            },
+                            "observed": {
+                              "type": "string",
+                              "description": "what this step established"
+                            },
+                            "primitives": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              },
+                              "minItems": 1,
+                              "description": "→ ObservablePrimitive ids (required link to ground truth)"
+                            }
+                          },
+                          "required": [
+                            "toolCallId",
+                            "observed",
+                            "primitives"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "minItems": 1
+                      }
+                    },
+                    "required": [
+                      "mode",
+                      "steps"
+                    ],
+                    "additionalProperties": false,
+                    "description": "REQUIRED — the openable trace to observable primitives"
+                  }
+                },
+                "required": [
+                  "id",
+                  "title",
+                  "state",
+                  "confidence",
+                  "evidence",
+                  "provenance"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "$ref": "#/definitions/CognitiveState/properties/nodes/items/anyOf/0/properties/id"
+                  },
+                  "title": {
+                    "$ref": "#/definitions/CognitiveState/properties/nodes/items/anyOf/0/properties/title"
+                  },
+                  "kind": {
+                    "$ref": "#/definitions/CognitiveState/properties/nodes/items/anyOf/0/properties/kind"
+                  },
+                  "layer": {
+                    "$ref": "#/definitions/CognitiveState/properties/nodes/items/anyOf/0/properties/layer"
+                  },
+                  "state": {
+                    "type": "string",
+                    "const": "hypothesis"
+                  },
+                  "confidence": {
+                    "$ref": "#/definitions/CognitiveState/properties/nodes/items/anyOf/0/properties/confidence"
+                  },
+                  "evidence": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/definitions/CognitiveState/properties/nodes/items/anyOf/0/properties/evidence/items"
+                    },
+                    "default": []
+                  },
+                  "falsification": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "REQUIRED — what evidence/condition would change it"
+                  },
+                  "provenance": {
+                    "$ref": "#/definitions/CognitiveState/properties/nodes/items/anyOf/0/properties/provenance"
+                  }
+                },
+                "required": [
+                  "id",
+                  "title",
+                  "state",
+                  "confidence",
+                  "falsification"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "$ref": "#/definitions/CognitiveState/properties/nodes/items/anyOf/0/properties/id"
+                  },
+                  "title": {
+                    "$ref": "#/definitions/CognitiveState/properties/nodes/items/anyOf/0/properties/title"
+                  },
+                  "kind": {
+                    "$ref": "#/definitions/CognitiveState/properties/nodes/items/anyOf/0/properties/kind"
+                  },
+                  "layer": {
+                    "$ref": "#/definitions/CognitiveState/properties/nodes/items/anyOf/0/properties/layer"
+                  },
+                  "state": {
+                    "type": "string",
+                    "const": "open"
+                  },
+                  "needs": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "REQUIRED — what's needed to resolve it"
+                  }
+                },
+                "required": [
+                  "id",
+                  "title",
+                  "state",
+                  "needs"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "$ref": "#/definitions/CognitiveState/properties/nodes/items/anyOf/0/properties/id"
+                  },
+                  "title": {
+                    "$ref": "#/definitions/CognitiveState/properties/nodes/items/anyOf/0/properties/title"
+                  },
+                  "kind": {
+                    "$ref": "#/definitions/CognitiveState/properties/nodes/items/anyOf/0/properties/kind"
+                  },
+                  "layer": {
+                    "$ref": "#/definitions/CognitiveState/properties/nodes/items/anyOf/0/properties/layer"
+                  },
+                  "state": {
+                    "type": "string",
+                    "const": "inflection"
+                  },
+                  "inflectKind": {
+                    "type": "string",
+                    "enum": [
+                      "backtrack",
+                      "aha",
+                      "refutation"
+                    ],
+                    "description": "the kind of turn"
+                  },
+                  "from": {
+                    "type": "string",
+                    "description": "the prior belief / choice (struck through)"
+                  },
+                  "to": {
+                    "type": "string",
+                    "description": "the new direction"
+                  },
+                  "rationale": {
+                    "type": "string"
+                  },
+                  "affects": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "default": [],
+                    "description": "node ids this inflection moved"
+                  }
+                },
+                "required": [
+                  "id",
+                  "title",
+                  "state",
+                  "inflectKind",
+                  "from",
+                  "to",
+                  "rationale"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "$ref": "#/definitions/CognitiveState/properties/nodes/items/anyOf/0/properties/id"
+                  },
+                  "title": {
+                    "$ref": "#/definitions/CognitiveState/properties/nodes/items/anyOf/0/properties/title"
+                  },
+                  "kind": {
+                    "$ref": "#/definitions/CognitiveState/properties/nodes/items/anyOf/0/properties/kind"
+                  },
+                  "layer": {
+                    "$ref": "#/definitions/CognitiveState/properties/nodes/items/anyOf/0/properties/layer"
+                  },
+                  "state": {
+                    "type": "string",
+                    "const": "refuted"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "why it sank — retained, never deleted"
+                  },
+                  "formerConfidence": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "required": [
+                  "id",
+                  "title",
+                  "state",
+                  "reason"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "outcome": {
+          "type": "object",
+          "properties": {
+            "nodeId": {
+              "type": "string"
+            },
+            "text": {
+              "type": "string"
+            },
+            "recommendation": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string",
+              "description": "e.g. 结论 / 决定 / 建议 / 已完成 / 交付"
+            }
+          },
+          "required": [
+            "nodeId",
+            "text"
+          ],
+          "additionalProperties": false
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string"
+              },
+              "hint": {
+                "type": "string"
+              },
+              "visibleNodeIds": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "label",
+              "hint",
+              "visibleNodeIds"
+            ],
+            "additionalProperties": false
+          },
+          "description": "optional stepped demo narrative"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "latentLevel",
+        "task",
+        "observablePrimitives",
+        "toolCalls",
+        "nodes"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

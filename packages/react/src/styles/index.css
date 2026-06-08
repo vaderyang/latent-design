@@ -1,0 +1,205 @@
+/* @latent/react — component styles.
+   Extracted verbatim from DESIGN_LANGUAGE.html (the source of truth) so the
+   rendered components are pixel-identical. Assumes @latent/tokens/css is loaded
+   by the host (provides the --d-*, --ink-*, epistemic, --voice/--ui/--mono vars).
+   The only change from source: trace-mode is scoped to `.scenario.trace` instead
+   of `body.trace`, so multiple scenarios can coexist on one page. */
+
+/* ---------- live components ---------- */
+.comp-shell{background:linear-gradient(180deg,var(--d-850),var(--d-900));border:1px solid var(--line);border-radius:18px;padding:24px;margin-top:18px;
+  box-shadow:inset 0 1px 0 rgba(126,158,190,.05)}
+.hcard{border:1px solid var(--line);border-radius:14px;padding:18px 20px;background:linear-gradient(180deg,var(--d-700),var(--d-800));position:relative;margin-bottom:16px}
+.hcard.grounded{border-color:var(--grounded-line);box-shadow:0 0 0 1px var(--grounded-dim)}
+.hcard.hypo{border-color:var(--hypo-line)}
+.hcard.refuted{opacity:.5;border-style:dashed}
+.hcard.refuted .htitle{text-decoration:line-through;color:var(--refuted)}
+.hhead{display:flex;align-items:flex-start;gap:12px;justify-content:space-between}
+.htitle{font-family:var(--voice);font-size:19px;color:var(--ink-100);line-height:1.3;font-weight:360}
+.badge{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;padding:4px 9px;border-radius:20px;white-space:nowrap;flex:none}
+.badge.g{background:var(--grounded-dim);color:var(--grounded);border:1px solid var(--grounded-line)}
+.badge.h{background:var(--hypo-dim);color:var(--hypo);border:1px solid var(--hypo-line)}
+.badge.r{background:var(--refuted-dim);color:var(--refuted);border:1px solid var(--line)}
+.badge.o{background:var(--open-dim);color:var(--open);border:1px solid var(--open-line)}
+/* confidence meter */
+.conf{display:flex;align-items:center;gap:10px;margin:14px 0 6px}
+.conf .track{height:5px;flex:1;border-radius:3px;background:var(--d-850);overflow:hidden;border:1px solid var(--line)}
+.conf .fill{height:100%;border-radius:3px}
+.conf .fill.g{background:linear-gradient(90deg,var(--hypo),var(--grounded))}
+.conf .fill.h{background:linear-gradient(90deg,var(--open),var(--hypo))}
+.conf .val{font-family:var(--mono);font-size:11px;color:var(--ink-300);width:42px;text-align:right}
+.conf .lab{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-500)}
+.conf .src{font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-600);border:1px solid var(--line);border-radius:5px;padding:2px 6px}
+/* evidence chips + provenance */
+.evid-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;align-items:center}
+.echip{font-family:var(--mono);font-size:11px;color:var(--ink-200);background:var(--d-850);border:1px solid var(--line-2);border-radius:7px;padding:5px 10px;cursor:pointer;transition:.18s;display:flex;gap:7px;align-items:center}
+.echip:hover{border-color:var(--grounded-line);color:var(--grounded)}
+.echip.refutes{border-color:var(--refuted)}
+.echip.refutes:hover{border-color:var(--inflect-line);color:var(--inflect)}
+.echip .ic{color:var(--grounded)}
+.echip.refutes .ic{color:var(--refuted)}
+.prov{margin-top:12px;border-top:1px dashed var(--line-2);padding-top:12px;display:none;animation:reveal .3s ease}
+.prov.open{display:block}
+@keyframes reveal{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.prov .pline{font-family:var(--mono);font-size:11px;color:var(--ink-400);padding:3px 0;display:flex;gap:10px;flex-wrap:wrap}
+.prov .pline .src{color:var(--hypo)}
+.prov .pmode{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:6px;margin-bottom:8px;display:inline-block}
+.prov .pmode.verifiable{background:var(--grounded-dim);color:var(--grounded);border:1px solid var(--grounded-line)}
+.prov .pmode.asserted{background:var(--refuted-dim);color:var(--ink-400);border:1px solid var(--line-2)}
+.prov .reexec{font-family:var(--mono);font-size:10.5px;color:var(--ink-300);margin-top:8px;padding:7px 10px;background:var(--d-900);border-radius:7px;border:1px solid var(--grounded-line);word-break:break-all}
+.prov .reexec b{color:var(--grounded)}
+.falsify{font-size:12.5px;color:var(--ink-300);margin-top:12px;padding:10px 12px;background:var(--open-dim);border-radius:9px;border-left:2px solid var(--open-line)}
+.falsify b{color:var(--open);font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:3px}
+.prov-toggle{font-family:var(--mono);font-size:10.5px;color:var(--ink-500);cursor:pointer;margin-top:12px;display:inline-flex;gap:6px;align-items:center;border-bottom:1px dotted var(--ink-600);user-select:none}
+.prov-toggle:hover{color:var(--ink-300)}
+
+/* inflection marker */
+.inflect-mark{border-left:2px solid var(--inflect);background:var(--inflect-dim);border-radius:0 12px 12px 0;padding:14px 18px;margin-bottom:16px;position:relative}
+.inflect-mark .it{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--inflect);margin-bottom:6px;display:flex;gap:8px;align-items:center}
+.inflect-mark .it::before{content:"↻";font-size:11px}
+.inflect-mark .body{font-family:var(--voice);font-size:15.5px;color:var(--ink-100);line-height:1.45}
+.inflect-mark .body .from{color:var(--refuted);text-decoration:line-through}
+.inflect-mark .body .to{color:var(--inflect)}
+
+/* activity stream (peripheral) */
+.activity-stream{background:var(--d-850);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.as-head{padding:11px 16px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none}
+.as-head .l{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-500)}
+.as-head .r{font-family:var(--mono);font-size:10px;color:var(--ink-600)}
+.as-body{display:none;border-top:1px solid var(--line);padding:10px 16px}
+.as-body.open{display:block}
+.as-line{font-family:var(--mono);font-size:11px;color:var(--activity);padding:4px 0;display:flex;gap:12px}
+.as-line .tt{color:var(--ink-600);width:64px;flex:none}
+.as-line .fn{color:var(--ink-400)}
+
+/* intervention */
+.interv{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.ibtn{font-family:var(--ui);font-size:13px;color:var(--ink-200);background:var(--d-700);border:1px solid var(--line-2);border-radius:9px;padding:9px 15px;cursor:pointer;transition:.18s}
+.ibtn:hover{border-color:var(--hypo-line);color:var(--hypo);background:var(--hypo-dim)}
+.ibtn.primary{border-color:var(--grounded-line);color:var(--grounded)}
+.ibtn.primary:hover{background:var(--grounded-dim)}
+
+/* peripheral mini-rows (activity + minihyp), reused by surface/rail */
+.minihyp{border-left:2px solid var(--grounded);background:var(--grounded-dim);padding:8px 12px;border-radius:0 8px 8px 0;margin-bottom:8px}
+.minihyp.h{border-color:var(--hypo);background:var(--hypo-dim)}
+.minihyp .t{font-family:var(--voice);font-size:14.5px;color:var(--ink-100)}
+.minihyp .c{font-family:var(--mono);font-size:10px;color:var(--ink-400);margin-top:2px}
+.act-mini{font-family:var(--mono);font-size:10.5px;color:var(--activity);padding:3px 0;display:flex;gap:7px;align-items:center;opacity:.75}
+.act-mini::before{content:"·";color:var(--ink-600)}
+
+/* ---------- user story (situates the surface) ---------- */
+.story{padding:16px 22px;border-bottom:1px solid var(--line);background:var(--hypo-dim)}
+.story-head{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap;margin-bottom:4px}
+.story-head .who{font-family:var(--voice);font-size:16px;color:var(--ink-100);font-weight:360}
+.story-head .trig{font-family:var(--mono);font-size:10.5px;color:var(--ink-400);letter-spacing:.04em}
+.story .goal{font-size:13px;color:var(--ink-300);margin-bottom:12px}
+.story-rd{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:680px){.story-rd{grid-template-columns:1fr}}
+.story-rd .rd{font-size:12.5px;color:var(--ink-300);line-height:1.5;border-left:2px solid var(--hypo-line);padding-left:11px}
+.story-rd .rd b{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--hypo);margin-bottom:3px;font-weight:500}
+
+/* ---------- replay call-to-action (demoted, clearly demo-only) ---------- */
+.replay-cta{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+.replay-cta button{font-family:var(--ui);font-size:12.5px;color:var(--ink-300);background:var(--d-700);border:1px solid var(--line-2);border-radius:9px;padding:8px 14px;cursor:pointer;transition:.18s}
+.replay-cta button:hover{border-color:var(--hypo-line);color:var(--hypo);background:var(--hypo-dim)}
+.replay-note{font-size:11.5px;color:var(--ink-500);font-style:italic;font-family:var(--voice)}
+
+/* ---------- scenario (worked example) ---------- */
+.scenario{background:var(--d-850);border:1px solid var(--line-2);border-radius:18px;overflow:hidden;margin-top:22px;
+  box-shadow:0 40px 100px -50px rgba(0,0,0,.9)}
+.sc-bar{padding:16px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;background:linear-gradient(180deg,var(--d-700),var(--d-800))}
+.sc-bar .inc{display:flex;flex-direction:column;gap:3px}
+.sc-bar .inc .ttl{font-family:var(--voice);font-size:16px;color:var(--ink-100)}
+.sc-bar .inc .meta{font-family:var(--mono);font-size:10.5px;color:var(--ink-500)}
+.sc-bar .sev{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--inflect);border:1px solid var(--inflect-line);padding:4px 10px;border-radius:20px}
+.modes{display:flex;gap:6px;background:var(--d-900);border-radius:10px;padding:4px;border:1px solid var(--line)}
+.mode-btn{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-500);padding:6px 13px;border-radius:7px;cursor:pointer;border:none;background:none;transition:.18s}
+.mode-btn.active{background:var(--d-600);color:var(--hypo);box-shadow:0 0 0 1px var(--hypo-line)}
+.sc-body{display:grid;grid-template-columns:1fr 256px;gap:0}
+@media(max-width:860px){.sc-body{grid-template-columns:1fr}}
+.sc-understanding{padding:22px}
+.sc-understanding .ulabel{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--hypo);margin-bottom:16px;display:flex;justify-content:space-between}
+.sc-rail{border-left:1px solid var(--line);background:var(--d-900);padding:18px 16px}
+.sc-rail .rlabel{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-500);margin-bottom:14px}
+.sc-rail .rsub{font-size:11px;color:var(--ink-400);margin:14px 0 8px;font-family:var(--mono);letter-spacing:.1em;text-transform:uppercase}
+.conclusion{margin-top:6px;border:1px solid var(--grounded-line);background:var(--grounded-dim);border-radius:14px;padding:18px 20px}
+.conclusion .cl{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--grounded);margin-bottom:8px}
+.conclusion .ctext{font-family:var(--voice);font-size:17px;color:var(--ink-100);line-height:1.45}
+.conclusion .ctext b{color:var(--grounded)}
+.step-ctl{display:flex;gap:12px;align-items:center;margin-top:20px;padding-top:18px;border-top:1px solid var(--line);flex-wrap:wrap}
+.step-ctl button{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;background:var(--d-600);color:var(--hypo);border:1px solid var(--hypo-line);border-radius:8px;padding:9px 16px;cursor:pointer;transition:.18s}
+.step-ctl button:hover{background:var(--hypo-dim)}
+.step-ctl button:disabled{opacity:.3;cursor:default}
+.step-ctl .prog{font-family:var(--mono);font-size:11px;color:var(--ink-500)}
+.step-ctl .hint{font-size:12px;color:var(--ink-400);margin-left:auto;font-style:italic;font-family:var(--voice)}
+.hidden-step{display:none}
+.step-in{animation:surfaceIn .5s cubic-bezier(.2,.7,.2,1)}
+@keyframes surfaceIn{from{opacity:0;transform:translateY(18px);filter:blur(3px)}to{opacity:1;transform:none;filter:none}}
+
+/* 简明 (plain) container */
+.sc-plain{padding:26px 28px}
+@media(max-width:680px){.sc-plain{padding:20px 16px}}
+
+/* trace mode reveal */
+.trace-panel{display:none;padding:20px 22px;border-top:1px solid var(--line);background:var(--d-900)}
+.scenario.trace .trace-panel{display:block;animation:reveal .3s}
+.scenario.trace .sc-understanding{opacity:.4;filter:saturate(.6)}
+.dev-wrap .trace-panel{display:block;border-top:none}
+.trace-panel .tlabel{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--activity);margin-bottom:14px}
+.trace-line{font-family:var(--mono);font-size:11.5px;color:var(--ink-300);padding:6px 0;border-bottom:1px solid var(--line);display:grid;grid-template-columns:70px 1fr auto;gap:14px}
+.trace-line .tt{color:var(--ink-600)} .trace-line .fn{color:var(--hypo)} .trace-line .dur{color:var(--ink-500)}
+
+/* ---------- PlainView — calm, plain-language default (for AI novices) ---------- */
+.plain{max-width:660px}
+.plain .p-sec{margin-bottom:26px}
+.plain .p-sec:last-child{margin-bottom:0}
+.plain .p-label{font-family:var(--ui);font-size:12px;color:var(--ink-400);margin-bottom:10px;display:flex;align-items:center;gap:9px}
+.plain .p-problem{font-size:15px;color:var(--ink-300);line-height:1.65}
+.plain .p-answer-sec{padding:18px 20px;background:var(--grounded-dim);border-radius:14px}
+.plain .p-answer{font-family:var(--voice);font-size:22px;line-height:1.45;color:var(--ink-100);font-weight:360;margin:2px 0 0}
+.plain .p-rec{font-size:14px;color:var(--ink-300);line-height:1.6;margin-top:12px}
+
+/* word-level certainty — a soft pill, never a number */
+.certainty{display:inline-flex;gap:6px;align-items:center;font-family:var(--ui);font-size:11.5px;
+  padding:2px 9px;border-radius:20px;white-space:nowrap;font-weight:400}
+.certainty .cdot{width:7px;height:7px;border-radius:50%;flex:none}
+.certainty.firm{color:var(--grounded);background:var(--grounded-dim)} .certainty.firm .cdot{background:var(--grounded)}
+.certainty.lean{color:var(--hypo);background:var(--hypo-dim)} .certainty.lean .cdot{background:var(--hypo)}
+.certainty.open{color:var(--open);background:var(--open-dim)} .certainty.open .cdot{background:var(--open)}
+.certainty.out{color:var(--refuted);background:var(--refuted-dim)} .certainty.out .cdot{background:var(--refuted)}
+
+/* reasons / needs — dividers + a dot, NOT bordered cards */
+.plain .reason,.plain .need{display:flex;gap:11px;padding:13px 0;border-bottom:1px solid var(--line)}
+.plain .reason:last-child,.plain .need:last-child{border-bottom:none}
+.plain .reason .rdot,.plain .need .rdot{margin-top:7px;width:8px;height:8px;border-radius:50%;flex:none}
+.plain .reason.firm .rdot{background:var(--grounded)}
+.plain .reason.lean .rdot,.plain .need.lean .rdot{background:var(--hypo)}
+.plain .need.open .rdot{background:var(--open)}
+.plain .rbody{min-width:0}
+.plain .rtitle{font-size:15.5px;color:var(--ink-100);line-height:1.5;display:flex;flex-wrap:wrap;gap:8px;align-items:baseline}
+.plain .rwhy{font-size:13px;color:var(--ink-400);margin-top:4px;line-height:1.6}
+.plain .more{font-size:12.5px;color:var(--ink-400);cursor:pointer;margin-top:7px;display:inline-block;user-select:none}
+.plain .more:hover{color:var(--hypo)}
+.plain .detail-open{font-size:12.5px;color:var(--ink-300);margin-top:8px;padding:11px 13px;background:var(--d-850);border-radius:9px;line-height:1.7}
+
+/* changed my mind — soft, conversational */
+.plain .changed{font-size:14.5px;color:var(--ink-200);line-height:1.6;background:var(--inflect-dim);
+  border-left:2px solid var(--inflect-line);padding:12px 15px;border-radius:0 9px 9px 0}
+.plain .changed .old{color:var(--ink-500);text-decoration:line-through}
+.plain .changed .new{color:var(--inflect)}
+
+/* ruled out — muted, collapsed by default */
+.plain .ruledout{font-size:13px;color:var(--ink-400);line-height:1.6;padding:8px 0;border-bottom:1px solid var(--line)}
+.plain .ruledout:last-child{border-bottom:none}
+.plain .ruledout b{color:var(--ink-300);font-weight:500}
+
+.plain .p-actions-sec .interv{margin-top:0}
+
+/* ---------- embeddable understanding panel (for product UIs) ---------- */
+.upanel{display:flex;flex-direction:column}
+.upanel-head{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--hypo);margin-bottom:14px}
+.upanel-act{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+
+/* ---------- understanding surface (standalone) ---------- */
+.understanding{display:flex;flex-direction:column}
+.proportion-tag{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-500);margin-bottom:14px;display:flex;gap:8px;align-items:center}
+.proportion-tag b{color:var(--hypo)}

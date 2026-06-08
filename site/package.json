@@ -1,0 +1,25 @@
+{
+  "name": "@latent/site",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Latent · 潜 — the recommendation site and scenario demos.",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/react": "^4.2.1",
+    "@latent/react": "workspace:*",
+    "@latent/schema": "workspace:*",
+    "@latent/tokens": "workspace:*",
+    "astro": "^5.4.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4"
+  }
+}

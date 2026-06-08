@@ -1,0 +1,19 @@
+{
+  "name": "@latent/validator",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "latent-validate — enforces the Grounding Contract on CognitiveState instances.",
+  "bin": {
+    "latent-validate": "./src/cli.ts"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "src"
+  ],
+  "dependencies": {
+    "@latent/schema": "workspace:*",
+    "zod": "^3.23.8"
+  }
+}

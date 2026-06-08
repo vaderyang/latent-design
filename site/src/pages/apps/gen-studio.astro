@@ -1,0 +1,118 @@
+---
+import Base from "../../layouts/Base.astro";
+import StagePanel from "../../components/StagePanel.tsx";
+import "@latent/react/app";
+import studio from "@examples/gen-studio.json";
+
+const actions = [
+  { label: "选定风格 A（写实质感）", variant: "primary" },
+  { label: "选定风格 B（微缩奇幻）" },
+  { label: "标注重渲镜头" },
+];
+
+const frames = [
+  { g: "linear-gradient(135deg,#2c1d12,#8a5e2e 70%,#caa15c)", t: "01 产品空镜" },
+  { g: "linear-gradient(135deg,#1f1810,#6e4a28 80%)", t: "02 暖光起幅" },
+  { g: "linear-gradient(160deg,#3a2614,#9b6c33)", t: "03 金属反光" },
+  { g: "linear-gradient(135deg,#241a10,#7a5530 75%,#b98c4e)", t: "04 玻璃质感" },
+  { g: "linear-gradient(135deg,#1b140d,#5e3f22)", t: "05 推镜中段" },
+  { g: "repeating-linear-gradient(45deg,#15110b,#15110b 8px,#1c160e 8px,#1c160e 16px)", t: "06 渲染中…", rendering: true },
+  { g: "linear-gradient(135deg,#2a1d11,#86592c)", t: "07 logo 定格" },
+  { g: "repeating-linear-gradient(45deg,#15110b,#15110b 8px,#1c160e 8px,#1c160e 16px)", t: "08 渲染中…", rendering: true },
+];
+---
+
+<Base title="潛 Studio · Image/Video 生成（应用层设计）" description="把设计语言用到生成工具：agent 对创作意图的理解占据主舞台，渲染任务退为外围队列。">
+  <div class="app-frame app-studio">
+    <!-- top chrome -->
+    <div class="app-topbar">
+      <div class="brand"><span class="mk">潛 Studio</span> 产品宣传短片</div>
+      <div class="tcrumb">16:9 · 30s · golden-hour · 渲染 12/48</div>
+      <div class="tright"><span class="mono" style="font-size:11px;color:var(--ink-500)">A/B 风格待选</span></div>
+    </div>
+
+    <!-- ① Stage — the agent's understanding of creative intent (lit primary) -->
+    <div class="zone zone-stage">
+      <div class="zone-note">
+        别家生成工具把<b>渲染队列</b>放在主位（一排排缩略图与进度条）。潛 Studio 把 agent 对<b>你创作意图的理解</b>放主舞台——定调决策、在押的风格选项、易出伪影的风险；画布在中间、渲染任务退为右侧队列。
+      </div>
+      <StagePanel data={studio} heading="agent 对创作意图的理解" actions={actions} client:load />
+    </div>
+
+    <!-- ② Artifact — the canvas / generated frames (co-present, neutral) -->
+    <div class="zone zone-artifact">
+      <div class="zone-head">② Artifact · 画布 <span class="zn">关键帧 · golden-hour 定调</span></div>
+      <div class="canvas">
+        {frames.map((f) => (
+          <div class="frame" style={`background:${f.g}`}>
+            <span class={`fl${f.rendering ? " rend" : ""}`}>{f.t}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- ③ Intervention — prompt bar (the creative control) -->
+    <div class="zone zone-intervene promptbar">
+      <div class="pinput">▸ 30s 产品短片 · 黄金时刻暖光 · 浅景深 · 缓慢推镜 · 突出金属/玻璃质感<span class="caret"></span></div>
+      <div class="pbtns">
+        <button class="ibtn primary">批量渲染（待选风格）</button>
+        <button class="ibtn">改定调</button>
+      </div>
+    </div>
+
+    <!-- · Activity — render queue / jobs (peripheral, recede) -->
+    <div class="zone zone-activity">
+      <div class="zone-head">· Activity · 渲染队列（外围）</div>
+      <div class="app-row"><span class="dot"></span>render · frame 12/48</div>
+      <div class="app-row"><span class="dot"></span>upscale · 1080→4K</div>
+      <div class="app-row"><span class="dot"></span>style_A · preview</div>
+      <div class="app-row muted"><span class="dot"></span>style_B · queued</div>
+      <div class="app-row muted"><span class="dot"></span>interp · 24→48fps</div>
+    </div>
+  </div>
+
+  <style>
+    .app-studio {
+      grid-template-columns: minmax(358px, 420px) minmax(0, 1fr) 226px;
+      grid-template-rows: 46px minmax(0, 1fr) 104px;
+      grid-template-areas:
+        "top top top"
+        "stage art act"
+        "stage intervene act";
+    }
+    .canvas {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      padding: 14px;
+      overflow: auto;
+    }
+    @media (max-width: 1180px) { .canvas { grid-template-columns: repeat(2, 1fr); } }
+    .frame {
+      aspect-ratio: 16 / 9;
+      border-radius: 8px;
+      border: 1px solid var(--line-2);
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.4);
+    }
+    .frame .fl {
+      position: absolute; left: 8px; bottom: 6px;
+      font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.04em;
+      color: rgba(255, 240, 220, 0.86); text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+    }
+    .frame .fl.rend { color: var(--hypo); }
+    .promptbar { display: flex; align-items: center; gap: 14px; }
+    .promptbar .pinput {
+      flex: 1; min-width: 0; font-family: var(--mono); font-size: 12px; color: var(--ink-300);
+      background: var(--d-900); border: 1px solid var(--line-2); border-radius: 10px;
+      padding: 11px 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .promptbar .caret {
+      display: inline-block; width: 7px; height: 14px; margin-left: 4px;
+      background: var(--hypo); vertical-align: middle; animation: blink 1.1s step-end infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+    .promptbar .pbtns { display: flex; gap: 8px; flex: none; }
+  </style>
+</Base>

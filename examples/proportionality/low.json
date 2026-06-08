@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "0.2",
+  "latentLevel": "low",
+  "persona": "operator",
+  "task": { "title": "把这封邮件改写为更正式的语气" },
+  "observablePrimitives": [
+    { "id": "op:doc:draft", "kind": "document", "label": "原始邮件草稿（3 个要点）" }
+  ],
+  "toolCalls": [
+    { "id": "tc:rewrite", "ts": "—", "fn": "rewrite", "summary": "正式化 · 保留要点", "producedPrimitives": ["op:doc:draft"] }
+  ],
+  "nodes": [
+    {
+      "id": "n:done",
+      "state": "grounded",
+      "kind": "answer",
+      "title": "已改写为正式语气，三个要点与原意完整保留",
+      "confidence": { "value": 0.96, "source": "self_report" },
+      "evidence": [
+        { "id": "ev:points", "label": "3/3 要点保留，无新增断言", "primitives": ["op:doc:draft"], "polarity": "supports" }
+      ],
+      "provenance": {
+        "mode": "asserted",
+        "steps": [
+          { "toolCallId": "tc:rewrite", "observed": "逐句正式化，要点逐一对照", "primitives": ["op:doc:draft"] }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,106 @@
+{
+  "schemaVersion": "0.2",
+  "latentLevel": "high",
+  "persona": "operator",
+  "task": {
+    "title": "核心支付链路 P99 延迟异常",
+    "goal": "定位 core-pay 链路间歇性 P99 飙升的根因并给出处置",
+    "context": "某股份制银行 · core-pay · 间歇性 · 持续 ~40min",
+    "status": "P99 12ms → 340ms"
+  },
+  "userStory": {
+    "who": "支付 SRE · 凌晨值班",
+    "trigger": "告警：core-pay P99 12ms→340ms，间歇 40min",
+    "goal": "找到根因、止血，并留下可审计依据",
+    "reads": "agent 当前对这次故障的理解：一个被证据锚定的根因、一个仍待解决的问题，以及它已排除的方向",
+    "acts": "采纳结论触发处置 / 质疑根因让 agent 重查 / 补充你已知的约束"
+  },
+  "observablePrimitives": [
+    { "id": "op:pcap:core-pay-seg", "kind": "pcap", "label": "core-pay-seg · 18.2GB → 2.1M pkt", "ref": "s3://traces/core-pay-seg.pcap" },
+    { "id": "op:log:safepoint-i7", "kind": "log", "label": "JVM safepoint.log (instance-7)", "ref": "s3://logs/safepoint-i7.log" },
+    { "id": "op:metric:connpool-i7", "kind": "metric", "label": "connpool backlog @ instance-7" },
+    { "id": "op:metric:rtt-i7", "kind": "metric", "label": "RTT per backend" }
+  ],
+  "toolCalls": [
+    { "id": "tc:dns", "ts": "12:04:44", "fn": "dns_check", "summary": "resp <2ms, 0 retrans", "durationMs": 1100, "producedPrimitives": ["op:pcap:core-pay-seg"] },
+    { "id": "tc:align", "ts": "12:04:58", "fn": "align_timestamps", "summary": "PCAP ⟷ safepoint.log", "durationMs": 2400, "producedPrimitives": ["op:log:safepoint-i7"] },
+    { "id": "tc:connpool", "ts": "12:05:12", "fn": "connpool_probe", "summary": "backlog 12→53, RTT 2ms→310ms", "durationMs": 900, "producedPrimitives": ["op:metric:connpool-i7", "op:metric:rtt-i7"] },
+    { "id": "tc:safepoint", "ts": "12:05:40", "fn": "query_safepoint_log", "summary": "STW 280ms × 7 events, aligned", "durationMs": 1300, "producedPrimitives": ["op:log:safepoint-i7"] }
+  ],
+  "nodes": [
+    {
+      "id": "n:inflect-1",
+      "state": "inflection",
+      "layer": "hypothesis",
+      "title": "重传重判为症状",
+      "inflectKind": "refutation",
+      "from": "网络层重传是病因",
+      "to": "应用层 GC 停顿是根因",
+      "rationale": "对齐时间戳后，重传尖峰滞后于延迟尖峰 ⇒ 重传是症状，不是病因",
+      "affects": ["n:retrans", "n:rootcause"]
+    },
+    {
+      "id": "n:dns",
+      "state": "refuted",
+      "kind": "claim",
+      "layer": "hypothesis",
+      "title": "上游 DNS 解析抖动",
+      "reason": "PCAP 显示 DNS 响应 <2ms、零重传",
+      "formerConfidence": 0.42
+    },
+    {
+      "id": "n:retrans",
+      "state": "hypothesis",
+      "kind": "claim",
+      "layer": "symptom",
+      "title": "目标网段 0.3% TCP 重传（重判为症状）",
+      "confidence": { "value": 0.3, "source": "self_consistency" },
+      "evidence": [
+        { "id": "ev:retrans", "label": "retrans 0.3% on core-pay-seg", "primitives": ["op:pcap:core-pay-seg"], "polarity": "supports" }
+      ],
+      "falsification": "若重传尖峰在时间上领先延迟尖峰，则升级为病因；当前观测到滞后 → 判定为症状"
+    },
+    {
+      "id": "n:rootcause",
+      "state": "grounded",
+      "kind": "claim",
+      "layer": "conclusion",
+      "title": "instance-7 的 GC 长停顿，引发连接池排队",
+      "confidence": { "value": 0.89, "source": "self_consistency" },
+      "evidence": [
+        { "id": "ev:align", "label": "延迟尖峰 ⟷ safepoint 窗口对齐", "primitives": ["op:pcap:core-pay-seg", "op:log:safepoint-i7"], "polarity": "supports" },
+        { "id": "ev:rtt", "label": "RTT inflation 仅见于该后端", "primitives": ["op:metric:rtt-i7"], "polarity": "supports" },
+        { "id": "ev:backlog", "label": "连接池 backlog +340%", "primitives": ["op:metric:connpool-i7"], "polarity": "supports" }
+      ],
+      "provenance": {
+        "mode": "verifiable",
+        "reExecCmd": "traceforge replay --incident core-pay-2024 --assert root_cause=gc_pause@instance-7",
+        "steps": [
+          { "toolCallId": "tc:safepoint", "observed": "STW 280ms × 7, aligned to spikes", "primitives": ["op:log:safepoint-i7"] },
+          { "toolCallId": "tc:connpool", "observed": "backlog 12→53 @ instance-7", "primitives": ["op:metric:connpool-i7"] },
+          { "toolCallId": "tc:align", "observed": "PCAP ⟷ safepoint.log aligned", "primitives": ["op:pcap:core-pay-seg", "op:log:safepoint-i7"] }
+        ]
+      }
+    },
+    {
+      "id": "n:why-i7",
+      "state": "open",
+      "kind": "risk",
+      "layer": "hypothesis",
+      "title": "为何唯独 instance-7？",
+      "needs": "是否承载某热点大客户的流量倾斜？需 query 路由权重 + 客户分片表"
+    }
+  ],
+  "outcome": {
+    "nodeId": "n:rootcause",
+    "label": "根因 · Grounded",
+    "text": "根因为 instance-7 的 GC 长停顿；网络层重传是症状非病因。",
+    "recommendation": "扩容/调优该实例堆与 GC，临时将其权重降级。"
+  },
+  "steps": [
+    { "label": "认知浮现", "hint": "认知浮现：目标网段重传是初始线索；DNS 已被 PCAP 推翻并沉降（保留可审计，未删除）。", "visibleNodeIds": ["n:retrans", "n:dns"] },
+    { "label": "拐点", "hint": "拐点：时间戳对齐后，重传由病因被重判为症状，注意力转向应用层 GC。", "visibleNodeIds": ["n:inflect-1", "n:retrans", "n:dns"] },
+    { "label": "根因凝定", "hint": "根因浮现并凝定为 grounded：GC 长停顿引发连接池排队，置信 0.89。", "visibleNodeIds": ["n:inflect-1", "n:rootcause", "n:retrans", "n:dns"] },
+    { "label": "诚实未知", "hint": "诚实留下一个 open question：为何唯独 instance-7。", "visibleNodeIds": ["n:inflect-1", "n:rootcause", "n:retrans", "n:why-i7", "n:dns"] }
+  ]
+}

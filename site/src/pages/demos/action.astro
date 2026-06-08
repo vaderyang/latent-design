@@ -1,0 +1,17 @@
+---
+import Base from "../../layouts/Base.astro";
+import DemoFrame from "../../components/DemoFrame.tsx";
+import data from "@examples/action.json";
+---
+
+<Base title="任务执行 / ambient · Latent demo" description="后台代理 agent：你回来查看时，看到的是它替你做了什么与为什么，而非动作流水。">
+  <section class="wrap" style="padding-top:64px">
+    <a class="demo-back" href="/">◂ Latent · 潜</a>
+    <div class="kicker">应用 Demo · 任务执行 / 代理操作（ambient）</div>
+    <h2>收件箱代理 — 替你处理 42 封邮件</h2>
+    <p>
+      这是论点里明确点名的 <strong>ambient / 后台 agent</strong> 场景：动作流过、状态留存，你“回来查看”的是那个留存的理解态。已执行的动作作为可审计、可撤销的 <span class="mono" style="color:var(--grounded)">decision</span> 呈现；疑似钓鱼作为 <span class="mono">risk</span> 假设已隔离；高风险项不擅自决定——<strong>暂停在干预区等你拍板</strong>。人类干预在这里是核心特性。
+    </p>
+    <DemoFrame data={data} mode="scenario" stepped client:load />
+  </section>
+</Base>

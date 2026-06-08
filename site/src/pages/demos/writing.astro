@@ -1,0 +1,17 @@
+---
+import Base from "../../layouts/Base.astro";
+import DemoFrame from "../../components/DemoFrame.tsx";
+import data from "@examples/writing.json";
+---
+
+<Base title="写作 / 生成 · Latent demo" description="写作型 agent：主舞台是对意图与约束的理解、草稿背后的取舍、未定的选择。">
+  <section class="wrap" style="padding-top:64px">
+    <a class="demo-back" href="/">◂ Latent · 潜</a>
+    <div class="kicker">应用 Demo · 写作 / 生成</div>
+    <h2>起草发布说明 — 企业客户版</h2>
+    <p>
+      生成类任务里，理解态是<strong>对“你到底想要什么”的理解 + 结构取舍 + 未定选择</strong>。<span class="mono" style="color:var(--grounded)">requirement</span> 锚定在你的原话上（asserted），结构 <span class="mono">decision</span> 挂在可量化的基准上，风格 <span class="mono">option</span> 与合规措辞作为诚实的 open 留着——而不是假装已经定稿。
+    </p>
+    <DemoFrame data={data} mode="scenario" stepped client:load />
+  </section>
+</Base>

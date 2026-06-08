@@ -1,0 +1,7 @@
+# Latent monorepo — bun config
+# Workspaces are declared in package.json ("workspaces"); bun links them via the
+# workspace:* protocol. Internal packages export TS source directly (no per-package
+# build step); the Astro site transpiles them through Vite.
+[install]
+# keep the lockfile deterministic
+exact = false

@@ -1,0 +1,17 @@
+---
+import Base from "../../layouts/Base.astro";
+import DemoFrame from "../../components/DemoFrame.tsx";
+import data from "@examples/rad-app.json";
+---
+
+<Base title="RAD · 全栈 Mini App · Latent demo" description="AI 协助构建全栈 mini app：主舞台是对要构建什么的理解，文件写入退为外围。">
+  <section class="wrap" style="padding-top:64px">
+    <a class="demo-back" href="/">◂ Latent · 潜</a>
+    <div class="kicker">应用 Demo · RAD / AI 协助全栈 Mini App</div>
+    <h2>从一句话生成报销审批 App</h2>
+    <p>
+      vibe coding 的现身说法：主舞台不是“正在写第 7 个文件”，而是 agent <strong>对“要构建什么”的理解</strong>——需求 <span class="mono" style="color:var(--grounded)">requirement</span>、架构 <span class="mono">decision</span>（挂在可重跑的 smoke 上）、下一步 <span class="mono">plan</span>、未定的通知渠道 <span class="mono" style="color:var(--open)">option</span>、以及“附件存储是生产风险”这样的诚实 <span class="mono">risk</span>。同一份 CognitiveState 既驱动这个界面，也正是 <span class="mono" style="color:var(--ink-200)">latent-design</span> skill 教 coding agent 去 emit 的东西。
+    </p>
+    <DemoFrame data={data} mode="scenario" stepped client:load />
+  </section>
+</Base>

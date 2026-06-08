@@ -1,0 +1,17 @@
+---
+import Base from "../../layouts/Base.astro";
+import DemoFrame from "../../components/DemoFrame.tsx";
+import data from "@examples/planning.json";
+---
+
+<Base title="规划 / 决策 · Latent demo" description="规划型 agent：主舞台是决策、计划、权衡与风险，而非根因。">
+  <section class="wrap" style="padding-top:64px">
+    <a class="demo-back" href="/">◂ Latent · 潜</a>
+    <div class="kicker">应用 Demo · 规划 / 决策</div>
+    <h2>架构规划 — 多区域高可用迁移</h2>
+    <p>
+      规划不是找根因，而是<strong>在约束下选定一条行动路线</strong>。同一套语言里，主舞台变成 <span class="mono" style="color:var(--grounded)">decision</span> / <span class="mono">plan</span> / <span class="mono">tradeoff</span> / <span class="mono">risk</span> 角色——而 Grounding Contract 不变：一个决策占据主舞台，也必须 grounded（挂在准则/压测上）、或标为 tentative（带“什么会改变这个选择”）、或留作 open。
+    </p>
+    <DemoFrame data={data} mode="scenario" stepped client:load />
+  </section>
+</Base>
