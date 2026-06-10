@@ -34,6 +34,10 @@ export { Scenario } from "./components/scenario.tsx";
 export { useLang, getLang, useStrings, STRINGS, LANG_EVENT } from "./i18n.ts";
 export type { Lang, Strings } from "./i18n.ts";
 
+// Live playback — latent is a process, not a one-shot output.
+export { useLatentClock, LiveControls } from "./live.tsx";
+export type { LatentClock } from "./live.tsx";
+
 // Re-export the schema types for convenience.
 export type {
   CognitiveState,

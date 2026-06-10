@@ -12,6 +12,7 @@ export default function StagePanel({
   headingZh,
   actions,
   actionsZh,
+  live = true,
 }: {
   data: unknown;
   dataZh?: unknown;
@@ -19,6 +20,8 @@ export default function StagePanel({
   headingZh?: string;
   actions?: InterventionAction[];
   actionsZh?: InterventionAction[];
+  /** play the understanding forming (latent is a process) */
+  live?: boolean;
 }) {
   const zh = useLang() === "zh";
   const active = zh && dataZh ? dataZh : data;
@@ -28,5 +31,5 @@ export default function StagePanel({
   if (!parsed.success) {
     return <div className="contract-error">✗ invalid CognitiveState</div>;
   }
-  return <UnderstandingPanel state={parsed.data} heading={head ?? null} actions={acts} />;
+  return <UnderstandingPanel state={parsed.data} heading={head ?? null} actions={acts} live={live} />;
 }

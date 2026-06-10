@@ -80,13 +80,22 @@ export function PlainView({
   state,
   actions,
   showProblem = true,
+  visibleNodeIds,
+  showOutcome = true,
+  forming = false,
 }: {
   state: CognitiveState;
   actions?: InterventionAction[];
   showProblem?: boolean;
+  /** live playback: restrict to the nodes revealed so far */
+  visibleNodeIds?: string[];
+  /** live playback: hide the answer until it settles */
+  showOutcome?: boolean;
+  /** live playback: show a "still forming" placeholder where the answer will land */
+  forming?: boolean;
 }) {
   const t = useStrings();
-  const nodes = state.nodes;
+  const nodes = visibleNodeIds ? state.nodes.filter((n) => visibleNodeIds.includes(n.id)) : state.nodes;
   const reasons = nodes.filter((n): n is GroundedClaim => n.state === "grounded");
   const uncertain = nodes.filter((n): n is Hypothesis => n.state === "hypothesis");
   const needs = nodes.filter((n) => n.state === "open");
@@ -114,7 +123,7 @@ export function PlainView({
         </div>
       )}
 
-      {state.outcome && (
+      {state.outcome && showOutcome && (
         <div className="p-sec p-answer-sec">
           <div className="p-label">
             {t.plain.judgement} <Certainty word={answerCert.word} tone={answerCert.tone} />
@@ -126,6 +135,12 @@ export function PlainView({
               {state.outcome.recommendation}
             </div>
           )}
+        </div>
+      )}
+      {state.outcome && !showOutcome && forming && (
+        <div className="p-sec p-answer-sec">
+          <div className="p-label">{t.plain.judgement}</div>
+          <div className="p-forming">{t.live.formingAnswer}</div>
         </div>
       )}
 

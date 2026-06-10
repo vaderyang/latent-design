@@ -139,6 +139,16 @@ const en = {
     mid: "Mid latent · multi-step synthesis — 2–3 grounded claims + 1 open",
     high: "High latent · diagnosis / research — full hypothesis board + inflections + sinks + provenance",
   },
+  // ---- live playback (latent is a process) ----
+  live: {
+    forming: "forming…",
+    formingAnswer: "still forming — don't trust me yet…",
+    settled: "settled",
+    pause: "pause",
+    play: "play",
+    replay: "replay",
+    skip: "skip to end",
+  },
 };
 
 export type Strings = typeof en;
@@ -231,6 +241,15 @@ const zh: Strings = {
     low: "Low latent · 直接任务 — 理解态退化为一行 grounded 结论 + provenance",
     mid: "Mid latent · 多步综合 — 2–3 个 grounded 论点 + 1 个 open",
     high: "High latent · 诊断/研究 — 完整假设板 + 拐点 + 沉降 + 溯源",
+  },
+  live: {
+    forming: "形成中…",
+    formingAnswer: "正在判断，先别急着信我…",
+    settled: "已凝定",
+    pause: "暂停",
+    play: "播放",
+    replay: "重放",
+    skip: "跳到结尾",
   },
 };
 

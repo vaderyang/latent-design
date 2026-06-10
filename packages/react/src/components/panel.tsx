@@ -7,6 +7,7 @@ import { InterventionRail } from "./activity.tsx";
 import type { InterventionAction } from "./activity.tsx";
 import { PlainView } from "./plainview.tsx";
 import { useStrings } from "../i18n.ts";
+import { useLatentClock, LiveControls } from "../live.tsx";
 
 export function OutcomeBanner({ outcome }: { outcome: NonNullable<CognitiveState["outcome"]> }) {
   const t = useStrings();
@@ -34,6 +35,7 @@ export function UnderstandingPanel({
   intervene = true,
   heading = null,
   showProblem = true,
+  live = false,
 }: {
   state: CognitiveState;
   actions?: InterventionAction[];
@@ -42,13 +44,30 @@ export function UnderstandingPanel({
   intervene?: boolean;
   heading?: string | null;
   showProblem?: boolean;
+  /** play the understanding forming (requires state.steps) */
+  live?: boolean;
 }) {
   const t = useStrings();
+  const clockState = useLatentClock(state, live && variant === "plain");
+  const playingLive = live && variant === "plain" && (state.steps?.length ?? 0) > 0;
+  const { done, visibleNodeIds, stepIdx } = clockState;
   return (
-    <div className="upanel">
-      {heading && <div className="upanel-head">① {heading}</div>}
+    <div className="upanel" ref={clockState.ref}>
+      {(heading || playingLive) && (
+        <div className="upanel-head" style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center" }}>
+          <span>{heading ? `① ${heading}` : ""}</span>
+          {playingLive && <LiveControls clockState={clockState} label={state.steps?.[stepIdx]?.label} />}
+        </div>
+      )}
       {variant === "plain" ? (
-        <PlainView state={state} actions={intervene ? actions : undefined} showProblem={showProblem} />
+        <PlainView
+          state={state}
+          actions={intervene && (!playingLive || done) ? actions : undefined}
+          showProblem={showProblem}
+          visibleNodeIds={playingLive ? visibleNodeIds : undefined}
+          showOutcome={!playingLive || done}
+          forming={playingLive && !done}
+        />
       ) : (
         <>
           {outcomeFirst && state.outcome && <OutcomeBanner outcome={state.outcome} />}

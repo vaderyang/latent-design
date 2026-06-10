@@ -6,9 +6,10 @@
  *     provenance) for power users who want the machinery.
  *   • Developer — the raw tool-call trace for builders / audit.
  *
- *  Default is Plain because the earlier board was counter-intuitive and heavy
- *  for the target user. The agent advances on its own; the user reads +
- *  intervenes. Chrome strings are bilingual via the i18n dictionary. */
+ *  LATENT IS A PROCESS: when the state carries `steps`, the surface plays the
+ *  understanding FORMING — nodes surface phase by phase, the answer holds a
+ *  "still forming" slot until it settles, tool calls stream into the rail.
+ *  Playback starts in view; ⏸/↻/⏭ in the bar; reduced-motion lands settled. */
 import { useState } from "react";
 import type { CognitiveState } from "@latent/schema";
 import { UnderstandingSurface } from "./surface.tsx";
@@ -18,6 +19,7 @@ import { OutcomeBanner } from "./panel.tsx";
 import { PlainView } from "./plainview.tsx";
 import { useStrings } from "../i18n.ts";
 import type { Strings } from "../i18n.ts";
+import { useLatentClock, LiveControls } from "../live.tsx";
 
 type View = "plain" | "detail" | "dev";
 
@@ -85,7 +87,7 @@ export function Scenario({
   traceNote,
 }: {
   state: CognitiveState;
-  /** in Detail mode, offer a replay of how the understanding formed */
+  /** play the formation of the understanding (requires state.steps) */
   stepped?: boolean;
   actions?: InterventionAction[];
   traceNote?: string;
@@ -93,20 +95,16 @@ export function Scenario({
   const t = useStrings();
   const acts = actions ?? defaultActions(t);
   const trace = traceNote ?? t.scenario.traceNote;
-  const steps = state.steps ?? [];
-  const canReplay = stepped && steps.length > 0;
   const [view, setView] = useState<View>("plain");
-  const [replaying, setReplaying] = useState(false);
-  const [cur, setCur] = useState(1);
 
-  const max = steps.length;
-  const stepIdx = Math.min(Math.max(cur, 1), Math.max(max, 1)) - 1;
-  const activeStep = replaying ? steps[stepIdx] : undefined;
-  const atEnd = cur >= max;
-  const showOutcome = state.outcome && (!replaying || atEnd);
+  const clockState = useLatentClock(state, stepped);
+  const { done, stepIdx, visibleNodeIds, toolCallCount } = clockState;
+  const steps = state.steps ?? [];
+  const live = stepped && steps.length > 0;
+  const phaseLabel = steps[stepIdx]?.label;
 
   return (
-    <div className="scenario">
+    <div className="scenario" ref={clockState.ref}>
       <div className="sc-bar">
         <div className="inc">
           <div className="ttl">{state.task.title}</div>
@@ -114,20 +112,27 @@ export function Scenario({
             <div className="meta">{state.task.goal ?? state.task.context}</div>
           )}
         </div>
-        <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
+        <div style={{ display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
+          {live && <LiveControls clockState={clockState} label={phaseLabel} />}
           {state.task.status && <span className="sev">{state.task.status}</span>}
           <ViewToggle view={view} onChange={setView} />
         </div>
       </div>
 
-      {/* Plain — the plain-language default */}
+      {/* Plain — the plain-language default; the answer forms, then settles */}
       {view === "plain" && (
         <div className="sc-plain">
-          <PlainView state={state} actions={acts} />
+          <PlainView
+            state={state}
+            actions={done ? acts : undefined}
+            visibleNodeIds={visibleNodeIds}
+            showOutcome={done}
+            forming={live && !done}
+          />
         </div>
       )}
 
-      {/* Detail — the epistemic board */}
+      {/* Detail — the epistemic board, surfacing phase by phase */}
       {view === "detail" && (
         <>
           {state.userStory && <UserStory story={state.userStory} />}
@@ -135,34 +140,22 @@ export function Scenario({
             <div className="sc-understanding">
               <div className="ulabel">
                 <span>{t.scenario.understandingLabel}</span>
-                {replaying && <span style={{ color: "var(--ink-500)" }}>{t.scenario.replayCount(cur, max)}</span>}
+                {live && !done && steps[stepIdx]?.hint && (
+                  <span className="uhint">{steps[stepIdx]?.hint}</span>
+                )}
               </div>
-              {showOutcome && !replaying && <OutcomeBanner outcome={state.outcome!} />}
-              <div key={replaying ? cur : "final"} className={replaying ? "step-in" : undefined}>
-                <UnderstandingSurface state={state} visibleNodeIds={activeStep?.visibleNodeIds} />
-              </div>
-              {showOutcome && replaying && <OutcomeBanner outcome={state.outcome!} />}
-              {canReplay && !replaying && (
-                <div className="replay-cta">
-                  <button onClick={() => { setCur(1); setReplaying(true); }}>{t.scenario.replayCta}</button>
-                  <span className="replay-note">{t.scenario.replayNote}</span>
-                </div>
-              )}
-              {replaying && (
-                <div className="step-ctl">
-                  <button onClick={() => setCur((c) => Math.max(1, c - 1))} disabled={cur === 1}>{t.scenario.prev}</button>
-                  <button onClick={() => setCur((c) => Math.min(max, c + 1))} disabled={cur === max}>{t.scenario.next}</button>
-                  <button onClick={() => setReplaying(false)} title={t.scenario.seeFullTitle}>{t.scenario.seeFull}</button>
-                  <span className="prog">{cur} / {max}</span>
-                  <span className="hint">{activeStep?.hint}</span>
-                </div>
-              )}
+              {done && state.outcome && <OutcomeBanner outcome={state.outcome} />}
+              <UnderstandingSurface state={state} visibleNodeIds={visibleNodeIds} />
             </div>
             <div className="sc-rail">
               <div className="rlabel">{t.scenario.activityLabel}</div>
-              <ActivityMini toolCalls={state.toolCalls} />
-              <div className="rsub">{t.scenario.youCanDoShort}</div>
-              <InterventionRail actions={acts} />
+              <ActivityMini toolCalls={state.toolCalls.slice(0, toolCallCount)} />
+              {done && (
+                <>
+                  <div className="rsub">{t.scenario.youCanDoShort}</div>
+                  <InterventionRail actions={acts} />
+                </>
+              )}
             </div>
           </div>
         </>
