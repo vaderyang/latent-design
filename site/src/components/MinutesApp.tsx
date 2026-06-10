@@ -1,17 +1,22 @@
-/** 潛 Minutes — an AI-native meeting-minutes app, saturated in the design
- *  language. The agent's understanding of the meeting (decisions · verified
- *  figures · people · open items) is the lit Stage; the minutes document is
- *  the Artifact — and the document itself carries the epistemics: every
- *  highlighted span is pinned to a cognitive node. Click a span → the Stage
- *  switches to the board and pulses that node. All mock data; the Stage is
- *  driven by a validated CognitiveState instance (examples/minutes.json). */
+/** 潛 Minutes — an AI-native meeting-minutes app.
+ *
+ *  Hierarchy (corrected): the WORK PRODUCT — the minutes document — is the
+ *  stage. The agent's understanding stands in the margin: a slim, quiet
+ *  support rail of compact items (what needs you, what was corrected, what was
+ *  verified), each expandable in place. The full epistemic reading lives one
+ *  tap away in a drawer — weakened, never hidden.
+ *
+ *  The document still carries the epistemics inline (highlights pinned to
+ *  cognitive nodes); clicking a highlight expands + pulses the matching rail
+ *  item — a proportionate response, not a stage takeover. All mock data; the
+ *  agent layer is driven by a validated CognitiveState (examples/minutes.json). */
 import { useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { CognitiveState } from "@latent/schema";
-import { PlainView, CognitiveNodeView, OutcomeBanner, InterventionRail, orderNodes, useLang } from "@latent/react";
+import { PlainView, useLang } from "@latent/react";
 import type { InterventionAction } from "@latent/react";
-import { Badge, Tag, Avatar, Table, Button, Segmented, Toaster, useToast, StateDot, Mono } from "@latent/react/kit";
-import type { Column } from "@latent/react/kit";
+import { Avatar, Table, Button, Drawer, Disclosure, Toaster, useToast, StateDot, Mono } from "@latent/react/kit";
+import type { Column, Tone } from "@latent/react/kit";
 import dataEn from "@examples/minutes.json";
 import dataZh from "@examples/minutes.zh.json";
 
@@ -20,9 +25,6 @@ interface Person {
   name: string;
   role: string;
   roleZh: string;
-  state?: "hypothesis";
-  note?: string;
-  noteZh?: string;
 }
 const ATTENDEES: Person[] = [
   { name: "Sarah Chen", role: "CEO", roleZh: "CEO" },
@@ -32,14 +34,6 @@ const ATTENDEES: Person[] = [
   { name: "Tom Garcia", role: "Sales", roleZh: "销售" },
   { name: "You", role: "Chief of Staff", roleZh: "幕僚长" },
 ];
-const MENTIONED: Person = {
-  name: "Zhang Wei",
-  role: "CFO office · mentioned",
-  roleZh: "CFO 办公室 · 被提及",
-  state: "hypothesis",
-  note: "identity 0.62 · confirm",
-  noteZh: "身份 0.62 · 待确认",
-};
 
 /* ------------------------------------------------------ mock action items */
 interface ActionRow {
@@ -59,8 +53,40 @@ const ACTIONS: ActionRow[] = [
   { id: 6, item: "Customer council invites", itemZh: "客户委员会邀请", owner: "Tom Garcia", due: "Jul 01" },
 ];
 
-/* ---------------------------------------------------------------- doc marks */
 type MarkTone = "g" | "h" | "o" | "i" | "r";
+
+/* a compact, quiet support-rail item — the agent in the margin */
+function RailItem({
+  tone,
+  title,
+  meta,
+  children,
+  open,
+  onToggle,
+  pulse,
+  itemRef,
+}: {
+  tone: Tone;
+  title: ReactNode;
+  meta?: ReactNode;
+  children?: ReactNode;
+  open: boolean;
+  onToggle: () => void;
+  pulse?: string;
+  itemRef?: (el: HTMLDivElement | null) => void;
+}) {
+  return (
+    <div className={`rail-item${open ? " open" : ""}${pulse ? ` ${pulse}` : ""}`} ref={itemRef}>
+      <button type="button" className="rail-head" onClick={onToggle} aria-expanded={open}>
+        <StateDot state={tone} size="sm" />
+        <span className="rail-title">{title}</span>
+        {meta && <span className="rail-meta">{meta}</span>}
+        <span className="rail-chev">{open ? "▾" : "▸"}</span>
+      </button>
+      {open && children && <div className="rail-body">{children}</div>}
+    </div>
+  );
+}
 
 function App() {
   const zh = useLang() === "zh";
@@ -70,40 +96,41 @@ function App() {
   const parsed = CognitiveState.safeParse(zh ? dataZh : dataEn);
   if (!parsed.success) return <div className="contract-error">✗ invalid CognitiveState</div>;
   const state = parsed.data;
+  const node = (id: string) => state.nodes.find((n) => n.id === id);
 
-  const [view, setView] = useState<"plain" | "board">("plain");
+  const [open, setOpen] = useState<string>("n:who"); // one rail item expanded
   const [pulse, setPulse] = useState<{ id: string; n: number }>({ id: "", n: 0 });
-  const [replay, setReplay] = useState(0); // 0 = off, 1..steps = step
-  const stageRef = useRef<HTMLDivElement>(null);
+  const [drawer, setDrawer] = useState(false);
+  const itemRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  const steps = state.steps ?? [];
-  const stepActive = replay > 0 ? steps[replay - 1] : undefined;
-  const visible = stepActive ? state.nodes.filter((n) => stepActive.visibleNodeIds?.includes(n.id)) : state.nodes;
-
-  /** click a doc span → board view + pulse + scroll the node card */
+  /** click a doc highlight → expand + pulse the matching rail item (proportionate) */
   const focusNode = (id: string) => {
-    setView("board");
-    setReplay(0);
+    setOpen(id);
     setPulse((p) => ({ id, n: p.n + 1 }));
-    requestAnimationFrame(() => {
-      stageRef.current?.querySelector(`[data-node="${CSS.escape(id)}"]`)?.scrollIntoView({ behavior: "smooth", block: "center" });
-    });
+    requestAnimationFrame(() => itemRefs.current[id]?.scrollIntoView({ behavior: "smooth", block: "nearest" }));
   };
+  const toggle = (id: string) => setOpen((o) => (o === id ? "" : id));
+  const pulseCls = (id: string) => (pulse.id === id ? `pulse-${pulse.n % 2}` : undefined);
 
   const Mk = ({ id, tone, children }: { id: string; tone: MarkTone; children: ReactNode }) => (
-    <span
-      className={`mk mk-${tone}`}
-      title={t("pinned to the agent's understanding — click to inspect", "钉在 agent 的理解上——点击查看")}
-      onClick={() => focusNode(id)}
-    >
+    <span className={`mk mk-${tone}`} title={t("the agent stands behind this — click for its note", "这句话背后有 agent 的注记——点击查看")} onClick={() => focusNode(id)}>
       {children}
     </span>
   );
 
-  const actions: InterventionAction[] = [
-    { label: t("Approve & distribute", "批准并分发"), variant: "primary", onAct: () => toast({ title: t("Minutes distributed", "纪要已分发"), body: t("Sent to 6 attendees · audit trail attached", "已发送给 6 位与会者 · 附审计链"), tone: "grounded" }) },
-    { label: t("Confirm Zhang Wei", "确认张唯身份"), onAct: () => toast({ title: t("Identity confirmed", "身份已确认"), body: t("“Wei” → Zhang Wei (CFO office) · hypothesis promoted", "“Wei”→ 张唯（CFO 办公室）· 假设已提升"), tone: "grounded" }) },
-    { label: t("Challenge an item", "对某条提出异议"), onAct: () => toast({ title: t("Challenge noted", "异议已记录"), body: t("Pick the span in the minutes to dispute it", "在纪要中点选要质疑的句子"), tone: "inflection" }) },
+  const approve = () =>
+    toast({ title: t("Minutes distributed", "纪要已分发"), body: t("Sent to 6 attendees · audit trail attached", "已发送给 6 位与会者 · 附审计链"), tone: "grounded" });
+  const confirmWei = () =>
+    toast({ title: t("Identity confirmed", "身份已确认"), body: t("“Wei” → Zhang Wei (CFO office) · note resolved", "“Wei”→ 张唯（CFO 办公室）· 注记已消解"), tone: "grounded" });
+  const askCfo = () =>
+    toast({ title: t("Sent to CFO office", "已发送 CFO 办公室"), body: t("Asked to confirm the $120k Q3 budget", "请其确认 Q3 的 $120k 预算"), tone: "hypothesis" });
+  const reexec = () =>
+    toast({ title: t("Re-ran the check", "已重跑验证"), body: "kpi.q2_retention = 0.942 ✓", tone: "grounded" });
+
+  const drawerActions: InterventionAction[] = [
+    { label: t("Approve & distribute", "批准并分发"), variant: "primary", onAct: approve },
+    { label: t("Confirm Zhang Wei", "确认张唯身份"), onAct: confirmWei },
+    { label: t("Ask CFO office", "询问 CFO 办公室"), onAct: askCfo },
   ];
 
   const actionCols: Column<ActionRow>[] = [
@@ -125,6 +152,13 @@ function App() {
     { key: "due", header: "due", mono: true, width: 70, render: (r) => r.due },
   ];
 
+  const who = node("n:who");
+  const budget = node("n:budget");
+  const tamFix = node("n:tam-fix");
+  const dec = node("n:dec1");
+  const metric = node("n:metric");
+  const acts = node("n:acts");
+
   return (
     <div className="app-frame app-minutes">
       {/* ---- top chrome ---- */}
@@ -136,7 +170,7 @@ function App() {
         <div className="tcrumb">2026-06-10 · 10:00–10:52 · {t("6 attendees · recorded", "6 位与会者 · 有录音")}</div>
         <div className="tright">
           <span className="status-pill">{t("Ready · 2 confirmations pending", "就绪 · 2 项待确认")}</span>
-          <Button size="sm" variant="primary" onClick={actions[0]!.onAct}>{t("Approve", "批准")}</Button>
+          <Button size="sm" variant="primary" onClick={approve}>{t("Approve", "批准")}</Button>
         </div>
       </div>
 
@@ -152,16 +186,13 @@ function App() {
         <div className="app-tree-row">{t("  Q2 retro", "  Q2 复盘")}</div>
       </div>
 
-      {/* ---- ② Artifact — THE MINUTES DOCUMENT (epistemics inline) ---- */}
-      <div className="zone zone-artifact">
-        <div className="zone-head">
-          ② Artifact · {t("Minutes", "纪要")} <span className="zn">{t("every highlight is pinned to the agent's understanding — click one", "每处高亮都钉在 agent 的理解上——点一下试试")}</span>
-        </div>
+      {/* ---- ① THE MINUTES — the work product IS the stage ---- */}
+      <div className="zone zone-doc">
         <div className="doc">
           <div className="doc-title">{t("Minutes — Q3 Roadmap Review", "会议纪要 — Q3 路线图评审")}</div>
           <div className="doc-meta">2026-06-10 · 10:00–10:52 · {t("recorded & diarized", "已录音并分轨")}</div>
 
-          {/* people strip */}
+          {/* attendees */}
           <div className="people">
             {ATTENDEES.map((p) => (
               <span className="person" key={p.name}>
@@ -170,20 +201,6 @@ function App() {
                 <span className="prole">{zh ? p.roleZh : p.role}</span>
               </span>
             ))}
-            <span className="person hypo" onClick={() => focusNode("n:who")}>
-              <Avatar name={MENTIONED.name} size="sm" tone="hypothesis" />
-              <span className="pname">{MENTIONED.name}</span>
-              <span className="prole">{zh ? MENTIONED.roleZh : MENTIONED.role} · {zh ? MENTIONED.noteZh : MENTIONED.note}</span>
-            </span>
-          </div>
-
-          {/* legend */}
-          <div className="legend">
-            <span><StateDot state="grounded" size="sm" /> {t("anchored", "已锚定")}</span>
-            <span><StateDot state="hypothesis" size="sm" /> {t("held with uncertainty", "不确定持有")}</span>
-            <span><StateDot state="open" size="sm" /> {t("needs you", "需要你定")}</span>
-            <span><StateDot state="inflection" size="sm" /> {t("corrected", "已更正")}</span>
-            <span><StateDot state="refuted" size="sm" /> {t("as spoken, retracted", "口述原文，已撤回")}</span>
           </div>
 
           <div className="doc-h">{t("1 · Decisions", "1 · 决策")}</div>
@@ -207,83 +224,145 @@ function App() {
           <div className="doc-h" onClick={() => focusNode("n:acts")} style={{ cursor: "pointer" }}>
             {t("3 · Action items", "3 · 行动项")} <span className="doc-h-sub">{t("6 extracted · 1 unowned", "提取 6 条 · 1 条无人认领")}</span>
           </div>
-          <Table columns={actionCols} rows={ACTIONS} rowKey={(r) => r.id} dense />
+          <Table columns={actionCols} rows={ACTIONS} rowKey={(r) => r.id} />
           <p className="doc-foot">
             {t("Item #3 is ", "第 3 条")}
             <Mk id="n:budget" tone="o">{t("gated by a budget sign-off that was referenced but never confirmed in-meeting", "卡在一笔会上提及但从未确认的预算审批上")}</Mk>
             {t("; its owner hinges on ", "；其 owner 取决于")}
-            <Mk id="n:who" tone="h">{t("whether “Wei” is Zhang Wei of the CFO office (0.62)", "“Wei”是否为 CFO 办公室的张唯（0.62）")}</Mk>
+            <Mk id="n:who" tone="h">{t("whether “Wei” is Zhang Wei of the CFO office", "“Wei”是否为 CFO 办公室的张唯")}</Mk>
             {t(".", "。")}
           </p>
-        </div>
-      </div>
 
-      {/* ---- · Activity — processing stream (peripheral) ---- */}
-      <div className="zone zone-activity">
-        <div className="zone-head">· Activity · {t("processing (peripheral · auditable)", "处理流（外围 · 可审计）")}</div>
-        {state.toolCalls.map((c) => (
-          <div className="app-row" key={c.id}>
-            <span className="dot"></span>
-            <Mono style={{ color: "var(--ink-500)", width: 44, flex: "none" }}>{c.ts}</Mono>
-            {c.fn} · {c.summary}
+          <div className="legend">
+            <span><StateDot state="grounded" size="sm" /> {t("anchored", "已锚定")}</span>
+            <span><StateDot state="hypothesis" size="sm" /> {t("held with uncertainty", "不确定持有")}</span>
+            <span><StateDot state="open" size="sm" /> {t("needs you", "需要你定")}</span>
+            <span><StateDot state="inflection" size="sm" /> {t("corrected", "已更正")}</span>
+            <span><StateDot state="refuted" size="sm" /> {t("as spoken, retracted", "口述原文，已撤回")}</span>
           </div>
-        ))}
+        </div>
       </div>
 
-      {/* ---- ① Stage — the agent's understanding (lit primary) ---- */}
-      <div className="zone zone-stage" ref={stageRef}>
-        <div className="zone-head" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
-          <span>① Stage · {t("the agent's understanding", "agent 的理解")}</span>
-          <Segmented
-            value={view}
-            onChange={(v) => { setView(v); setReplay(0); }}
-            options={[
-              { value: "plain", label: t("Plain", "简明") },
-              { value: "board", label: t("Board", "详细") },
-            ]}
-          />
+      {/* ---- · Agent — the supporting margin (slim, quiet, expandable) ---- */}
+      <div className="zone zone-agent">
+        <div className="zone-head">· {t("Agent · in support", "Agent · 支持")}</div>
+        <div className="rail-sum">
+          {t("3 decisions · 6 actions · figures checked, 1 corrected", "3 项决策 · 6 条行动 · 数字核查完毕，1 处更正")}
         </div>
 
-        {view === "plain" ? (
-          <>
-            <PlainView state={state} actions={actions} />
-          </>
-        ) : (
-          <>
-            {replay === 0 && state.outcome && <OutcomeBanner outcome={state.outcome} />}
-            {replay > 0 && (
-              <div className="replay-bar">
-                <Mono style={{ fontSize: 10.5, color: "var(--hypo)" }}>
-                  {t("Replay", "回放")} {replay}/{steps.length} · {stepActive?.label}
-                </Mono>
-                <span className="replay-hint">{stepActive?.hint}</span>
-              </div>
-            )}
-            <div className="board" key={replay}>
-              {orderNodes(visible).map((n) => (
-                <div key={n.id} data-node={n.id} className={pulse.id === n.id ? `pulse-${pulse.n % 2}` : undefined}>
-                  <CognitiveNodeView node={n} />
-                </div>
-              ))}
+        <div className="rail-group">{t("Needs you", "需要你定")} · 2</div>
+        {who && who.state === "hypothesis" && (
+          <RailItem
+            tone="hypothesis"
+            title={t("Is “Wei” Zhang Wei (CFO office)?", "“Wei”是张唯（CFO 办公室）吗？")}
+            meta="0.62"
+            open={open === "n:who"}
+            onToggle={() => toggle("n:who")}
+            pulse={pulseCls("n:who")}
+            itemRef={(el) => (itemRefs.current["n:who"] = el)}
+          >
+            <div className="rail-why">{who.falsification}</div>
+            <div className="rail-acts">
+              <Button size="sm" onClick={confirmWei}>{t("It's Zhang Wei", "是张唯")}</Button>
+              <Button size="sm" variant="ghost" onClick={() => toast({ title: t("Flipped", "已反转"), body: t("Owner reassigned to Wei Lin (Design)", "owner 改为林薇（设计部）"), tone: "inflection" })}>
+                {t("It's Wei Lin", "是林薇")}
+              </Button>
             </div>
-            <div className="step-ctl" style={{ borderTop: "1px solid var(--line)" }}>
-              {replay === 0 ? (
-                <button onClick={() => setReplay(1)}>{t("▸ Replay: watch this understanding form", "▸ 回放：看这份理解如何形成")}</button>
-              ) : (
-                <>
-                  <button onClick={() => setReplay((r) => Math.max(1, r - 1))} disabled={replay === 1}>{t("◂ Prev", "◂ 上一步")}</button>
-                  <button onClick={() => setReplay((r) => Math.min(steps.length, r + 1))} disabled={replay === steps.length}>{t("Next ▸", "下一步 ▸")}</button>
-                  <button onClick={() => setReplay(0)}>{t("↺ Full result", "↺ 完整结果")}</button>
-                </>
-              )}
-            </div>
-            <div style={{ marginTop: 14 }}>
-              <div className="rsub">{t("③ What you can do", "③ 你可以做什么")}</div>
-              <InterventionRail actions={actions} column={false} />
-            </div>
-          </>
+          </RailItem>
         )}
+        {budget && budget.state === "open" && (
+          <RailItem
+            tone="open"
+            title={t("Budget sign-off unconfirmed", "预算审批未确认")}
+            open={open === "n:budget"}
+            onToggle={() => toggle("n:budget")}
+            pulse={pulseCls("n:budget")}
+            itemRef={(el) => (itemRefs.current["n:budget"] = el)}
+          >
+            <div className="rail-why">{budget.needs}</div>
+            <div className="rail-acts">
+              <Button size="sm" onClick={askCfo}>{t("Ask CFO office", "询问 CFO 办公室")}</Button>
+            </div>
+          </RailItem>
+        )}
+
+        <div className="rail-group">{t("Corrected", "已更正")} · 1</div>
+        {tamFix && tamFix.state === "inflection" && (
+          <RailItem
+            tone="inflection"
+            title={t("TAM $4.2B → $3.1B", "TAM $4.2B → $3.1B")}
+            open={open === "n:tam-fix" || open === "n:tam-old"}
+            onToggle={() => toggle("n:tam-fix")}
+            pulse={pulseCls("n:tam-fix") ?? pulseCls("n:tam-old")}
+            itemRef={(el) => { itemRefs.current["n:tam-fix"] = el; itemRefs.current["n:tam-old"] = el; }}
+          >
+            <div className="rail-why">{tamFix.rationale}</div>
+            <div className="rail-fine">{t("The spoken figure is kept, sunk, for audit.", "口述原文已沉降保留，可供审计。")}</div>
+          </RailItem>
+        )}
+
+        <div className="rail-group">{t("Standing behind", "已核实")} · 3</div>
+        {dec && dec.state === "grounded" && (
+          <RailItem
+            tone="grounded"
+            title={t("Ship decision — on record", "上线决策——有录音在案")}
+            open={open === "n:dec1"}
+            onToggle={() => toggle("n:dec1")}
+            pulse={pulseCls("n:dec1")}
+            itemRef={(el) => (itemRefs.current["n:dec1"] = el)}
+          >
+            {dec.evidence.map((e) => (
+              <div className="rail-ev" key={e.id}>◆ {e.label}</div>
+            ))}
+          </RailItem>
+        )}
+        {metric && metric.state === "grounded" && (
+          <RailItem
+            tone="grounded"
+            title={t("Retention 94.2% — re-runnable", "留存 94.2%——可重跑")}
+            open={open === "n:metric"}
+            onToggle={() => toggle("n:metric")}
+            pulse={pulseCls("n:metric")}
+            itemRef={(el) => (itemRefs.current["n:metric"] = el)}
+          >
+            <div className="rail-cmd">{metric.provenance.reExecCmd}</div>
+            <div className="rail-acts">
+              <Button size="sm" onClick={reexec}>{t("Re-run check", "重跑验证")}</Button>
+            </div>
+          </RailItem>
+        )}
+        {acts && acts.state === "grounded" && (
+          <RailItem
+            tone="grounded"
+            title={t("6 actions extracted · #4 unowned", "提取 6 条行动 · #4 无人认领")}
+            open={open === "n:acts"}
+            onToggle={() => toggle("n:acts")}
+            pulse={pulseCls("n:acts")}
+            itemRef={(el) => (itemRefs.current["n:acts"] = el)}
+          >
+            <div className="rail-why">{acts.provenance.steps[0]?.observed}</div>
+          </RailItem>
+        )}
+
+        <div className="rail-foot">
+          <button type="button" className="rail-full" onClick={() => setDrawer(true)}>
+            {t("Full understanding ▸", "完整理解 ▸")}
+          </button>
+          <Disclosure summary={t("6 tool calls · 1:36", "6 次工具调用 · 1:36")} openSummary={t("collapse", "收起")}>
+            {state.toolCalls.map((c) => (
+              <div className="rail-tc" key={c.id}>
+                <Mono style={{ color: "var(--ink-600)", width: 40, flex: "none" }}>{c.ts}</Mono>
+                <span>{c.fn} · {c.summary}</span>
+              </div>
+            ))}
+          </Disclosure>
+        </div>
       </div>
+
+      {/* ---- the full epistemic reading — one tap away, never gone ---- */}
+      <Drawer open={drawer} onClose={() => setDrawer(false)} title={t("The agent's full understanding", "agent 的完整理解")}>
+        <PlainView state={state} actions={drawerActions} showProblem={false} />
+      </Drawer>
     </div>
   );
 }

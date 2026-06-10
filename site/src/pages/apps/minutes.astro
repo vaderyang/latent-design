@@ -7,17 +7,19 @@ import "@latent/react/kit.css";
 
 <Base
   title="潛 Minutes · AI-native meeting minutes (applied layer)"
-  description="The design language saturating a meeting-minutes app: the document itself carries the epistemics — every figure verified or corrected, every person identified or honestly held as a hypothesis."
+  description="The work product is the stage; the agent stands in the margin. Verified figures, corrected numbers and honest unknowns live inline in the minutes — with the agent's full understanding one tap away."
 >
   <div class="minutes-note wrap">
     <span data-i18n="en">
-      In most AI note-takers the result is a wall of confident prose. 潛 Minutes makes the <b>minutes document itself carry the epistemics</b>:
-      verified figures glow gold (re-runnable), a number spoken wrong in the meeting is struck through and corrected, an unconfirmed identity
-      stays visibly uncertain, and an unapproved budget is an honest open — <b>click any highlight</b> and the agent's understanding pulses on the Stage.
+      The hierarchy here: <b>the minutes — the user's work product — are the stage</b>, set in document-grade type. The agent is
+      <b>in support, not first class</b>: a slim margin rail of compact notes (what needs you, what was corrected, what it stands behind),
+      each expandable in place. The document still carries the epistemics inline — click any highlight and the matching margin note opens;
+      the agent's full reading is one tap away in a drawer. Weakened ≠ hidden.
     </span>
     <span data-i18n="zh">
-      多数 AI 纪要工具的产出是一面自信的文字墙。潛 Minutes 让<b>纪要文档本身携带认识论状态</b>：
-      核实过的数字泛金光（可重跑）、会上说错的数字被划掉并更正、未确认的身份保持可见的不确定、未批的预算是诚实的未决——<b>点击任意高亮</b>，agent 的理解会在 Stage 区脉冲定位。
+      这里的层级：<b>纪要——用户的工作产物——才是舞台</b>，用文档级排版呈现。agent 是<b>支持角色，不是头等舱</b>：
+      右侧一条纤细的页边支持栏，放紧凑注记（需要你定什么、更正了什么、它为哪些话背书），逐条原地展开。
+      文档仍然内联携带认识论状态——点击任意高亮，对应的页边注记展开；agent 的完整理解收在一个抽屉里，一步可达。弱化 ≠ 隐藏。
     </span>
   </div>
   <MinutesApp client:load />
@@ -27,73 +29,99 @@ import "@latent/react/kit.css";
     .minutes-note{font-size:12.5px;line-height:1.65;color:var(--ink-300);padding-top:64px;padding-bottom:14px;max-width:980px}
     .minutes-note b{color:var(--hypo)}
 
-    /* ---- app grid ---- */
+    /* ---- app grid: meetings | THE DOCUMENT | agent margin ---- */
     .app-minutes{
-      grid-template-columns:184px minmax(0,1fr) minmax(390px,442px);
-      grid-template-rows:46px minmax(0,1fr) 148px;
-      grid-template-areas:"top top top" "ctx art stage" "ctx act stage";
+      grid-template-columns:172px minmax(0,1fr) 308px;
+      grid-template-rows:46px minmax(0,1fr);
+      grid-template-areas:"top top top" "ctx art rail";
       height:calc(100vh - 110px);min-height:680px;
     }
     .app-minutes .mk-brand{font-family:var(--mono);font-size:10.5px;color:var(--hypo);border:1px solid var(--hypo-line);border-radius:6px;padding:2px 7px}
     .app-minutes .status-pill{font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--grounded);border:1px solid var(--grounded-line);background:var(--grounded-dim);padding:4px 10px;border-radius:20px;white-space:nowrap}
-    .app-minutes .app-topbar .tright{padding-right:12px;}
+    .app-minutes .app-topbar .tright{padding-right:12px}
 
-    /* ---- the minutes document ---- */
-    .doc{padding:10px 26px 30px;max-width:760px;font-family:var(--ui);font-size:13.5px;color:var(--ink-200);line-height:1.75}
-    .doc-title{font-family:var(--voice);font-size:22px;color:var(--ink-100);font-weight:380;margin-top:6px}
-    .doc-meta{font-family:var(--mono);font-size:10.5px;color:var(--ink-500);margin:4px 0 14px}
-    .doc-h{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-500);margin:22px 0 8px;border-top:1px solid var(--line);padding-top:14px}
+    /* ---- ① the document zone — the LIT plane now ---- */
+    .zone-doc{grid-area:art;overflow:auto;min-width:0;min-height:0;
+      background:linear-gradient(180deg,var(--d-700),var(--d-800))}
+    .doc{padding:34px 48px 48px;max-width:760px;margin:0 auto;font-family:var(--ui);
+      font-size:15.5px;color:var(--ink-100);line-height:1.85}
+    .doc-title{font-family:var(--voice);font-size:30px;color:var(--ink-100);font-weight:380;line-height:1.25}
+    .doc-meta{font-family:var(--mono);font-size:11px;color:var(--ink-500);margin:8px 0 18px}
+    .doc-h{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-500);
+      margin:30px 0 10px;border-top:1px solid var(--line);padding-top:18px}
     .doc-h-sub{color:var(--ink-600);letter-spacing:.04em;text-transform:none;margin-left:8px}
-    .doc p{margin:8px 0}
-    .doc-foot{font-size:12.5px;color:var(--ink-300)}
+    .doc p{margin:10px 0}
+    .doc-foot{font-size:14px;color:var(--ink-200)}
+    .doc .lk-table{font-size:14px}
+    .doc .lk-table td{padding:11px 12px}
 
-    /* epistemic inline marks — the document carries the language */
+    /* epistemic inline marks — the understanding embedded in the artifact */
     .mk{cursor:pointer;padding:1px 3px;margin:0 1px;border-radius:4px;border-bottom:2px solid;transition:.16s;text-decoration:none}
-    .mk-g{background:var(--grounded-dim);border-color:var(--grounded-line);color:var(--ink-100)}
+    .mk-g{background:var(--grounded-dim);border-color:var(--grounded-line)}
     .mk-g:hover{background:transparent;box-shadow:0 0 0 1px var(--grounded-line)}
-    .mk-h{background:var(--hypo-dim);border-color:var(--hypo-line);border-bottom-style:dotted;color:var(--ink-100)}
+    .mk-h{background:var(--hypo-dim);border-color:var(--hypo-line);border-bottom-style:dotted}
     .mk-h:hover{background:transparent;box-shadow:0 0 0 1px var(--hypo-line)}
-    .mk-o{background:var(--open-dim);border-color:var(--open-line);color:var(--ink-100)}
+    .mk-o{background:var(--open-dim);border-color:var(--open-line)}
     .mk-o:hover{background:transparent;box-shadow:0 0 0 1px var(--open-line)}
-    .mk-i{background:var(--inflect-dim);border-color:var(--inflect-line);color:var(--ink-100)}
+    .mk-i{background:var(--inflect-dim);border-color:var(--inflect-line)}
     .mk-i:hover{background:transparent;box-shadow:0 0 0 1px var(--inflect-line)}
-    .mk-r{background:none;border:none;color:var(--refuted);text-decoration:line-through;cursor:pointer}
+    .mk-r{background:none;border:none;color:var(--refuted);text-decoration:line-through}
     .mk-r:hover{color:var(--ink-300)}
 
-    /* legend */
+    /* legend — small, at the foot of the doc */
     .legend{display:flex;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:9.5px;letter-spacing:.05em;color:var(--ink-500);
-      border:1px dashed var(--line-2);border-radius:9px;padding:8px 12px;margin:6px 0 4px}
+      border-top:1px dashed var(--line-2);padding-top:14px;margin-top:30px}
     .legend span{display:inline-flex;gap:6px;align-items:center}
 
-    /* people strip */
-    .people{display:flex;gap:14px;flex-wrap:wrap;margin:10px 0 4px;padding:10px 12px;background:var(--d-850);border:1px solid var(--line);border-radius:11px}
+    /* attendees */
+    .people{display:flex;gap:16px;flex-wrap:wrap;margin:6px 0 4px}
     .person{display:inline-flex;gap:8px;align-items:center}
-    .person .pname{font-size:12px;color:var(--ink-200);white-space:nowrap}
+    .person .pname{font-size:13px;color:var(--ink-200);white-space:nowrap}
     .person .prole{font-family:var(--mono);font-size:9.5px;color:var(--ink-500);white-space:nowrap}
-    .person.hypo{cursor:pointer;border:1px dotted var(--hypo-line);border-radius:8px;padding:3px 8px;background:var(--hypo-dim)}
-    .person.hypo .prole{color:var(--hypo)}
 
     /* owner cells */
     .own{cursor:pointer;border-bottom:1px dotted;padding-bottom:1px}
     .own-h{color:var(--hypo);border-color:var(--hypo-line)}
     .own-o{color:var(--open);border-color:var(--open-line);font-style:italic}
 
-    /* stage board */
-    .app-minutes .zone-stage{padding:14px 16px}
-    .app-minutes .board{display:flex;flex-direction:column}
-    .app-minutes .plain{max-width:none}
-    .replay-bar{display:flex;flex-direction:column;gap:3px;margin-bottom:12px;padding:9px 12px;background:var(--hypo-dim);border-left:2px solid var(--hypo-line);border-radius:0 8px 8px 0}
-    .replay-bar .replay-hint{font-size:11.5px;color:var(--ink-300);font-style:italic;font-family:var(--voice)}
+    /* ---- · the agent margin — slim, quiet, supportive ---- */
+    .zone-agent{grid-area:rail;overflow:auto;min-width:0;min-height:0;padding:14px 14px 18px;
+      background:var(--d-900);border-left:1px solid var(--line);
+      font-family:var(--ui)}
+    .zone-agent .zone-head{padding:0 2px 8px}
+    .rail-sum{font-size:11.5px;color:var(--ink-400);line-height:1.55;padding:0 2px 10px;border-bottom:1px solid var(--line);margin-bottom:6px}
+    .rail-group{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-600);margin:14px 2px 6px}
+    .rail-item{border:1px solid transparent;border-radius:10px;transition:.16s}
+    .rail-item.open{background:var(--d-850);border-color:var(--line)}
+    .rail-head{display:flex;gap:8px;align-items:center;width:100%;text-align:left;background:none;border:none;cursor:pointer;
+      padding:7px 9px;border-radius:10px;color:var(--ink-300);font-family:var(--ui);font-size:12.5px;line-height:1.4}
+    .rail-head:hover{color:var(--ink-100)}
+    .rail-title{flex:1;min-width:0}
+    .rail-meta{font-family:var(--mono);font-size:10px;color:var(--ink-600);flex:none}
+    .rail-chev{font-size:9px;color:var(--ink-600);flex:none}
+    .rail-body{padding:2px 11px 11px 27px}
+    .rail-why{font-size:11.5px;color:var(--ink-400);line-height:1.6}
+    .rail-fine{font-size:10.5px;color:var(--ink-500);margin-top:6px;font-style:italic}
+    .rail-ev{font-family:var(--mono);font-size:10.5px;color:var(--ink-400);padding:2px 0;line-height:1.5}
+    .rail-cmd{font-family:var(--mono);font-size:10px;color:var(--ink-300);background:var(--d-850);border:1px solid var(--grounded-line);
+      border-radius:7px;padding:6px 8px;word-break:break-all;line-height:1.5}
+    .rail-acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
+    .rail-foot{margin-top:18px;padding-top:12px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+    .rail-full{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--hypo);background:none;
+      border:1px solid var(--hypo-line);border-radius:8px;padding:8px 12px;cursor:pointer;transition:.16s;text-align:center}
+    .rail-full:hover{background:var(--hypo-dim)}
+    .rail-tc{display:flex;gap:8px;font-family:var(--mono);font-size:10px;color:var(--ink-500);padding:2px 0;line-height:1.5}
 
     /* click-to-pulse (two alternating classes so repeat clicks re-trigger) */
     .pulse-0{animation:mk-pulse 1.3s ease}
     .pulse-1{animation:mk-pulse2 1.3s ease}
-    @keyframes mk-pulse{0%,100%{box-shadow:0 0 0 0 transparent}30%{box-shadow:0 0 0 4px var(--inflect-dim),0 0 0 1px var(--inflect-line)}}
-    @keyframes mk-pulse2{0%,100%{box-shadow:0 0 0 0 transparent}30%{box-shadow:0 0 0 4px var(--inflect-dim),0 0 0 1px var(--inflect-line)}}
+    @keyframes mk-pulse{0%,100%{box-shadow:0 0 0 0 transparent}30%{box-shadow:0 0 0 3px var(--inflect-dim),0 0 0 1px var(--inflect-line)}}
+    @keyframes mk-pulse2{0%,100%{box-shadow:0 0 0 0 transparent}30%{box-shadow:0 0 0 3px var(--inflect-dim),0 0 0 1px var(--inflect-line)}}
 
     @media (max-width: 980px){
-      .app-minutes{grid-template-columns:1fr;grid-template-rows:auto;grid-template-areas:"top" "stage" "art" "act";height:auto}
+      .app-minutes{grid-template-columns:1fr;grid-template-rows:auto;grid-template-areas:"top" "art" "rail";height:auto}
       .app-minutes .zone-context{display:none}
+      .doc{padding:24px 20px 36px}
     }
   </style>
 </Base>
