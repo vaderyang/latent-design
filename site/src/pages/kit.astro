@@ -1,0 +1,76 @@
+---
+import Base from "../layouts/Base.astro";
+import KitGallery from "../components/KitGallery.tsx";
+import "@latent/react/kit.css";
+---
+
+<Base
+  title="Component Kit · Latent 潜"
+  description="@latent/react/kit — standalone, prop-driven React components grounded in the Latent design language and decoupled from the CognitiveState schema."
+>
+  <section class="wrap" style="padding-top:64px">
+    <a class="demo-back" href="/">◂ Latent · 潜</a>
+    <div class="kicker" data-i18n="en">Component Kit · @latent/react/kit</div>
+    <div class="kicker" data-i18n="zh">组件套件 · @latent/react/kit</div>
+    <h2 data-i18n="en">A series of components, usable from React</h2>
+    <h2 data-i18n="zh">一系列可被 React 使用的组件</h2>
+    <p data-i18n="en">
+      Full application coverage, all <strong>schema-free</strong> — simple props, drop into any React app:
+      <strong>primitives</strong>, <strong>forms</strong>, <strong>overlays</strong> (modal / drawer / popover / toast),
+      <strong>data display</strong> (table / stat / timeline …), <strong>navigation</strong>, plus the distinctive
+      <strong>semantic</strong> components (epistemic state, confidence, provenance, inflection, motion). Colour always carries epistemic meaning; the fixed
+      vocabulary (verifiable / asserted, the "what would change it" label, certainty words) switches with the language
+      toggle. Install once: <span class="mono" style="color:var(--ink-200)">import "@latent/react/kit.css"</span> then
+      <span class="mono" style="color:var(--ink-200)">import &#123; Button, EpistemicCard &#125; from "@latent/react/kit"</span>.
+    </p>
+    <p data-i18n="zh">
+      覆盖完整应用所需，全部 <strong>schema-free</strong>——简单 props、可放进任意 React app：
+      <strong>原语</strong>、<strong>表单</strong>、<strong>浮层</strong>（modal / drawer / popover / toast）、
+      <strong>数据展示</strong>（table / stat / timeline …）、<strong>导航</strong>，以及这套语言独有的
+      <strong>语义组件</strong>（认识论状态、置信、溯源、拐点、动效）。颜色始终承载认识论含义；固定词汇（verifiable / asserted、"什么会改变它"、确定度词）随语言开关切换。一次引入：
+      <span class="mono" style="color:var(--ink-200)">import "@latent/react/kit.css"</span> 然后
+      <span class="mono" style="color:var(--ink-200)">import &#123; Button, EpistemicCard &#125; from "@latent/react/kit"</span>。
+    </p>
+    <KitGallery client:load />
+  </section>
+
+  <style is:global>
+    .kit-gallery {
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      margin-top: 26px;
+    }
+    .kit-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px 24px;
+    }
+    @media (max-width: 760px) {
+      .kit-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .kit-demo {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-width: 0;
+    }
+    .kit-demo--wide {
+      grid-column: 1 / -1;
+    }
+    .kit-demo__lbl {
+      font-family: var(--mono);
+      font-size: 9.5px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-500);
+    }
+    .kit-flex {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+  </style>
+</Base>
