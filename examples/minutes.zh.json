@@ -1,0 +1,129 @@
+{
+  "schemaVersion": "0.2",
+  "latentLevel": "high",
+  "persona": "operator",
+  "task": {
+    "title": "会议纪要 · Q3 路线图评审",
+    "goal": "把 52 分钟录音整理成一份每个数字都核实过、每条行动项都有 owner 的纪要",
+    "context": "6 位与会者 · 52 分钟 · 录制于 10:00–10:52",
+    "status": "就绪 · 2 项待确认"
+  },
+  "userStory": {
+    "who": "总裁办幕僚长 · 会议负责人",
+    "trigger": "路线图评审刚结束，各方今天就等着纪要",
+    "goal": "发出一份可以被信任的纪要——数字核实过、行动有归属、未知诚实标注",
+    "reads": "agent 对这场会的理解：决策、行动项、哪些数字核实过（其中一个被纠正）、它还不确定什么",
+    "acts": "批准并分发 / 对某条提出异议 / 确认两个待定项"
+  },
+  "observablePrimitives": [
+    { "id": "op:seg", "kind": "transcript", "label": "分轨转录 · 412 段 · 6 位发言人" },
+    { "id": "op:wh", "kind": "metric", "label": "数据仓库查询结果 · kpi.q2_retention = 0.942" },
+    { "id": "op:deck", "kind": "document", "label": "分析师报告 v7（5 月）· TAM 章节 p.12" },
+    { "id": "op:crm", "kind": "tool-result", "label": "CRM 查询 · “Wei” → 2 个匹配（张唯 / 林薇）" },
+    { "id": "op:cal", "kind": "tool-result", "label": "日历 · CFO 办公室本场会议出席记录" }
+  ],
+  "toolCalls": [
+    { "id": "tc:diarize", "ts": "+0:00", "fn": "transcribe_diarize", "summary": "52 分钟 → 412 段 · 6 位发言人", "producedPrimitives": ["op:seg"] },
+    { "id": "tc:extract", "ts": "+0:41", "fn": "extract_decisions_actions", "summary": "提取出 3 项决策 · 6 条行动项", "producedPrimitives": ["op:seg"] },
+    { "id": "tc:verify", "ts": "+1:02", "fn": "verify_metric", "summary": "留存率 94.2% 在数据仓库得到确认", "producedPrimitives": ["op:wh"] },
+    { "id": "tc:deck", "ts": "+1:18", "fn": "search_docs", "summary": "TAM 数字与分析师报告 v7 交叉核对", "producedPrimitives": ["op:deck"] },
+    { "id": "tc:crm", "ts": "+1:30", "fn": "crm_lookup", "summary": "“Wei” 解析出 2 个人——需要消歧", "producedPrimitives": ["op:crm"] },
+    { "id": "tc:cal", "ts": "+1:36", "fn": "calendar_check", "summary": "拉取 CFO 办公室出席记录以交叉验证", "producedPrimitives": ["op:cal"] }
+  ],
+  "nodes": [
+    {
+      "id": "n:dec1",
+      "state": "grounded",
+      "kind": "decision",
+      "title": "决策：Insights 模块 9 月 12 日上线；v1 范围冻结",
+      "confidence": { "value": 0.92, "source": "self_consistency" },
+      "evidence": [
+        { "id": "ev:quote", "label": "CEO 于 41:32——“就这么定：Insights 9 月 12 日上线。”", "primitives": ["op:seg"], "polarity": "supports" },
+        { "id": "ev:nods", "label": "三位负责人均在录音中确认（41:40–42:05）", "primitives": ["op:seg"], "polarity": "supports" }
+      ],
+      "provenance": {
+        "mode": "asserted",
+        "steps": [
+          { "toolCallId": "tc:diarize", "observed": "发言人=CEO，t=41:32，第 388 段", "primitives": ["op:seg"] },
+          { "toolCallId": "tc:extract", "observed": "匹配到带明确日期与范围的承诺句式", "primitives": ["op:seg"] }
+        ]
+      }
+    },
+    {
+      "id": "n:metric",
+      "state": "grounded",
+      "kind": "claim",
+      "title": "Q2 留存率 94.2%——已对数据仓库核实",
+      "confidence": { "value": 0.97, "source": "self_consistency" },
+      "evidence": [
+        { "id": "ev:wh", "label": "kpi.q2_retention = 0.942（数据仓库，今日查询）", "primitives": ["op:wh"], "polarity": "supports" }
+      ],
+      "provenance": {
+        "mode": "verifiable",
+        "steps": [{ "toolCallId": "tc:verify", "observed": "SELECT retention FROM kpi.quarterly WHERE q='2026Q2' → 0.942", "primitives": ["op:wh"] }],
+        "reExecCmd": "lakehouse query \"SELECT retention FROM kpi.quarterly WHERE q='2026Q2'\""
+      }
+    },
+    {
+      "id": "n:tam-old",
+      "state": "refuted",
+      "kind": "claim",
+      "title": "“TAM 是 $4.2B”（会上口述，18:24）",
+      "reason": "分析师报告 v7（5 月，权威来源）给出的 TAM 是 $3.1B；$4.2B 来自 2024 年的旧稿。纪要采用 $3.1B 并附更正说明。",
+      "formerConfidence": 0.6
+    },
+    {
+      "id": "n:tam-fix",
+      "state": "inflection",
+      "title": "纪要中已更正：TAM $4.2B → $3.1B",
+      "inflectKind": "refutation",
+      "from": "TAM $4.2B（会上口述）",
+      "to": "TAM $3.1B（分析师报告 v7，5 月）",
+      "rationale": "会上口述的数字会漂移；报告才是权威来源。纪要采用更正后的数字，并向与会者标明差异。"
+    },
+    {
+      "id": "n:acts",
+      "state": "grounded",
+      "kind": "plan",
+      "title": "提取出 6 条行动项——5 条已有 owner，1 条无人认领",
+      "confidence": { "value": 0.88, "source": "self_consistency" },
+      "evidence": [
+        { "id": "ev:acts", "label": "6 个带 owner 与截止日期句式的承诺片段", "primitives": ["op:seg"], "polarity": "supports" }
+      ],
+      "provenance": {
+        "mode": "asserted",
+        "steps": [{ "toolCallId": "tc:extract", "observed": "5/6 匹配到 owner；第 4 条（定价一页纸）录音中无人认领", "primitives": ["op:seg"] }]
+      }
+    },
+    {
+      "id": "n:who",
+      "state": "hypothesis",
+      "kind": "claim",
+      "title": "预算讨论里的“Wei”= CFO 办公室的张唯，而非设计部的林薇",
+      "confidence": { "value": 0.62, "source": "self_report" },
+      "evidence": [
+        { "id": "ev:crm", "label": "CRM：张唯负责预算审批；林薇无财务职责", "primitives": ["op:crm"], "polarity": "supports" }
+      ],
+      "falsification": "若 CFO 办公室日历显示张唯未出席、且预算跟进实际由林薇负责，该识别即反转——一键即可确认。"
+    },
+    {
+      "id": "n:budget",
+      "state": "open",
+      "kind": "risk",
+      "title": "预算审批在会上被提及，但从未得到确认",
+      "needs": "与 CFO 办公室确认 Q3 的 $120k 预算是否已批——它卡着行动项 #3（供应商合同）。"
+    }
+  ],
+  "outcome": {
+    "nodeId": "n:dec1",
+    "label": "纪要 · 就绪",
+    "text": "纪要已就绪：3 项决策、6 条行动项（1 条无人认领）、所有数字核查完毕——其中一个已更正（$4.2B → $3.1B）。",
+    "recommendation": "确认张唯的身份与预算审批状态，然后批准分发。"
+  },
+  "steps": [
+    { "label": "转录与归属", "hint": "52 分钟变成 412 个带发言人的片段——一切认知都钉回这层地面真相。", "visibleNodeIds": ["n:acts"] },
+    { "label": "提取决策与行动", "hint": "承诺句式浮现：一项已拍板的决策、六条行动项。", "visibleNodeIds": ["n:dec1", "n:acts"] },
+    { "label": "核实数字", "hint": "留存率验证通过（可重跑）。TAM 没过——已更正，原始口述沉降保留以供审计。", "visibleNodeIds": ["n:dec1", "n:acts", "n:metric", "n:tam-old", "n:tam-fix"] },
+    { "label": "人员与未决项", "hint": "一个身份以假设持有并附反转条件；一个预算风险诚实留白。", "visibleNodeIds": ["n:dec1", "n:acts", "n:metric", "n:tam-old", "n:tam-fix", "n:who", "n:budget"] }
+  ]
+}

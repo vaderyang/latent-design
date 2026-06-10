@@ -1,0 +1,99 @@
+---
+import Base from "../../layouts/Base.astro";
+import MinutesApp from "../../components/MinutesApp.tsx";
+import "@latent/react/app";
+import "@latent/react/kit.css";
+---
+
+<Base
+  title="潛 Minutes · AI-native meeting minutes (applied layer)"
+  description="The design language saturating a meeting-minutes app: the document itself carries the epistemics — every figure verified or corrected, every person identified or honestly held as a hypothesis."
+>
+  <div class="minutes-note wrap">
+    <span data-i18n="en">
+      In most AI note-takers the result is a wall of confident prose. 潛 Minutes makes the <b>minutes document itself carry the epistemics</b>:
+      verified figures glow gold (re-runnable), a number spoken wrong in the meeting is struck through and corrected, an unconfirmed identity
+      stays visibly uncertain, and an unapproved budget is an honest open — <b>click any highlight</b> and the agent's understanding pulses on the Stage.
+    </span>
+    <span data-i18n="zh">
+      多数 AI 纪要工具的产出是一面自信的文字墙。潛 Minutes 让<b>纪要文档本身携带认识论状态</b>：
+      核实过的数字泛金光（可重跑）、会上说错的数字被划掉并更正、未确认的身份保持可见的不确定、未批的预算是诚实的未决——<b>点击任意高亮</b>，agent 的理解会在 Stage 区脉冲定位。
+    </span>
+  </div>
+  <MinutesApp client:load />
+
+  <style is:global>
+    /* ---- intro note above the frame ---- */
+    .minutes-note{font-size:12.5px;line-height:1.65;color:var(--ink-300);padding-top:64px;padding-bottom:14px;max-width:980px}
+    .minutes-note b{color:var(--hypo)}
+
+    /* ---- app grid ---- */
+    .app-minutes{
+      grid-template-columns:184px minmax(0,1fr) minmax(390px,442px);
+      grid-template-rows:46px minmax(0,1fr) 148px;
+      grid-template-areas:"top top top" "ctx art stage" "ctx act stage";
+      height:calc(100vh - 110px);min-height:680px;
+    }
+    .app-minutes .mk-brand{font-family:var(--mono);font-size:10.5px;color:var(--hypo);border:1px solid var(--hypo-line);border-radius:6px;padding:2px 7px}
+    .app-minutes .status-pill{font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--grounded);border:1px solid var(--grounded-line);background:var(--grounded-dim);padding:4px 10px;border-radius:20px;white-space:nowrap}
+    .app-minutes .app-topbar .tright{padding-right:12px;}
+
+    /* ---- the minutes document ---- */
+    .doc{padding:10px 26px 30px;max-width:760px;font-family:var(--ui);font-size:13.5px;color:var(--ink-200);line-height:1.75}
+    .doc-title{font-family:var(--voice);font-size:22px;color:var(--ink-100);font-weight:380;margin-top:6px}
+    .doc-meta{font-family:var(--mono);font-size:10.5px;color:var(--ink-500);margin:4px 0 14px}
+    .doc-h{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-500);margin:22px 0 8px;border-top:1px solid var(--line);padding-top:14px}
+    .doc-h-sub{color:var(--ink-600);letter-spacing:.04em;text-transform:none;margin-left:8px}
+    .doc p{margin:8px 0}
+    .doc-foot{font-size:12.5px;color:var(--ink-300)}
+
+    /* epistemic inline marks — the document carries the language */
+    .mk{cursor:pointer;padding:1px 3px;margin:0 1px;border-radius:4px;border-bottom:2px solid;transition:.16s;text-decoration:none}
+    .mk-g{background:var(--grounded-dim);border-color:var(--grounded-line);color:var(--ink-100)}
+    .mk-g:hover{background:transparent;box-shadow:0 0 0 1px var(--grounded-line)}
+    .mk-h{background:var(--hypo-dim);border-color:var(--hypo-line);border-bottom-style:dotted;color:var(--ink-100)}
+    .mk-h:hover{background:transparent;box-shadow:0 0 0 1px var(--hypo-line)}
+    .mk-o{background:var(--open-dim);border-color:var(--open-line);color:var(--ink-100)}
+    .mk-o:hover{background:transparent;box-shadow:0 0 0 1px var(--open-line)}
+    .mk-i{background:var(--inflect-dim);border-color:var(--inflect-line);color:var(--ink-100)}
+    .mk-i:hover{background:transparent;box-shadow:0 0 0 1px var(--inflect-line)}
+    .mk-r{background:none;border:none;color:var(--refuted);text-decoration:line-through;cursor:pointer}
+    .mk-r:hover{color:var(--ink-300)}
+
+    /* legend */
+    .legend{display:flex;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:9.5px;letter-spacing:.05em;color:var(--ink-500);
+      border:1px dashed var(--line-2);border-radius:9px;padding:8px 12px;margin:6px 0 4px}
+    .legend span{display:inline-flex;gap:6px;align-items:center}
+
+    /* people strip */
+    .people{display:flex;gap:14px;flex-wrap:wrap;margin:10px 0 4px;padding:10px 12px;background:var(--d-850);border:1px solid var(--line);border-radius:11px}
+    .person{display:inline-flex;gap:8px;align-items:center}
+    .person .pname{font-size:12px;color:var(--ink-200);white-space:nowrap}
+    .person .prole{font-family:var(--mono);font-size:9.5px;color:var(--ink-500);white-space:nowrap}
+    .person.hypo{cursor:pointer;border:1px dotted var(--hypo-line);border-radius:8px;padding:3px 8px;background:var(--hypo-dim)}
+    .person.hypo .prole{color:var(--hypo)}
+
+    /* owner cells */
+    .own{cursor:pointer;border-bottom:1px dotted;padding-bottom:1px}
+    .own-h{color:var(--hypo);border-color:var(--hypo-line)}
+    .own-o{color:var(--open);border-color:var(--open-line);font-style:italic}
+
+    /* stage board */
+    .app-minutes .zone-stage{padding:14px 16px}
+    .app-minutes .board{display:flex;flex-direction:column}
+    .app-minutes .plain{max-width:none}
+    .replay-bar{display:flex;flex-direction:column;gap:3px;margin-bottom:12px;padding:9px 12px;background:var(--hypo-dim);border-left:2px solid var(--hypo-line);border-radius:0 8px 8px 0}
+    .replay-bar .replay-hint{font-size:11.5px;color:var(--ink-300);font-style:italic;font-family:var(--voice)}
+
+    /* click-to-pulse (two alternating classes so repeat clicks re-trigger) */
+    .pulse-0{animation:mk-pulse 1.3s ease}
+    .pulse-1{animation:mk-pulse2 1.3s ease}
+    @keyframes mk-pulse{0%,100%{box-shadow:0 0 0 0 transparent}30%{box-shadow:0 0 0 4px var(--inflect-dim),0 0 0 1px var(--inflect-line)}}
+    @keyframes mk-pulse2{0%,100%{box-shadow:0 0 0 0 transparent}30%{box-shadow:0 0 0 4px var(--inflect-dim),0 0 0 1px var(--inflect-line)}}
+
+    @media (max-width: 980px){
+      .app-minutes{grid-template-columns:1fr;grid-template-rows:auto;grid-template-areas:"top" "stage" "art" "act";height:auto}
+      .app-minutes .zone-context{display:none}
+    }
+  </style>
+</Base>

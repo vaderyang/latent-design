@@ -1,0 +1,129 @@
+{
+  "schemaVersion": "0.2",
+  "latentLevel": "high",
+  "persona": "operator",
+  "task": {
+    "title": "Minutes · Q3 Roadmap Review",
+    "goal": "Turn a 52-minute recording into minutes where every number is verified and every action item has an owner",
+    "context": "6 attendees · 52 min · recorded 10:00–10:52",
+    "status": "Ready · 2 confirmations pending"
+  },
+  "userStory": {
+    "who": "Chief of Staff · meeting owner",
+    "trigger": "The roadmap review just ended; stakeholders expect minutes today",
+    "goal": "Distribute minutes that can be trusted — verified figures, owned actions, honest unknowns",
+    "reads": "the agent's understanding of the meeting: decisions, action items, which figures were verified (and one that was corrected), what it is still unsure about",
+    "acts": "approve & distribute / challenge an item / confirm the two open identifications"
+  },
+  "observablePrimitives": [
+    { "id": "op:seg", "kind": "transcript", "label": "Diarized transcript · 412 segments · 6 speakers" },
+    { "id": "op:wh", "kind": "metric", "label": "Warehouse query result · kpi.q2_retention = 0.942" },
+    { "id": "op:deck", "kind": "document", "label": "Analyst deck v7 (May) · TAM section, p.12" },
+    { "id": "op:crm", "kind": "tool-result", "label": "CRM lookup · 'Wei' → 2 matches (Zhang Wei / Wei Lin)" },
+    { "id": "op:cal", "kind": "tool-result", "label": "Calendar · CFO-office attendance for this meeting" }
+  ],
+  "toolCalls": [
+    { "id": "tc:diarize", "ts": "+0:00", "fn": "transcribe_diarize", "summary": "52 min → 412 segments · 6 speakers", "producedPrimitives": ["op:seg"] },
+    { "id": "tc:extract", "ts": "+0:41", "fn": "extract_decisions_actions", "summary": "3 decisions · 6 action items found", "producedPrimitives": ["op:seg"] },
+    { "id": "tc:verify", "ts": "+1:02", "fn": "verify_metric", "summary": "retention 94.2% confirmed in warehouse", "producedPrimitives": ["op:wh"] },
+    { "id": "tc:deck", "ts": "+1:18", "fn": "search_docs", "summary": "TAM figure cross-checked against analyst deck v7", "producedPrimitives": ["op:deck"] },
+    { "id": "tc:crm", "ts": "+1:30", "fn": "crm_lookup", "summary": "'Wei' resolves to 2 people — disambiguation needed", "producedPrimitives": ["op:crm"] },
+    { "id": "tc:cal", "ts": "+1:36", "fn": "calendar_check", "summary": "CFO-office attendance pulled for cross-reference", "producedPrimitives": ["op:cal"] }
+  ],
+  "nodes": [
+    {
+      "id": "n:dec1",
+      "state": "grounded",
+      "kind": "decision",
+      "title": "Decision: Insights module ships Sept 12; v1 scope frozen",
+      "confidence": { "value": 0.92, "source": "self_consistency" },
+      "evidence": [
+        { "id": "ev:quote", "label": "CEO at 41:32 — “Lock it: Insights ships Sept 12.”", "primitives": ["op:seg"], "polarity": "supports" },
+        { "id": "ev:nods", "label": "All three leads confirmed on record (41:40–42:05)", "primitives": ["op:seg"], "polarity": "supports" }
+      ],
+      "provenance": {
+        "mode": "asserted",
+        "steps": [
+          { "toolCallId": "tc:diarize", "observed": "speaker=CEO, t=41:32, segment #388", "primitives": ["op:seg"] },
+          { "toolCallId": "tc:extract", "observed": "commitment pattern matched with explicit date + scope", "primitives": ["op:seg"] }
+        ]
+      }
+    },
+    {
+      "id": "n:metric",
+      "state": "grounded",
+      "kind": "claim",
+      "title": "Q2 retention is 94.2% — verified against the warehouse",
+      "confidence": { "value": 0.97, "source": "self_consistency" },
+      "evidence": [
+        { "id": "ev:wh", "label": "kpi.q2_retention = 0.942 (warehouse, queried today)", "primitives": ["op:wh"], "polarity": "supports" }
+      ],
+      "provenance": {
+        "mode": "verifiable",
+        "steps": [{ "toolCallId": "tc:verify", "observed": "SELECT retention FROM kpi.quarterly WHERE q='2026Q2' → 0.942", "primitives": ["op:wh"] }],
+        "reExecCmd": "lakehouse query \"SELECT retention FROM kpi.quarterly WHERE q='2026Q2'\""
+      }
+    },
+    {
+      "id": "n:tam-old",
+      "state": "refuted",
+      "kind": "claim",
+      "title": "“TAM is $4.2B” (as spoken in the meeting, 18:24)",
+      "reason": "Analyst deck v7 (May, source of record) puts TAM at $3.1B; the $4.2B figure traces to the 2024 draft. Minutes use $3.1B with a correction note.",
+      "formerConfidence": 0.6
+    },
+    {
+      "id": "n:tam-fix",
+      "state": "inflection",
+      "title": "Corrected in the minutes: TAM $4.2B → $3.1B",
+      "inflectKind": "refutation",
+      "from": "TAM $4.2B (spoken in meeting)",
+      "to": "TAM $3.1B (analyst deck v7, May)",
+      "rationale": "Numbers spoken in meetings drift; the deck is the source of record. The minutes carry the corrected figure and flag the discrepancy to attendees."
+    },
+    {
+      "id": "n:acts",
+      "state": "grounded",
+      "kind": "plan",
+      "title": "6 action items extracted — 5 assigned, 1 still unowned",
+      "confidence": { "value": 0.88, "source": "self_consistency" },
+      "evidence": [
+        { "id": "ev:acts", "label": "6 commitment segments with owner + due-date patterns", "primitives": ["op:seg"], "polarity": "supports" }
+      ],
+      "provenance": {
+        "mode": "asserted",
+        "steps": [{ "toolCallId": "tc:extract", "observed": "owners matched for 5/6; #4 (pricing one-pager) has no owner on record", "primitives": ["op:seg"] }]
+      }
+    },
+    {
+      "id": "n:who",
+      "state": "hypothesis",
+      "kind": "claim",
+      "title": "“Wei” in the budget thread = Zhang Wei (CFO office), not Wei Lin (Design)",
+      "confidence": { "value": 0.62, "source": "self_report" },
+      "evidence": [
+        { "id": "ev:crm", "label": "CRM: Zhang Wei owns budget approvals; Wei Lin has no finance role", "primitives": ["op:crm"], "polarity": "supports" }
+      ],
+      "falsification": "If the CFO-office calendar shows Zhang Wei absent and Design's Wei Lin owns the budget follow-up, the identification flips — one click to confirm."
+    },
+    {
+      "id": "n:budget",
+      "state": "open",
+      "kind": "risk",
+      "title": "Budget sign-off was referenced but never confirmed in-meeting",
+      "needs": "Confirm with the CFO office whether the $120k Q3 budget was approved — it gates action item #3 (vendor contract)."
+    }
+  ],
+  "outcome": {
+    "nodeId": "n:dec1",
+    "label": "Minutes · Ready",
+    "text": "Minutes are ready: 3 decisions, 6 action items (1 unowned), every figure checked — one corrected ($4.2B → $3.1B).",
+    "recommendation": "Confirm Zhang Wei's identity and the budget sign-off, then approve & distribute."
+  },
+  "steps": [
+    { "label": "Transcribe & attribute", "hint": "52 minutes become 412 speaker-attributed segments — the ground truth everything pins to.", "visibleNodeIds": ["n:acts"] },
+    { "label": "Extract decisions & actions", "hint": "Commitment patterns surface: one shipped decision, six action items.", "visibleNodeIds": ["n:dec1", "n:acts"] },
+    { "label": "Verify the numbers", "hint": "Retention checks out (re-runnable). The TAM figure does not — corrected, with the original kept sunk for audit.", "visibleNodeIds": ["n:dec1", "n:acts", "n:metric", "n:tam-old", "n:tam-fix"] },
+    { "label": "People & open items", "hint": "One identity held as a hypothesis with its flip condition; one budget risk left honestly open.", "visibleNodeIds": ["n:dec1", "n:acts", "n:metric", "n:tam-old", "n:tam-fix", "n:who", "n:budget"] }
+  ]
+}
