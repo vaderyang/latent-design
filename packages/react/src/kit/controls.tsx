@@ -11,14 +11,14 @@ export type Theme = "dark" | "light" | "kami";
 function readTheme(): Theme {
   if (typeof document !== "undefined") {
     const t = document.documentElement.dataset.theme;
-    if (t === "light" || t === "kami") return t;
+    if (t === "dark" || t === "kami") return t;
   }
-  return "dark";
+  return "light";
 }
 
 export function ThemeToggle({ className }: { className?: string }) {
   // start at the SSR-stable default, then sync to the real attribute on mount
-  const [theme, setTheme] = useState<Theme>("dark");
+  const [theme, setTheme] = useState<Theme>("light");
   useEffect(() => setTheme(readTheme()), []);
   const set = (t: Theme) => {
     setTheme(t);

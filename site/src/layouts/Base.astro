@@ -14,7 +14,7 @@ const {
 ---
 
 <!doctype html>
-<html lang="en" data-lang="en">
+<html lang="en" data-lang="en" data-theme="light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -27,18 +27,18 @@ const {
       rel="stylesheet"
     />
     <script is:inline>
-      // set theme before paint to avoid a flash; ?theme= overrides + persists
+      // set theme before paint to avoid a flash; ?theme= overrides + persists. Light is default.
       (function () {
         var valid = { dark: 1, light: 1, kami: 1 };
-        var t = "dark";
+        var t = "light";
         try {
           var q = new URLSearchParams(location.search).get("theme");
           if (q && valid[q]) {
             t = q;
             localStorage.setItem("latent-theme", t);
           } else {
-            t = localStorage.getItem("latent-theme") || "dark";
-            if (!valid[t]) t = "dark";
+            t = localStorage.getItem("latent-theme") || "light";
+            if (!valid[t]) t = "light";
           }
         } catch (e) {}
         document.documentElement.dataset.theme = t;
@@ -104,7 +104,7 @@ const {
             b.classList.toggle("active", b.getAttribute("data-theme-set") === t);
           });
         }
-        sync(root.dataset.theme || "dark");
+        sync(root.dataset.theme || "light");
         btns.forEach(function (b) {
           b.addEventListener("click", function () {
             var t = b.getAttribute("data-theme-set");
@@ -140,6 +140,10 @@ const {
             sync(l);
             window.dispatchEvent(new Event("latent-langchange"));
           });
+        });
+        // stay in sync when another control (e.g. the kit's LangToggle) switches
+        window.addEventListener("latent-langchange", function () {
+          sync(root.dataset.lang || "en");
         });
       })();
     </script>

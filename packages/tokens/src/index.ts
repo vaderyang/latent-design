@@ -39,8 +39,8 @@ export const ink = {
 export const epistemic = {
   grounded: { base: "#E7B45C", dim: "rgba(231,180,92,.15)", line: "rgba(231,180,92,.40)", note: "anchored · high confidence" },
   hypothesis: { base: "#54C7C0", dim: "rgba(84,199,192,.13)", line: "rgba(84,199,192,.38)", note: "in play · under investigation" },
-  open: { base: "#9C8CCB", dim: "rgba(156,140,203,.13)", line: "rgba(156,140,203,.35)", note: "unresolved · honest unknown" },
-  inflection: { base: "#6E93DD", dim: "rgba(110,147,221,.16)", line: "rgba(110,147,221,.45)", note: "change-of-mind / aha · cue colour (noteworthy, not an error)" },
+  open: { base: "#8F79C2", dim: "rgba(143,121,194,.13)", line: "rgba(143,121,194,.35)", note: "unresolved · honest unknown" },
+  inflection: { base: "#82A7F2", dim: "rgba(130,167,242,.16)", line: "rgba(130,167,242,.45)", note: "change-of-mind / aha · cue colour (noteworthy, not an error)" },
   refuted: { base: "#5C6B7A", dim: "rgba(92,107,122,.10)", line: "rgba(126,158,190,.12)", note: "sunk · refuted (kept for audit)" },
   activity: { base: "#6E7C8E", dim: "rgba(76,90,105,.18)", line: "rgba(126,158,190,.12)", note: "tool / action · deliberately low-key" },
 } as const;
