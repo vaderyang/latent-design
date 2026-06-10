@@ -8,6 +8,10 @@
 现有 agentic 界面把注意力花在渲染工具调用上——但工具调用是认知的*剧场*，不是认知本身。
 **潛** 把视觉层级倒过来：agent 不断演化、被证据锚定的「理解态」占据主舞台；动作退为外围、可审计的 provenance。
 
+[![The Inversion — 把视觉层级倒过来；三个区域，一种比例](docs/assets/the-inversion.png)](https://latent-design.pages.dev)
+
+<p align="center"><a href="https://latent-design.pages.dev"><b>latent-design.pages.dev</b></a> — 在线站点 · demos · <a href="https://latent-design.pages.dev/kit/">组件套件</a></p>
+
 这个仓库把该设计语言做成一份**成熟交付物**，由一份 canonical schema 作为脊梁，串起四条应用线：
 产品设计、模型（训练）设计、agentic-coding 指引、含多场景 demo 的推介网站。
 

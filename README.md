@@ -6,6 +6,10 @@
 
 Today's agentic interfaces spend their attention rendering tool calls — but a tool call is the *theater* of cognition, not cognition itself. **潛** inverts the visual hierarchy: the agent's continuously evolving, evidence-anchored *understanding* takes the main stage, while actions recede into a peripheral, auditable provenance.
 
+[![The Inversion — invert the visual hierarchy; three zones, one proportion](docs/assets/the-inversion.png)](https://latent-design.pages.dev)
+
+<p align="center"><a href="https://latent-design.pages.dev"><b>latent-design.pages.dev</b></a> — live site · demos · <a href="https://latent-design.pages.dev/kit/">component kit</a></p>
+
 This repository turns that design language into a **mature deliverable**, built around a single canonical schema as its spine, threaded through four lines of application: product design, model (training) design, agentic-coding guidance, and a pitch site with multi-scenario demos.
 
 ## Repository structure
