@@ -1,0 +1,138 @@
+{
+  "schemaVersion": "0.2",
+  "latentLevel": "high",
+  "persona": "operator",
+  "task": {
+    "title": "AI 协助构建全栈 Mini App · 报销审批",
+    "goal": "从一句话需求生成可用的报销审批 app（前端 + API + 存储 + 鉴权）",
+    "context": "RAD · vibe coding · 一键可跑",
+    "status": "已生成 v0"
+  },
+  "userStory": {
+    "who": "独立开发者 / 业务负责人",
+    "trigger": "想要一个报销审批小工具，给了一句话需求",
+    "goal": "拿到一个能跑的 v0，并知道接下来要拍板什么",
+    "reads": "agent 对“要建什么”的理解：需求、已通过自检的架构决策、已生成的东西，和还没定的选择",
+    "acts": "确认状态集/通知渠道让它生成 v1 / 对架构决策提异议 / 补充需求"
+  },
+  "observablePrimitives": [
+    { "id": "op:req:oneliner", "kind": "user-statement", "label": "需求：员工提交报销→主管审批→财务打款" },
+    { "id": "op:constraint:deploy", "kind": "constraint", "label": "约束：轻量、可一键部署、离线优先" },
+    { "id": "op:smoke:health", "kind": "tool-result", "label": "本地 /health 启动自检" },
+    { "id": "op:code:tree", "kind": "code", "label": "生成的文件树（7 文件）" }
+  ],
+  "toolCalls": [
+    { "id": "tc:scaffold", "ts": "—", "fn": "scaffold", "summary": "生成 7 文件 + 迁移 + 种子", "producedPrimitives": ["op:code:tree"] },
+    { "id": "tc:migrate", "ts": "—", "fn": "run_migration", "summary": "建表：requests/users/approvals", "producedPrimitives": ["op:code:tree"] },
+    { "id": "tc:smoke", "ts": "—", "fn": "smoke_test", "summary": "/health 200 · 启动 0.3s", "durationMs": 1800, "producedPrimitives": ["op:smoke:health"] }
+  ],
+  "nodes": [
+    {
+      "id": "n:req",
+      "state": "grounded",
+      "kind": "requirement",
+      "title": "理解到的需求：三角色（员工/主管/财务）+ 附件 + 状态流转 + 鉴权",
+      "confidence": { "value": 0.85, "source": "human" },
+      "evidence": [
+        { "id": "ev:one", "label": "由一句话需求展开的角色与流程", "primitives": ["op:req:oneliner"], "polarity": "supports" }
+      ],
+      "provenance": {
+        "mode": "asserted",
+        "steps": [
+          { "toolCallId": "tc:scaffold", "observed": "据需求推出三角色 RBAC 与状态机", "primitives": ["op:req:oneliner"] }
+        ]
+      }
+    },
+    {
+      "id": "n:inflect",
+      "state": "inflection",
+      "title": "从单页 CRUD 转向状态机驱动",
+      "inflectKind": "aha",
+      "from": "一个表单 + 列表的单页 CRUD",
+      "to": "审批状态机（draft→submitted→approved/rejected→paid）+ 角色路由",
+      "rationale": "“审批”本质是状态流转与权限边界，单纯 CRUD 无法表达谁能在哪个状态做什么——状态机才是正确的骨架。",
+      "affects": ["n:crud", "n:stack"]
+    },
+    {
+      "id": "n:stack",
+      "state": "grounded",
+      "kind": "decision",
+      "title": "技术栈：Bun + Hono API + SQLite + 最小 React 前端，3 角色 RBAC",
+      "confidence": { "value": 0.82, "source": "self_consistency" },
+      "evidence": [
+        { "id": "ev:light", "label": "满足轻量/一键部署/离线优先约束", "primitives": ["op:constraint:deploy"], "polarity": "supports" },
+        { "id": "ev:boot", "label": "smoke：服务启动、/health 200", "primitives": ["op:smoke:health"], "polarity": "supports" }
+      ],
+      "provenance": {
+        "mode": "verifiable",
+        "reExecCmd": "bun run dev && curl -fsS localhost:3000/health",
+        "steps": [
+          { "toolCallId": "tc:smoke", "observed": "/health 200，启动 0.3s", "primitives": ["op:smoke:health"] },
+          { "toolCallId": "tc:scaffold", "observed": "技术栈契合部署约束", "primitives": ["op:constraint:deploy"] }
+        ]
+      }
+    },
+    {
+      "id": "n:built",
+      "state": "grounded",
+      "kind": "observation",
+      "title": "已生成 7 文件 + 迁移 + 种子数据，本地自检通过",
+      "confidence": { "value": 0.88, "source": "self_consistency" },
+      "evidence": [
+        { "id": "ev:tree", "label": "requests/users/approvals 表 + API + 前端", "primitives": ["op:code:tree"], "polarity": "supports" }
+      ],
+      "provenance": {
+        "mode": "verifiable",
+        "reExecCmd": "bun test && bun run build",
+        "steps": [
+          { "toolCallId": "tc:migrate", "observed": "三表建好、种子数据写入", "primitives": ["op:code:tree"] }
+        ]
+      }
+    },
+    {
+      "id": "n:plan",
+      "state": "hypothesis",
+      "kind": "plan",
+      "title": "下一步：生成审批状态机与迁移（待你确认状态集）",
+      "confidence": { "value": 0.5, "source": "self_report" },
+      "evidence": [],
+      "falsification": "状态集若需加“财务退回补材料”等中间态，则状态机与权限矩阵随之变化；先与你确认状态集再生成。"
+    },
+    {
+      "id": "n:notify",
+      "state": "open",
+      "kind": "option",
+      "title": "通知渠道未定（邮件 / Mattermost / 站内）",
+      "needs": "你倾向哪种审批通知渠道？影响是否引入外部依赖与配置项。"
+    },
+    {
+      "id": "n:storage",
+      "state": "hypothesis",
+      "kind": "risk",
+      "title": "附件用本地磁盘存储，生产需换对象存储",
+      "confidence": { "value": 0.4, "source": "self_report" },
+      "evidence": [],
+      "falsification": "若仅内网小规模试用，本地磁盘可接受；一旦多副本/生产部署，必须切换对象存储，否则附件丢失。"
+    },
+    {
+      "id": "n:crud",
+      "state": "refuted",
+      "kind": "option",
+      "title": "单页表单 + 列表的纯 CRUD",
+      "reason": "无法表达状态流转与角色权限边界，与“审批”语义不符。",
+      "formerConfidence": 0.45
+    }
+  ],
+  "outcome": {
+    "nodeId": "n:built",
+    "label": "已生成 v0 · Grounded",
+    "text": "可跑的 v0 已生成（状态机骨架 + 三角色 RBAC + 本地自检通过）。",
+    "recommendation": "确认状态集与通知渠道后生成 v1；生产前把附件改对象存储。"
+  },
+  "steps": [
+    { "label": "理解需求", "hint": "把一句话需求锚定为 requirement：三角色 + 附件 + 状态流转 + 鉴权。", "visibleNodeIds": ["n:req", "n:crud"] },
+    { "label": "拐点", "hint": "啊哈：审批=状态机而非 CRUD，单页方案沉降。", "visibleNodeIds": ["n:req", "n:inflect", "n:crud"] },
+    { "label": "技术栈 + 落地", "hint": "技术栈定为 grounded 决策，已生成 7 文件并通过本地自检（可重跑）。", "visibleNodeIds": ["n:req", "n:inflect", "n:stack", "n:built", "n:crud"] },
+    { "label": "待你拍板", "hint": "诚实留下：状态集待确认、通知渠道未定、附件存储是生产风险。", "visibleNodeIds": ["n:req", "n:inflect", "n:stack", "n:built", "n:plan", "n:notify", "n:storage", "n:crud"] }
+  ]
+}

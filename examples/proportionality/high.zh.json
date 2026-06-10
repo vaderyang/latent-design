@@ -1,0 +1,55 @@
+{
+  "schemaVersion": "0.2",
+  "latentLevel": "high",
+  "persona": "operator",
+  "task": { "title": "缓存层选型与回收策略", "status": "规划" },
+  "observablePrimitives": [
+    { "id": "op:metric:hit", "kind": "metric", "label": "命中率/内存压测" },
+    { "id": "op:constraint:mem", "kind": "constraint", "label": "单机内存上限 4GB" }
+  ],
+  "toolCalls": [
+    { "id": "tc:bench", "ts": "—", "fn": "run_bench", "summary": "LFU vs LRU 命中率", "producedPrimitives": ["op:metric:hit"] }
+  ],
+  "nodes": [
+    {
+      "id": "n:inflect",
+      "state": "inflection",
+      "title": "回收策略重排",
+      "inflectKind": "aha",
+      "from": "默认 LRU",
+      "to": "热点倾斜场景用 LFU + 容量上限",
+      "rationale": "访问呈强热点倾斜，LFU 在压测中命中率显著高于 LRU。",
+      "affects": ["n:decide"]
+    },
+    {
+      "id": "n:decide",
+      "state": "grounded",
+      "kind": "decision",
+      "title": "采用 LFU 回收 + 4GB 容量上限 + TTL 兜底",
+      "confidence": { "value": 0.8, "source": "self_consistency" },
+      "evidence": [
+        { "id": "ev:hit", "label": "LFU 命中率 +12pp，内存达标", "primitives": ["op:metric:hit", "op:constraint:mem"], "polarity": "supports" }
+      ],
+      "provenance": {
+        "mode": "verifiable",
+        "reExecCmd": "bun bench/cache.ts --policy lfu --cap 4g",
+        "steps": [
+          { "toolCallId": "tc:bench", "observed": "LFU 命中率高于 LRU", "primitives": ["op:metric:hit"] }
+        ]
+      }
+    },
+    {
+      "id": "n:warm",
+      "state": "open",
+      "kind": "risk",
+      "title": "冷启动预热策略未定",
+      "needs": "确认是否需要启动预热；影响发布期命中率与上游压力。"
+    }
+  ],
+  "outcome": {
+    "nodeId": "n:decide",
+    "label": "规划决定 · Grounded",
+    "text": "缓存采用 LFU + 4GB 上限 + TTL 兜底。",
+    "recommendation": "补冷启动预热策略（见“待解决”）。"
+  }
+}

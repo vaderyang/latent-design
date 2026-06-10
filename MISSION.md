@@ -1,70 +1,72 @@
+**English** · [中文](MISSION.zh.md)
+
 This is a meaty design-strategy problem and the thesis "Latent is attentioned" is doing a lot of work, so let me ground the domain research properly before I build on it. Let me survey the current landscape of agentic UX.Strong signal already — notice the entire field frames reasoning as a *justification appended to actions* ("show the reasoning next to the action"). Let me check the adjacent threads: generative UI, ambient agents, and how products currently render "thinking."The key finding crystallizes the gap: even **Generative UI** — the field's cutting edge — is defined as *"connecting the results of a tool call to a React component."* The most advanced paradigm is still tool-call-*rooted*. Let me check two more things: how products currently render "thinking," and the faithfulness problem that will be central to my critique.I have what I need. The landscape research surfaces a sharp, useful picture — and a literature that almost names your thesis for you. Let me read the design skill before I build the deliverable, then give you the synthesis and the system together.The research is in, and it sharpens your thesis more than I expected. Here's the synthesis, then the system itself.
 
 ---
 
-## 一、领域诊断：整个领域都把 latent 当作 action 的脚注
+## I. Domain diagnosis: the whole field treats latent as a footnote to action
 
-把当前 agentic UI 摊开看，有一个统一的结构性事实：**几乎所有产品都以 action/tool-call 为根，把推理当作"动作的事后辩护"来渲染。**
+Lay out today's agentic UI and one structural fact is uniform across it: **almost every product is rooted in action/tool-call, and renders reasoning as an after-the-fact justification of the action.**
 
-- 主流范式仍是 **ReAct 式的 thought-action-observation 流**——把推理痕迹和动作执行交织展示，本意是为调试和信任提供透明度,但落到 UI 上,推理被压成动作旁边的一行小字。当前最佳实践被反复表述为"把推理简短地、就在动作旁边展示出来",Smashing 的模式库甚至把它命名为动作之后的 "Explainable Rationale"——一个动作发生后,好的伙伴会解释它的理由。注意这个时序:**先动作,后解释**。Latent 在这里是 action 的附属品。
+- The dominant paradigm is still the **ReAct-style thought-action-observation stream** — interleaving reasoning traces with action execution, originally meant to provide transparency for debugging and trust. But once it lands in the UI, reasoning gets compressed into a line of fine print beside the action. The current best practice is stated, over and over, as "show the reasoning briefly, right next to the action"; Smashing's pattern library even names it "Explainable Rationale" *after* the action — once an action happens, a good companion explains its reason. Note the ordering: **action first, explanation second.** Here, latent is an appendage to action.
 
-- 即使是被吹捧为下一代的 **Generative UI,本质上仍然是 tool-call-rooted。** 行业对它的定义直白得惊人:"Generative UI 就是把一次 tool call 的结果连接到一个 React 组件的过程"。也就是说,连最前沿的范式,UI 的生成源头依然是工具输出,而不是认知本身。Vercel/CopilotKit/A2UI 的全部分歧只在于*生成的 UI 出现在哪里*(chat / canvas / 无聊天内嵌),没有一个在问*认知该不该成为主体*。
+- Even **Generative UI**, hyped as the next generation, is at bottom still tool-call-rooted. The industry's own definition is startlingly plain: "Generative UI is the process of connecting the result of a tool call to a React component." In other words, even in the most advanced paradigm, the UI's generative source is still tool output, not cognition itself. The entire disagreement among Vercel / CopilotKit / A2UI is only about *where the generated UI appears* (chat / canvas / chat-less inline) — none of them asks *whether cognition should be the subject.*
 
-- 唯一在结构上松动这个根的,是 **ambient/background agents 这条前沿线**。当 agent 转入异步后台、你"回来查看"而非"盯着它做",注意力模型被迫转向一个*你反复回访的持久状态*——这种自主的、面向后台任务的范式在 2025 年才随长程推理能力成熟而成为可能,需要全新的、此前不存在的工作流和 UI。这恰恰是你的论点的顺风:**当动作流过、状态留存,真正值得被 attention 的就是那个留存的"理解态"。**
+- The only thread that structurally loosens this root is the **ambient/background-agents** frontier. When an agent moves to an asynchronous background and you "come back to check" rather than "watch it work," the attention model is forced toward a *persistent state you revisit repeatedly* — and this autonomous, background-task-oriented paradigm only became possible in 2025, as long-horizon reasoning matured; it demands entirely new workflows and UI that did not exist before. That is precisely a tailwind for your thesis: **once actions have flowed past and state persists, the thing that genuinely deserves attention is that persisting "understanding."**
 
-还有一个反复出现的巧合值得你注意:领域里讨论复杂 agentic 流程时,**最常被当作 canonical example 的就是网络/系统故障诊断**——UX Magazine 整篇就用一个由 Supervisor Agent(也叫"Reasoning Agent")带领若干 Worker Agent 进行系统故障排查、找根因、给修复建议的流程作范例。你的 TraceForge 正好坐在这个领域的认知最密集处。换句话说:**你不是在边缘场景上赌一个审美偏好,你是在领域的认知核心区做一次注意力的重新分配。**
-
----
-
-## 二、把立论锤实:"Latent is attentioned" 的双关与最强形式
-
-这个 neologism 里藏着两层意思,都该被保留:
-
-1. **Latent 应当被给予注意力**(消费侧:用户的注意力预算应投向认知,而非工具执行的剧场)。
-2. **Latent 正是注意力运作之处**(机制侧:transformer 的 attention 本身就是那个隐空间过程)。UI 该把用户的 attention 对齐到模型 attention 真正发生的层面。
-
-最强形式因此不是"显示模型的想法",而是:
-
-> **把用户有限的注意力,分配给"问题的潜结构"与"agent 对它不断演化的理解",而不是工具执行的机械过程;让动作退为可按需调取的 provenance。**
+There's a recurring coincidence worth your attention: when the field discusses complex agentic flows, **the example reached for most often as canonical is network/system fault diagnosis** — an entire UX Magazine piece uses a flow in which a Supervisor Agent (also called the "Reasoning Agent") leads several Worker Agents to troubleshoot a system fault, find the root cause, and propose a fix. Your TraceForge sits squarely at the cognitively densest spot of this domain. Put differently: **you are not betting an aesthetic preference on an edge case — you are reallocating attention in the cognitive core of the field.**
 
 ---
 
-## 三、致命风险(这是这套语言成败的支点)
+## II. Driving the thesis home: the pun in "Latent is attentioned" and its strongest form
 
-如果你天真地执行"把模型的思考摆到台前",你会用一种**比 tool-call theater 更危险的东西替换它:reasoning theater**。
+This neologism hides two meanings, both of which should be kept:
 
-这不是顾虑,是有名字的实证现象。已有专门论文就叫 *Reasoning Theater*,核心发现是模型给出的链式推理常常并非其真实计算——而恰恰是 backtracking、突然的"啊哈"时刻、重新考量这类拐点,几乎只出现在内部置信度发生大幅迁移的问题上,是对内部不确定性消解的忠实表达。更广的结论是残酷的:CoT 提供了透明的外观,但不等于忠实的可解释性;它常是事后合理化,而非模型内部处理的真实反映,这种不忠实源于transformer 分布式并行计算与序列化显式推理之间的结构性错配。甚至有机制性发现:推理链在 70–85% 处存在一个"推理视界",超过它后推理 token 对最终答案的因果影响急剧衰减。
+1. **Latent deserves attention** (the consumption side: a user's attention budget should go to cognition, not to the theater of tool execution).
+2. **Latent is exactly where attention operates** (the mechanism side: the transformer's attention *is* that latent-space process). The UI should align the user's attention with the layer where the model's attention actually happens.
 
-把这点说穿:**渲染出来的 latent ≠ 真实的 latent。** 你看到的是 verbalized 投影,一个有时被事后编造、可能"看起来很有洞见却完全是虚构"的叙述——一个完美自洽的解释可能完全是杜撰的,而一个有瑕疵的解释反而可能反映了模型的真实策略。如果你的设计语言把这层叙述当主角、做得越漂亮,**你越是在为不忠实的认知贴上"可信"的金箔。** 这会直接摧毁你想要的信任,而且在金融场景里是合规灾难。
+The strongest form, therefore, is not "display the model's thoughts," but:
+
+> **Allocate the user's finite attention to the *latent structure of the problem* and the *agent's continuously evolving understanding of it* — not to the mechanical process of tool execution; let actions recede into provenance that can be retrieved on demand.**
 
 ---
 
-## 四、解法(这是真正的贡献,也是这套语言区别于一切现有方案的地方)
+## III. The fatal risk (this is the pivot on which the whole language succeeds or fails)
 
-把上面的风险翻转成约束,你的论点就从"审美偏好"升级成"认识论纪律":
+If you naively execute "put the model's thinking on stage," you will replace one problem with **something more dangerous than tool-call theater: reasoning theater.**
 
-**只有可证伪的、被证据锚定的认知,才配占据主注意力。** 我把它叫 **Grounding Contract**。任何想进入"理解态"主舞台的 latent 元素,必须是以下三种合法形态之一,否则不得占据主注意力:
+This is not a worry — it is a named, empirical phenomenon. There is a paper literally titled *Reasoning Theater*, and its core finding is that the chain-of-thought a model produces is often not its actual computation — whereas it is precisely the inflections, the backtracking, the sudden "aha" moments, the reconsiderations, that appear almost exclusively on problems where internal confidence undergoes a large shift, and these are faithful expressions of the resolution of internal uncertainty. The broader conclusion is brutal: CoT offers the *appearance* of transparency but does not amount to faithful interpretability; it is often post-hoc rationalization rather than a true reflection of the model's internal processing, and this unfaithfulness stems from a structural mismatch between the transformer's distributed, parallel computation and serialized, explicit reasoning. There is even a mechanistic finding: a "reasoning horizon" exists at roughly 70–85% of the chain, beyond which a reasoning token's causal influence on the final answer decays sharply.
 
-| 形态 | 必须携带 | 视觉权重 |
+To say it plainly: **the rendered latent ≠ the real latent.** What you see is a verbalized projection — a narrative that is sometimes fabricated after the fact, that may "look insightful while being entirely fictional." A perfectly self-consistent explanation may be wholly confabulated, while a flawed explanation may in fact reflect the model's real strategy. If your design language treats this narrative as the protagonist, the more beautifully you do it, **the more you are gilding unfaithful cognition with the lacquer of "trustworthy."** That directly destroys the trust you want — and in a financial setting it is a compliance disaster.
+
+---
+
+## IV. The solution (this is the real contribution, and what distinguishes this language from every existing approach)
+
+Flip the risk above into a constraint, and your thesis is upgraded from "aesthetic preference" to "epistemic discipline":
+
+**Only falsifiable, evidence-anchored cognition is worthy of occupying primary attention.** I call this the **Grounding Contract**. Any latent element that wants onto the main stage of "understanding" must be one of these three legal forms — otherwise it may not occupy primary attention:
+
+| Form | Must carry | Visual weight |
 |---|---|---|
-| **Grounded claim**(已锚定结论) | 指向 evidence / observable primitives 的可点开溯源 | 最高(金 amber) |
-| **Hypothesis**(在押假设) | 置信度 + "什么证据会改变它" | 中(青 aqua) |
-| **Open question**(诚实的未知) | 待查项 | 低但可见(靛 indigo) |
+| **Grounded claim** (an anchored conclusion) | openable provenance pointing to evidence / observable primitives | Highest (amber) |
+| **Hypothesis** (a wager in play) | confidence + "what evidence would change it" | Medium (aqua) |
+| **Open question** (an honest unknown) | what it needs to be resolved | Low but visible (indigo) |
 
-这条契约的妙处在于,它**正是你自己的五层诊断本体论**(Observable Primitives → Evidence → Symptoms → Hypotheses → Conclusions),也正是你的 Popper/Lakatos 立场:本体论的上层(假设/结论)是台前主体,但每一个都必须有一根线**栓回到下层的可观测原语**——不能悬空断言。Reasoning theater 之所以危险,正因为它的叙述悬空;Grounding Contract 用"必须可证伪、必须落到证据"把悬空的叙述挡在主舞台之外。
+The beauty of this contract is that it **is exactly your own five-layer diagnostic ontology** (Observable Primitives → Evidence → Symptoms → Hypotheses → Conclusions), and exactly your Popper/Lakatos stance: the upper layers of the ontology (hypotheses/conclusions) are the on-stage protagonists, but each must have a thread tying it **back down to the observable primitives** — no free-floating assertion. Reasoning theater is dangerous precisely because its narrative floats free; the Grounding Contract uses "must be falsifiable, must land on evidence" to keep free-floating narrative off the main stage.
 
-由此再叠加四条从研究里直接长出来的纪律:
+On top of that, four further disciplines that grow directly out of the research:
 
-1. **优先浮现 inflection,而非流水叙述。** 研究说拐点(改主意、啊哈、推翻)恰恰是 latent 中*最忠实*的高价值部分——那就把它们提到台前高亮,而把"我在读文件 / 我在调用搜索"这类程序性叙述(不忠实的温床)沉到外围。注意力跟着"理解发生了什么变化"走,而不是跟着"执行了哪一步"走。
-2. **Provenance 永远可重建(审计不可让渡)。** 在金融客户那里,"agent 碰了哪些数据"是合规问题。Tool calls 视觉上退为外围,但必须始终可调取、可审计。**弱化 ≠ 隐藏。**
-3. **比例原则(proportionality)。** "给所有 AI 应用"意味着有些任务认知很浅(格式化 JSON、起草一封邮件)。理解态的体量应随*问题的认识论复杂度*伸缩——别给琐碎任务摆一块假设板。
-4. **两种人格,两种视图。** 领域里"要看 tool call"的呼声(transparency / 可控)是对的——但那是 *builder/debugger* 人格的需求。**Operator/end-user 视图 = latent 主导(默认);Trace 视图 = tool-call 主导(调试/审计时切入)。** 一个 toggle 解决"透明派 vs 你的论点"的张力,而不是二选一。
+1. **Surface inflections, not running narration.** The research says inflections (changes of mind, aha moments, refutations) are precisely the *most faithful*, highest-value part of the latent — so promote them to the stage and highlight them, while sinking procedural narration like "I'm reading a file / I'm calling search" (the breeding ground of unfaithfulness) to the periphery. Attention follows *what changed in the understanding*, not *which step was executed*.
+2. **Provenance is always reconstructable (auditability is non-negotiable).** With a financial client, "which data did the agent touch" is a compliance question. Tool calls recede visually to the periphery, but must remain retrievable and auditable at all times. **Weakened ≠ hidden.**
+3. **Proportionality.** "For all AI applications" means some tasks are cognitively shallow (formatting JSON, drafting an email). The mass of the understanding surface should scale with the *epistemic complexity of the problem* — don't put a hypothesis board on a trivial task.
+4. **Two personas, two views.** The field's call for "let me see the tool calls" (transparency / control) is right — but that is the need of the *builder/debugger* persona. **Operator/end-user view = latent-led (default); Trace view = tool-call-led (entered for debugging/audit).** A single toggle resolves the tension between "the transparency camp vs. your thesis" — rather than forcing a choice between them.
 
 ---
 
-下面是把这一切落成的设计语言。我没有用一份普通 markdown 来写它——那对这个主题是反讽的。**我把它做成了一个自我演示的 design-language 站点:它既是规范,也用你的 TraceForge 诊断场景把语言渲染出来给你看。** 命名用了 **Latent**,哲学根取「**潜**」(潜龙在渊——隐而未发、值得被看见的认知)。
+What follows is the design language that puts all of this into practice. I did not write it as an ordinary markdown document — that would be ironic for this very subject. **I built it as a self-demonstrating design-language site: it is both the spec and a rendering of the language through your TraceForge diagnosis scenario.** The naming uses **Latent**, with its philosophical root in 「**潜**」(潜龙在渊 — cognition that is hidden but not yet expressed, and worthy of being seen).
 
-让我先把它构建出来。I see some stray tokens slipped into the CSS variables. Let me clean those up so the stylesheet is correct.Let me scan for any other stray tokens I may have introduced.Balanced and well-formed. Let me place it where you can open it.I built the system as a **self-demonstrating design-language site** rather than a markdown spec — given the thesis, a static document would have been ironic. Open it full-screen; it contains the full language: the inversion, the three-zone attention model, the Grounding Contract, the epistemic color/type/motion foundations, a live component library, the seven principles, voice rules, and anti-patterns — all anchored by a **steppable TraceForge diagnosis** (hit *推进诊断* to watch a hypothesis sink, an inflection surface, and the root cause settle; toggle *Trace* to see the two-persona resolution). It embodies its own argument: cognition is the lit primary plane, tool calls recede to a peripheral, auditable rail, and color carries epistemic state rather than decoration.
+Let me build it first.I see some stray tokens slipped into the CSS variables. Let me clean those up so the stylesheet is correct.Let me scan for any other stray tokens I may have introduced.Balanced and well-formed. Let me place it where you can open it.I built the system as a **self-demonstrating design-language site** rather than a markdown spec — given the thesis, a static document would have been ironic. Open it full-screen; it contains the full language: the inversion, the three-zone attention model, the Grounding Contract, the epistemic color/type/motion foundations, a live component library, the seven principles, voice rules, and anti-patterns — all anchored by a **steppable TraceForge diagnosis** (hit *Advance diagnosis* to watch a hypothesis sink, an inflection surface, and the root cause settle; toggle *Trace* to see the two-persona resolution). It embodies its own argument: cognition is the lit primary plane, tool calls recede to a peripheral, auditable rail, and color carries epistemic state rather than decoration.
 
 Three things I want to flag honestly, because they're where this stops being a UX project and becomes *your core technical program*:
 

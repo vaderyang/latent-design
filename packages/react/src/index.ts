@@ -30,6 +30,10 @@ export { UnderstandingPanel, OutcomeBanner } from "./components/panel.tsx";
 export { PlainView } from "./components/plainview.tsx";
 export { Scenario } from "./components/scenario.tsx";
 
+// Bilingual (English default · 中文) chrome strings + reactive language hook.
+export { useLang, getLang, useStrings, STRINGS, LANG_EVENT } from "./i18n.ts";
+export type { Lang, Strings } from "./i18n.ts";
+
 // Re-export the schema types for convenience.
 export type {
   CognitiveState,

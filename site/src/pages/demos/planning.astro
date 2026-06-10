@@ -2,16 +2,22 @@
 import Base from "../../layouts/Base.astro";
 import DemoFrame from "../../components/DemoFrame.tsx";
 import data from "@examples/planning.json";
+import dataZh from "@examples/planning.zh.json";
 ---
 
-<Base title="规划 / 决策 · Latent demo" description="规划型 agent：主舞台是决策、计划、权衡与风险，而非根因。">
+<Base title="Planning / Decision · Latent 潜 demo" description="A planning agent: the primary plane is decisions, plans, tradeoffs and risks — not root cause.">
   <section class="wrap" style="padding-top:64px">
     <a class="demo-back" href="/">◂ Latent · 潜</a>
-    <div class="kicker">应用 Demo · 规划 / 决策</div>
-    <h2>架构规划 — 多区域高可用迁移</h2>
-    <p>
+    <div class="kicker" data-i18n="en">Application demo · Planning / decision</div>
+    <div class="kicker" data-i18n="zh">应用 Demo · 规划 / 决策</div>
+    <h2 data-i18n="en">Architecture planning — multi-region HA migration</h2>
+    <h2 data-i18n="zh">架构规划 — 多区域高可用迁移</h2>
+    <p data-i18n="en">
+      Planning isn't about finding root cause — it's about <strong>committing to a course of action under constraints</strong>. In the same language, the primary plane becomes the <span class="mono" style="color:var(--grounded)">decision</span> / <span class="mono">plan</span> / <span class="mono">tradeoff</span> / <span class="mono">risk</span> roles — and the Grounding Contract holds: a decision that takes the primary plane must be grounded (hung on principles/load tests), or marked tentative (with "what would change this choice"), or left open.
+    </p>
+    <p data-i18n="zh">
       规划不是找根因，而是<strong>在约束下选定一条行动路线</strong>。同一套语言里，主舞台变成 <span class="mono" style="color:var(--grounded)">decision</span> / <span class="mono">plan</span> / <span class="mono">tradeoff</span> / <span class="mono">risk</span> 角色——而 Grounding Contract 不变：一个决策占据主舞台，也必须 grounded（挂在准则/压测上）、或标为 tentative（带“什么会改变这个选择”）、或留作 open。
     </p>
-    <DemoFrame data={data} mode="scenario" stepped client:load />
+    <DemoFrame data={data} dataZh={dataZh} mode="scenario" stepped client:load />
   </section>
 </Base>

@@ -1,77 +1,76 @@
+**English** · [中文](README.zh.md)
+
 # Latent · 潜 — An Agentic Design Language
 
-> **Latent is attentioned.** 注意力跟随理解，而非活动。
-> Attention follows understanding, not activity.
+> **Latent is attentioned.** Attention follows understanding, not activity.
 
-现有 agentic 界面把注意力花在渲染工具调用上——但工具调用是认知的*剧场*，不是认知本身。
-**潛** 把视觉层级倒过来：agent 不断演化、被证据锚定的「理解态」占据主舞台；动作退为外围、可审计的 provenance。
+Today's agentic interfaces spend their attention rendering tool calls — but a tool call is the *theater* of cognition, not cognition itself. **潛** inverts the visual hierarchy: the agent's continuously evolving, evidence-anchored *understanding* takes the main stage, while actions recede into a peripheral, auditable provenance.
 
-这个仓库把该设计语言做成一份**成熟交付物**，由一份 canonical schema 作为脊梁，串起四条应用线：
-产品设计、模型（训练）设计、agentic-coding 指引、含多场景 demo 的推介网站。
+This repository turns that design language into a **mature deliverable**, built around a single canonical schema as its spine, threaded through four lines of application: product design, model (training) design, agentic-coding guidance, and a pitch site with multi-scenario demos.
 
-## 仓库结构
+## Repository structure
 
 ```
-packages/tokens/   @latent/tokens     设计 token：色彩(认识论状态)·字体(三声音)·动效(浮现/凝定/沉降/拐点)
-packages/react/    @latent/react      ~15 个 schema 驱动的 React 组件
-schema/            @latent/schema     ★脊梁：Zod CognitiveState 契约 → 生成 JSON Schema
-validator/         @latent/validator  latent-validate CLI，机械执行 Grounding Contract
-site/              Astro 推介站 + 5 个场景 demo + 比例条带
-skills/            latent-design/SKILL.md — 给 Claude Code 的设计语言 skill
-docs/product/      产品设计规范（设计师/PM）
-docs/training/     模型训练规范（schema=训练目标 · reward shaping · SFT · verifiable/asserted）
-examples/          每个 demo 一份校验过的 CognitiveState 实例
-DESIGN_LANGUAGE.html  原始自演示单页（tokens/组件/TraceForge 的真相源）
-MISSION.md            战略综述（论点、风险、技术纲领）
+packages/tokens/   @latent/tokens     design tokens: color (epistemic state) · type (three voices) · motion (surface/settle/sink/inflection)
+packages/react/    @latent/react      ~15 schema-driven React components
+schema/            @latent/schema     ★ the spine: Zod CognitiveState contract → generated JSON Schema
+validator/         @latent/validator  latent-validate CLI, mechanically enforces the Grounding Contract
+site/              Astro pitch site + 5 scenario demos + proportionality band
+skills/            latent-design/SKILL.md — the design-language skill for Claude Code
+docs/product/      product design spec (designers / PMs)
+docs/training/     model training spec (schema = training target · reward shaping · SFT · verifiable/asserted)
+examples/          one validated CognitiveState instance per demo
+DESIGN_LANGUAGE.html  the original self-demonstrating single page (source of truth for tokens/components/TraceForge)
+MISSION.md            strategic overview (thesis, risks, technical program)
 ```
 
-## 脊梁：一份 schema，四个消费者
+## The spine: one schema, four consumers
 
-`CognitiveState`（`schema/src/cognitive-state.ts`，v0.2）同时：(a) 描述模型应 emit 的输出、(b) 类型化并驱动 React 组件、(c) 被 validator 校验、(d) 被 skill 引用。
-Grounding Contract 的纪律被编码为**硬约束**——grounded 必带可溯源 provenance、hypothesis 必带 falsification、verifiable provenance 必带可重执行命令、所有 evidence/provenance 引用必须解析——因此 validator 能**机械地拒绝 reasoning theater**。
+`CognitiveState` (`schema/src/cognitive-state.ts`, v0.2) simultaneously: (a) describes the output the model should emit, (b) types and drives the React components, (c) is checked by the validator, and (d) is referenced by the skill.
+The discipline of the Grounding Contract is encoded as **hard constraints** — grounded claims must carry traceable provenance, every hypothesis must carry a falsification, verifiable provenance must carry a re-executable command, and every evidence/provenance reference must resolve — so the validator can **mechanically reject reasoning theater**.
 
-**通用而非诊断专用**：节点有两条正交轴——`state`（认识论状态：grounded/hypothesis/open/inflection/refuted，编码颜色）与 `kind`（内容角色：decision / plan / requirement / option / tradeoff / answer / risk / observation / claim，编码标签）。于是同一契约跨各种 agent 成立：一个**决策**或**需求理解**占据主舞台，同样必须 grounded、或 tentative（带可证伪条件）、或诚实 open。
+**General, not diagnosis-specific.** Nodes have two orthogonal axes: `state` (the epistemic stance — grounded/hypothesis/open/inflection/refuted, which encodes color) and `kind` (the content role — decision / plan / requirement / option / tradeoff / answer / risk / observation / claim, which encodes the badge label). The same contract therefore holds across every kind of agent: a **decision** or a **requirement understanding** that takes the main stage must equally be grounded, or tentative (with a falsification condition), or honestly open.
 
-**三套主题**：`<html data-theme="dark|light|kami">` 切换 dark（深海蓝）/ light（冷纸）/ kami（暖羊皮纸 + 靛蓝，Kami 风格）。组件只引用语义 token，主题是纯值替换。站点右上角可切换、`?theme=` 可分享。
+**Three themes.** `<html data-theme="dark|light|kami">` switches between dark (deep-sea blue), light (cool paper), and kami (warm parchment + indigo, Kami style). Components reference only semantic tokens; a theme is pure value substitution. Switch it from the top-right of the site, or share via `?theme=`.
 
-## 快速开始（bun）
+## Quick start (bun)
 
 ```bash
 bun install
-bun run gen           # 生成 cognitive-state.schema.json + tokens.json
-bun run validate "examples/**/*.json"   # 跑契约校验（应全过）
-bun run dev           # 本地预览推介站 (astro dev)
-bun run build         # gen + 构建静态站点到 site/dist/
-bun run preview       # 预览构建产物（纯静态）
+bun run gen           # generate cognitive-state.schema.json + tokens.json
+bun run validate "examples/**/*.json"   # run the contract checks (all should pass)
+bun run dev           # preview the pitch site locally (astro dev)
+bun run build         # gen + build the static site to site/dist/
+bun run preview       # preview the build output (pure static)
 ```
 
-部署：`site/dist/` 为纯静态，可经 staging caddy 暴露到 `https://<name>.staging.netis.com`（见 `register_staging` skill）。
+Deployment: `site/dist/` is pure static and can be exposed through the staging caddy at `https://<name>.staging.netis.com` (see the `register_staging` skill).
 
-## 6 个应用 demo（跨 agent 原型 × latent 复杂度）
+## 6 application demos (agent archetype × latent complexity)
 
-| Demo | 原型 | latent | 看点 |
+| Demo | Archetype | latent | What to watch |
 |---|---|---|---|
-| `/demos/traceforge` | 诊断 / 根因 | 高 | hypotheses → 拐点 → grounded 根因；verifiable 溯源 |
-| `/demos/planning` | 规划 / 决策 | 高 | decision / plan / tradeoff / risk 角色；约束驱动 |
-| `/demos/writing` | 写作 / 生成 | 中 | requirement 锚定原话；结构 decision；风格 option |
-| `/demos/advisory` | 助手 / 建议 | 中 | answer + 显式假设 + tradeoff + 诚实 risk |
-| `/demos/action` | 代理操作 / ambient | 高 | 替你做的可审计 decision；高风险项暂停等你拍板 |
-| `/demos/rad-app` | RAD / 全栈 App | 高 | requirement → 架构 decision（smoke 可重跑）→ plan/option/risk |
+| `/demos/traceforge` | Diagnosis / root cause | High | hypotheses → inflection → grounded root cause; verifiable provenance |
+| `/demos/planning` | Planning / decision | High | decision / plan / tradeoff / risk roles; constraint-driven |
+| `/demos/writing` | Authoring / generation | Mid | requirement anchored to the user's own words; structural decision; stylistic option |
+| `/demos/advisory` | Assistant / advice | Mid | answer + explicit assumptions + tradeoff + honest risk |
+| `/demos/action` | Agentic action / ambient | High | auditable decisions taken on your behalf; high-risk items pause for your call |
+| `/demos/rad-app` | RAD / full-stack app | High | requirement → architecture decision (re-runnable smoke) → plan/option/risk |
 
-## 应用层：App Attention Grammar（宏观）
+## Application layer: App Attention Grammar (macro)
 
-设计语言不止组件——三区模型放大到**整个 App**：五个注意力区域（**① Stage 理解 · ② Artifact 工件 · Activity 活动 · Context 导航 · ③ Intervene 干预**），权重 `Stage > Artifact > {Context, Activity}`。宏观倒置：别家把工具调用流放主舞台，潛 把「理解」放上去。`@latent/react/app` 提供 zone 角色样式，App 用 `grid-template-areas` 自排，Stage 放 `<UnderstandingPanel>`。两个参考实现：
+The design language is more than components — the three-zone model scales up to the **whole app**: five attention zones (**① Stage · Understanding · ② Artifact · Activity · Context · ③ Intervene**), with weighting `Stage > Artifact > {Context, Activity}`. The macro inversion: where others put the tool-call stream on the main stage, 潛 puts *understanding* there. `@latent/react/app` provides the zone-role styles; an app lays itself out with `grid-template-areas` and places `<UnderstandingPanel>` in the Stage. Two reference implementations:
 
-| App | 地址 | 看点 |
+| App | Path | What to watch |
 |---|---|---|
-| 潛 IDE · Vibe Coding | `/apps/vibe-ide` | 侧栏的工具调用流 → agent 对「要建什么」的理解；代码居中、终端退下 |
-| 潛 Studio · Image/Video 生成 | `/apps/gen-studio` | 渲染队列从主位挪开 → agent 对创作意图的理解；画布居中、队列退侧 |
+| 潛 IDE · Vibe Coding | `/apps/vibe-ide` | the sidebar's tool-call stream → the agent's understanding of *what to build*; code centered, terminal recedes |
+| 潛 Studio · Image/Video generation | `/apps/gen-studio` | the render queue moves off the main spot → the agent's understanding of creative intent; canvas centered, queue recedes to the side |
 
-## 进一步
+## Going further
 
-- 设计师/PM → `docs/product/README.md`
-- 训练/Lab → `docs/training/README.md`
-- 用 AI 写 Latent UI → `skills/latent-design/SKILL.md`
-- 哲学与战略 → `MISSION.md`
+- Designers / PMs → `docs/product/README.md`
+- Training / Lab → `docs/training/README.md`
+- Writing Latent UI with AI → `skills/latent-design/SKILL.md`
+- Philosophy and strategy → `MISSION.md`
 
 v0.1 · 潛龍在淵 · for Netis.

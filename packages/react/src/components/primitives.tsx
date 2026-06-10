@@ -1,6 +1,7 @@
 /** Low-level pieces shared by the cognitive-node cards. All schema-typed. */
 import { useState } from "react";
 import type { Confidence, Evidence, Provenance } from "@latent/schema";
+import { useStrings } from "../i18n.ts";
 
 type Tone = "g" | "h" | "o" | "r";
 
@@ -68,13 +69,15 @@ export function EvidenceChips({
 /** The "what would change it" block — falsification, needs, or refutation reason. */
 export function Falsification({
   text,
-  label = "什么会改变它",
+  label,
   tone = "o",
 }: {
   text: string;
   label?: string;
   tone?: "o" | "h" | "r";
 }) {
+  const t = useStrings();
+  const lab = label ?? t.prim.whatWouldChange;
   const style =
     tone === "r"
       ? { background: "var(--refuted-dim)", borderColor: "var(--line)" }
@@ -82,7 +85,7 @@ export function Falsification({
   const bStyle = tone === "r" ? { color: "var(--refuted)" } : tone === "o" ? { color: "var(--open)" } : undefined;
   return (
     <div className="falsify" style={style}>
-      <b style={bStyle}>{label}</b>
+      <b style={bStyle}>{lab}</b>
       {text}
     </div>
   );
@@ -91,23 +94,25 @@ export function Falsification({
 /** Provenance — weakened ≠ hidden. Always openable; surfaces verifiable vs asserted. */
 export function ProvenanceView({
   provenance,
-  label = "provenance · observable primitives",
+  label,
   defaultOpen = false,
 }: {
   provenance: Provenance;
   label?: string;
   defaultOpen?: boolean;
 }) {
+  const t = useStrings();
+  const lab = label ?? t.prim.provenanceLabel;
   const [open, setOpen] = useState(defaultOpen);
   const n = provenance.steps.length;
   return (
     <>
       <div className="prov-toggle" onClick={() => setOpen((o) => !o)}>
-        {open ? "▾" : "▸"} {label} · {n} {n === 1 ? "step" : "steps"}
+        {open ? "▾" : "▸"} {lab} · {n} {n === 1 ? "step" : "steps"}
       </div>
       <div className={`prov${open ? " open" : ""}`}>
         <span className={`pmode ${provenance.mode}`}>
-          {provenance.mode === "verifiable" ? "◆ verifiable · 可重执行验证" : "○ asserted · 仅自报"}
+          {provenance.mode === "verifiable" ? t.prim.verifiable : t.prim.asserted}
         </span>
         {provenance.steps.map((st, i) => (
           <div className="pline" key={i}>

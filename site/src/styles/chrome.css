@@ -36,14 +36,20 @@ body{
 :root[data-theme="light"] .grain,
 :root[data-theme="kami"] .grain{opacity:.03;mix-blend-mode:multiply}
 
-/* theme toggle (fixed) */
-.theme-toggle{position:fixed;top:14px;right:14px;z-index:60;display:flex;gap:3px;
+/* language + theme toggles (fixed, top-right) */
+.chrome-toggles{position:fixed;top:14px;right:14px;z-index:60;display:flex;gap:8px;align-items:center}
+.lang-toggle,.theme-toggle{display:flex;gap:3px;
   background:color-mix(in srgb,var(--d-700) 82%, transparent);border:1px solid var(--line-2);
   border-radius:11px;padding:4px;backdrop-filter:blur(10px);box-shadow:0 12px 34px -18px rgba(0,0,0,.5)}
-.theme-toggle button{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink-500);
+.lang-toggle button,.theme-toggle button{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink-500);
   background:none;border:none;border-radius:8px;padding:5px 11px;cursor:pointer;transition:.15s}
-.theme-toggle button:hover{color:var(--ink-200)}
-.theme-toggle button.active{background:var(--d-600);color:var(--hypo);box-shadow:0 0 0 1px var(--hypo-line)}
+.lang-toggle button:hover,.theme-toggle button:hover{color:var(--ink-200)}
+.lang-toggle button.active,.theme-toggle button.active{background:var(--d-600);color:var(--hypo);box-shadow:0 0 0 1px var(--hypo-line)}
+
+/* bilingual static prose — render both languages, show only the active one.
+   English is the default, so SSR/no-JS shows English. */
+html[data-lang="en"] [data-i18n="zh"]{display:none}
+html[data-lang="zh"] [data-i18n="en"]{display:none}
 
 /* ---------- layout ---------- */
 .wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px}

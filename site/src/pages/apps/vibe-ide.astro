@@ -3,26 +3,32 @@ import Base from "../../layouts/Base.astro";
 import StagePanel from "../../components/StagePanel.tsx";
 import "@latent/react/app";
 import radapp from "@examples/rad-app.json";
+import radappZh from "@examples/rad-app.zh.json";
 
 const actions = [
+  { label: "Confirm the state set, generate v1", variant: "primary" },
+  { label: "Challenge the architecture decision" },
+  { label: "Add a requirement" },
+];
+const actionsZh = [
   { label: "确认状态集，生成 v1", variant: "primary" },
   { label: "对架构决策提异议" },
   { label: "补充需求" },
 ];
 ---
 
-<Base title="潛 IDE · Vibe Coding（应用层设计）" description="把设计语言用到 Vibe Coding IDE：agent 的理解占据主舞台，代码与终端退为外围。">
+<Base title="潛 IDE · Vibe Coding (applied layer)" description="The design language applied to a Vibe Coding IDE: the agent's understanding holds the primary Stage, while code and terminal recede to the periphery.">
   <div class="app-frame app-vibe">
     <!-- top chrome -->
     <div class="app-topbar">
       <div class="brand"><span class="mk">潛 IDE</span> reimburse-app</div>
       <div class="tcrumb">~/reimburse-app · bun · ⌥ vibe</div>
-      <div class="tright"><span class="mono" style="font-size:11px;color:var(--ink-500)">已生成 v0 · /health 200</span></div>
+      <div class="tright"><span class="mono" style="font-size:11px;color:var(--ink-500)"><span data-i18n="en">generated v0 · /health 200</span><span data-i18n="zh">已生成 v0 · /health 200</span></span></div>
     </div>
 
     <!-- · Context — file tree (recessive) -->
     <div class="zone zone-context">
-      <div class="zone-head">· Context · 文件</div>
+      <div class="zone-head">· Context · <span data-i18n="en">Files</span><span data-i18n="zh">文件</span></div>
       <div class="app-tree-row dir">▾ src/</div>
       <div class="app-tree-row">  index.ts</div>
       <div class="app-tree-row active">  routes/approvals.ts</div>
@@ -37,12 +43,12 @@ const actions = [
 
     <!-- ② Artifact — the code (co-present, neutral) -->
     <div class="zone zone-artifact">
-      <div class="zone-head">② Artifact · 代码 <span class="zn">routes/approvals.ts</span></div>
+      <div class="zone-head">② Artifact · <span data-i18n="en">Code</span><span data-i18n="zh">代码</span> <span class="zn">routes/approvals.ts</span></div>
       <pre class="code"><span class="c-k">import</span> {`{ Hono }`} <span class="c-k">from</span> <span class="c-s">"hono"</span>
 <span class="c-k">import</span> {`{ db }`} <span class="c-k">from</span> <span class="c-s">"../db"</span>
 <span class="c-k">import</span> {`{ requireRole }`} <span class="c-k">from</span> <span class="c-s">"../rbac"</span>
 
-<span class="c-c">// 审批状态机：draft→submitted→approved/rejected→paid</span>
+<span class="c-c">// approval state machine: draft→submitted→approved/rejected→paid</span>
 <span class="c-k">const</span> app = <span class="c-k">new</span> <span class="c-f">Hono</span>()
 
 app.<span class="c-f">post</span>(<span class="c-s">"/requests"</span>, <span class="c-f">requireRole</span>(<span class="c-s">"employee"</span>), <span class="c-k">async</span> (c) => {`{`}
@@ -56,19 +62,22 @@ app.<span class="c-f">post</span>(<span class="c-s">"/requests/:id/approve"</spa
 
     <!-- · Activity — terminal / tool calls (peripheral, recede) -->
     <div class="zone zone-activity">
-      <div class="zone-head">· Activity · 终端 / 工具调用（外围 · 可审计）</div>
-      <div class="app-row"><span class="dot"></span>scaffold · 生成 7 文件 + 迁移 + 种子</div>
-      <div class="app-row"><span class="dot"></span>run_migration · requests/users/approvals 建表</div>
-      <div class="app-row"><span class="dot"></span>smoke_test · /health 200 · 启动 0.3s</div>
+      <div class="zone-head">· Activity · <span data-i18n="en">terminal / tool calls (peripheral · auditable)</span><span data-i18n="zh">终端 / 工具调用（外围 · 可审计）</span></div>
+      <div class="app-row"><span class="dot"></span>scaffold · <span data-i18n="en">generated 7 files + migration + seed</span><span data-i18n="zh">生成 7 文件 + 迁移 + 种子</span></div>
+      <div class="app-row"><span class="dot"></span>run_migration · <span data-i18n="en">created requests/users/approvals tables</span><span data-i18n="zh">requests/users/approvals 建表</span></div>
+      <div class="app-row"><span class="dot"></span>smoke_test · /health 200 · <span data-i18n="en">boot 0.3s</span><span data-i18n="zh">启动 0.3s</span></div>
       <div class="app-row muted"><span class="dot"></span>bun run dev · watching…</div>
     </div>
 
     <!-- ① Stage — the agent's understanding (lit primary plane) -->
     <div class="zone zone-stage">
-      <div class="zone-note">
+      <div class="zone-note" data-i18n="en">
+        In most AI IDEs, this plane is a <b>stream of tool calls</b> (“installing dependencies… editing App.tsx…”). 潛 IDE replaces it with the agent's <b>understanding of what to build</b> — requirements, architecture decisions, plan, and risks. The code sits in the middle and the terminal below, both receding to the periphery.
+      </div>
+      <div class="zone-note" data-i18n="zh">
         在多数 AI IDE，这块是<b>工具调用流</b>（“正在装依赖…正在编辑 App.tsx…”）。潛 IDE 把它换成 agent 对<b>“要建什么”的理解</b>——需求、架构决策、计划与风险。代码在中间、终端在下方，都退为外围。
       </div>
-      <StagePanel data={radapp} heading="agent 的理解" actions={actions} client:load />
+      <StagePanel data={radapp} dataZh={radappZh} heading="the agent's understanding" headingZh="agent 的理解" actions={actions} actionsZh={actionsZh} client:load />
     </div>
   </div>
 

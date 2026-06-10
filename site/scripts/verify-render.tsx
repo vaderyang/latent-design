@@ -9,15 +9,17 @@ import { CognitiveState } from "@latent/schema";
 
 const root = new URL("../../", import.meta.url); // repo root
 
-// plain-language markers that must appear in the default (简明) view
+// plain-language markers that must appear in the default (English) view.
+// Components default to English (getServerSnapshot → "en"), so renderToString
+// yields the English plain reading.
 const plainChecks: Record<string, string[]> = {
-  "examples/traceforge.json": ["你的问题", "我的判断", "我为什么这么看", "GC 长停顿", "我中途改了主意"],
-  "examples/planning.json": ["你的问题", "我的判断", "分阶段", "我中途改了主意", "需要你定"],
-  "examples/writing.json": ["你的问题", "我的判断", "三栏", "需要你定"],
-  "examples/advisory.json": ["你的问题", "我的判断", "K8s", "我为什么这么看"],
-  "examples/action.json": ["你的问题", "我的判断", "归档", "需要你定"],
-  "examples/rad-app.json": ["你的问题", "我的判断", "状态机"],
-  "examples/gen-studio.json": ["你的问题", "我的判断", "暖光"],
+  "examples/traceforge.json": ["Your question", "My read", "Why I think so", "GC pause", "Where I changed my mind"],
+  "examples/planning.json": ["Your question", "My read", "phased", "Where I changed my mind", "Still unsure"],
+  "examples/writing.json": ["Your question", "My read", "three-column", "Still unsure"],
+  "examples/advisory.json": ["Your question", "My read", "K8s", "Why I think so"],
+  "examples/action.json": ["Your question", "My read", "phishing", "Still unsure"],
+  "examples/rad-app.json": ["Your question", "My read", "state-machine"],
+  "examples/gen-studio.json": ["Your question", "My read", "golden-hour"],
 };
 
 let fail = 0;
@@ -33,14 +35,14 @@ for (const [file, expect] of Object.entries(plainChecks)) {
   const trace = renderToString(h(TraceView, { toolCalls: parsed.data.toolCalls }));
   const missing = expect.filter((s) => !plain.includes(s));
   // certainty words must be present (no raw confidence numbers leaking to plain)
-  const hasCertainty = /比较确定|大致确定|初步判断|倾向认为|还在判断/.test(plain);
+  const hasCertainty = /fairly sure|mostly sure|initial read|leaning yes|still weighing/.test(plain);
   const boardOk = board.length > 0 && /hcard/.test(board);
   const traceOk = trace.includes("Trace View");
   if (missing.length || !hasCertainty || !boardOk || !traceOk) {
     console.log(`✗ ${file} — missing: ${missing.join(", ")}${hasCertainty ? "" : " [no certainty word]"}${boardOk ? "" : " [board]"}${traceOk ? "" : " [trace]"}`);
     fail++;
   } else {
-    console.log(`✓ ${file} — plain(${expect.length} markers + 词级确定度) · board · trace`);
+    console.log(`✓ ${file} — plain(${expect.length} markers + certainty word) · board · trace`);
   }
 }
 

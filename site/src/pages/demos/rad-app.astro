@@ -2,16 +2,22 @@
 import Base from "../../layouts/Base.astro";
 import DemoFrame from "../../components/DemoFrame.tsx";
 import data from "@examples/rad-app.json";
+import dataZh from "@examples/rad-app.zh.json";
 ---
 
-<Base title="RAD · 全栈 Mini App · Latent demo" description="AI 协助构建全栈 mini app：主舞台是对要构建什么的理解，文件写入退为外围。">
+<Base title="RAD · Full-stack Mini App · Latent 潜 demo" description="AI-assisted full-stack mini app build: the primary plane is the understanding of what to build, with file writes demoted to the periphery.">
   <section class="wrap" style="padding-top:64px">
     <a class="demo-back" href="/">◂ Latent · 潜</a>
-    <div class="kicker">应用 Demo · RAD / AI 协助全栈 Mini App</div>
-    <h2>从一句话生成报销审批 App</h2>
-    <p>
+    <div class="kicker" data-i18n="en">Application demo · RAD / AI-assisted full-stack mini app</div>
+    <div class="kicker" data-i18n="zh">应用 Demo · RAD / AI 协助全栈 Mini App</div>
+    <h2 data-i18n="en">Generating an expense-approval app from one sentence</h2>
+    <h2 data-i18n="zh">从一句话生成报销审批 App</h2>
+    <p data-i18n="en">
+      Vibe coding made visible: the primary plane isn't "writing the 7th file" — it's the agent's <strong>understanding of "what to build"</strong> — the <span class="mono" style="color:var(--grounded)">requirement</span>, the architecture <span class="mono">decision</span> (hung on a re-runnable smoke), the next <span class="mono">plan</span>, the undecided notification-channel <span class="mono" style="color:var(--open)">option</span>, and honest <span class="mono">risk</span>s like "attachment storage is a production risk." The same CognitiveState drives this interface and is exactly what the <span class="mono" style="color:var(--ink-200)">latent-design</span> skill teaches a coding agent to emit.
+    </p>
+    <p data-i18n="zh">
       vibe coding 的现身说法：主舞台不是“正在写第 7 个文件”，而是 agent <strong>对“要构建什么”的理解</strong>——需求 <span class="mono" style="color:var(--grounded)">requirement</span>、架构 <span class="mono">decision</span>（挂在可重跑的 smoke 上）、下一步 <span class="mono">plan</span>、未定的通知渠道 <span class="mono" style="color:var(--open)">option</span>、以及“附件存储是生产风险”这样的诚实 <span class="mono">risk</span>。同一份 CognitiveState 既驱动这个界面，也正是 <span class="mono" style="color:var(--ink-200)">latent-design</span> skill 教 coding agent 去 emit 的东西。
     </p>
-    <DemoFrame data={data} mode="scenario" stepped client:load />
+    <DemoFrame data={data} dataZh={dataZh} mode="scenario" stepped client:load />
   </section>
 </Base>

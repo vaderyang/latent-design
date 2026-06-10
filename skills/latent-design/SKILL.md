@@ -85,15 +85,16 @@ option / answer / risk …) when present; color always encodes `state`.
 The target user is a **domain expert who is an AI novice**. The DEFAULT view must
 read like a smart colleague's note, not a dashboard — use `<PlainView>` (or
 `<UnderstandingPanel variant="plain">`, the default). Reserve the dense epistemic
-board for a "详细" toggle and the raw trace for "开发者".
+board for a "Detailed" toggle and the raw trace for "Developer".
 
 - Lead with **your question → my judgement**, in plain words.
-- Certainty in **words, never raw numbers**: 比较确定 / 大致确定 / 倾向认为 /
-  还在判断 / 待确认.
-- **Translate insider terms**: grounded→「比较确定」, provenance→「我是怎么确认的」,
-  verifiable→「这条可以复核」, hypothesis→「我倾向 / 还在判断」, refuted→「我考虑过但排除了」.
+- Certainty in **words, never raw numbers**: "fairly sure" / "mostly sure" /
+  "inclined to think" / "still judging" / "to be confirmed".
+- **Translate insider terms**: grounded → "fairly sure", provenance → "how I
+  confirmed it", verifiable → "this one can be re-checked", hypothesis → "I lean /
+  still judging", refuted → "I considered it but ruled it out".
 - Carry weight with **whitespace and type**, not borders / badges / mono readings.
-- Never leak jargon into user-facing text (no "（grounded 0.82）", no "（见 open）").
+- Never leak jargon into user-facing text (no "(grounded 0.82)", no "(see open)").
 
 ## DO
 

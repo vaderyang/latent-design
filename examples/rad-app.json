@@ -3,72 +3,72 @@
   "latentLevel": "high",
   "persona": "operator",
   "task": {
-    "title": "AI 协助构建全栈 Mini App · 报销审批",
-    "goal": "从一句话需求生成可用的报销审批 app（前端 + API + 存储 + 鉴权）",
-    "context": "RAD · vibe coding · 一键可跑",
-    "status": "已生成 v0"
+    "title": "AI-assisted full-stack mini app · expense approvals",
+    "goal": "Generate a working expense-approval app from a one-line requirement (frontend + API + storage + auth)",
+    "context": "RAD · vibe coding · runs in one click",
+    "status": "v0 generated"
   },
   "userStory": {
-    "who": "独立开发者 / 业务负责人",
-    "trigger": "想要一个报销审批小工具，给了一句话需求",
-    "goal": "拿到一个能跑的 v0，并知道接下来要拍板什么",
-    "reads": "agent 对“要建什么”的理解：需求、已通过自检的架构决策、已生成的东西，和还没定的选择",
-    "acts": "确认状态集/通知渠道让它生成 v1 / 对架构决策提异议 / 补充需求"
+    "who": "Indie developer / business owner",
+    "trigger": "Wanted a small expense-approval tool and gave a one-line requirement",
+    "goal": "Get a working v0 and know what to decide next",
+    "reads": "The agent's read on \"what to build\": the requirement, the architecture decisions that passed self-checks, what's been generated, and the choices still open",
+    "acts": "Confirm the state set / notification channel to have it generate v1 / dispute an architecture decision / add requirements"
   },
   "observablePrimitives": [
-    { "id": "op:req:oneliner", "kind": "user-statement", "label": "需求：员工提交报销→主管审批→财务打款" },
-    { "id": "op:constraint:deploy", "kind": "constraint", "label": "约束：轻量、可一键部署、离线优先" },
-    { "id": "op:smoke:health", "kind": "tool-result", "label": "本地 /health 启动自检" },
-    { "id": "op:code:tree", "kind": "code", "label": "生成的文件树（7 文件）" }
+    { "id": "op:req:oneliner", "kind": "user-statement", "label": "Requirement: employee submits expense → manager approves → finance pays out" },
+    { "id": "op:constraint:deploy", "kind": "constraint", "label": "Constraint: lightweight, one-click deployable, offline-first" },
+    { "id": "op:smoke:health", "kind": "tool-result", "label": "Local /health startup self-check" },
+    { "id": "op:code:tree", "kind": "code", "label": "Generated file tree (7 files)" }
   ],
   "toolCalls": [
-    { "id": "tc:scaffold", "ts": "—", "fn": "scaffold", "summary": "生成 7 文件 + 迁移 + 种子", "producedPrimitives": ["op:code:tree"] },
-    { "id": "tc:migrate", "ts": "—", "fn": "run_migration", "summary": "建表：requests/users/approvals", "producedPrimitives": ["op:code:tree"] },
-    { "id": "tc:smoke", "ts": "—", "fn": "smoke_test", "summary": "/health 200 · 启动 0.3s", "durationMs": 1800, "producedPrimitives": ["op:smoke:health"] }
+    { "id": "tc:scaffold", "ts": "—", "fn": "scaffold", "summary": "generated 7 files + migration + seed", "producedPrimitives": ["op:code:tree"] },
+    { "id": "tc:migrate", "ts": "—", "fn": "run_migration", "summary": "created tables: requests/users/approvals", "producedPrimitives": ["op:code:tree"] },
+    { "id": "tc:smoke", "ts": "—", "fn": "smoke_test", "summary": "/health 200 · boot 0.3s", "durationMs": 1800, "producedPrimitives": ["op:smoke:health"] }
   ],
   "nodes": [
     {
       "id": "n:req",
       "state": "grounded",
       "kind": "requirement",
-      "title": "理解到的需求：三角色（员工/主管/财务）+ 附件 + 状态流转 + 鉴权",
+      "title": "Requirement as understood: three roles (employee/manager/finance) + attachments + state transitions + auth",
       "confidence": { "value": 0.85, "source": "human" },
       "evidence": [
-        { "id": "ev:one", "label": "由一句话需求展开的角色与流程", "primitives": ["op:req:oneliner"], "polarity": "supports" }
+        { "id": "ev:one", "label": "roles and flow unpacked from the one-line requirement", "primitives": ["op:req:oneliner"], "polarity": "supports" }
       ],
       "provenance": {
         "mode": "asserted",
         "steps": [
-          { "toolCallId": "tc:scaffold", "observed": "据需求推出三角色 RBAC 与状态机", "primitives": ["op:req:oneliner"] }
+          { "toolCallId": "tc:scaffold", "observed": "derived three-role RBAC and a state machine from the requirement", "primitives": ["op:req:oneliner"] }
         ]
       }
     },
     {
       "id": "n:inflect",
       "state": "inflection",
-      "title": "从单页 CRUD 转向状态机驱动",
+      "title": "From single-page CRUD to state-machine-driven",
       "inflectKind": "aha",
-      "from": "一个表单 + 列表的单页 CRUD",
-      "to": "审批状态机（draft→submitted→approved/rejected→paid）+ 角色路由",
-      "rationale": "“审批”本质是状态流转与权限边界，单纯 CRUD 无法表达谁能在哪个状态做什么——状态机才是正确的骨架。",
+      "from": "A single-page CRUD with one form + a list",
+      "to": "An approval state machine (draft→submitted→approved/rejected→paid) + role-based routing",
+      "rationale": "\"Approval\" is fundamentally about state transitions and permission boundaries; plain CRUD can't express who can do what in which state — a state machine is the right skeleton.",
       "affects": ["n:crud", "n:stack"]
     },
     {
       "id": "n:stack",
       "state": "grounded",
       "kind": "decision",
-      "title": "技术栈：Bun + Hono API + SQLite + 最小 React 前端，3 角色 RBAC",
+      "title": "Stack: Bun + Hono API + SQLite + a minimal React frontend, 3-role RBAC",
       "confidence": { "value": 0.82, "source": "self_consistency" },
       "evidence": [
-        { "id": "ev:light", "label": "满足轻量/一键部署/离线优先约束", "primitives": ["op:constraint:deploy"], "polarity": "supports" },
-        { "id": "ev:boot", "label": "smoke：服务启动、/health 200", "primitives": ["op:smoke:health"], "polarity": "supports" }
+        { "id": "ev:light", "label": "meets the lightweight / one-click-deploy / offline-first constraints", "primitives": ["op:constraint:deploy"], "polarity": "supports" },
+        { "id": "ev:boot", "label": "smoke test: service starts, /health 200", "primitives": ["op:smoke:health"], "polarity": "supports" }
       ],
       "provenance": {
         "mode": "verifiable",
         "reExecCmd": "bun run dev && curl -fsS localhost:3000/health",
         "steps": [
-          { "toolCallId": "tc:smoke", "observed": "/health 200，启动 0.3s", "primitives": ["op:smoke:health"] },
-          { "toolCallId": "tc:scaffold", "observed": "技术栈契合部署约束", "primitives": ["op:constraint:deploy"] }
+          { "toolCallId": "tc:smoke", "observed": "/health 200, boot 0.3s", "primitives": ["op:smoke:health"] },
+          { "toolCallId": "tc:scaffold", "observed": "the stack fits the deployment constraints", "primitives": ["op:constraint:deploy"] }
         ]
       }
     },
@@ -76,16 +76,16 @@
       "id": "n:built",
       "state": "grounded",
       "kind": "observation",
-      "title": "已生成 7 文件 + 迁移 + 种子数据，本地自检通过",
+      "title": "Generated 7 files + migration + seed data, local self-check passes",
       "confidence": { "value": 0.88, "source": "self_consistency" },
       "evidence": [
-        { "id": "ev:tree", "label": "requests/users/approvals 表 + API + 前端", "primitives": ["op:code:tree"], "polarity": "supports" }
+        { "id": "ev:tree", "label": "requests/users/approvals tables + API + frontend", "primitives": ["op:code:tree"], "polarity": "supports" }
       ],
       "provenance": {
         "mode": "verifiable",
         "reExecCmd": "bun test && bun run build",
         "steps": [
-          { "toolCallId": "tc:migrate", "observed": "三表建好、种子数据写入", "primitives": ["op:code:tree"] }
+          { "toolCallId": "tc:migrate", "observed": "three tables created, seed data written", "primitives": ["op:code:tree"] }
         ]
       }
     },
@@ -93,46 +93,46 @@
       "id": "n:plan",
       "state": "hypothesis",
       "kind": "plan",
-      "title": "下一步：生成审批状态机与迁移（待你确认状态集）",
+      "title": "Next: generate the approval state machine and migration (pending your confirmation of the state set)",
       "confidence": { "value": 0.5, "source": "self_report" },
       "evidence": [],
-      "falsification": "状态集若需加“财务退回补材料”等中间态，则状态机与权限矩阵随之变化；先与你确认状态集再生成。"
+      "falsification": "If the state set needs intermediate states like \"finance returns for more documents,\" the state machine and permission matrix change accordingly; confirm the state set with you before generating."
     },
     {
       "id": "n:notify",
       "state": "open",
       "kind": "option",
-      "title": "通知渠道未定（邮件 / Mattermost / 站内）",
-      "needs": "你倾向哪种审批通知渠道？影响是否引入外部依赖与配置项。"
+      "title": "Notification channel undecided (email / Mattermost / in-app)",
+      "needs": "Which approval-notification channel do you prefer? It affects whether we introduce an external dependency and config options."
     },
     {
       "id": "n:storage",
       "state": "hypothesis",
       "kind": "risk",
-      "title": "附件用本地磁盘存储，生产需换对象存储",
+      "title": "Attachments use local disk; production needs object storage",
       "confidence": { "value": 0.4, "source": "self_report" },
       "evidence": [],
-      "falsification": "若仅内网小规模试用，本地磁盘可接受；一旦多副本/生产部署，必须切换对象存储，否则附件丢失。"
+      "falsification": "For a small internal trial, local disk is acceptable; once you go multi-replica / production, you must switch to object storage or attachments will be lost."
     },
     {
       "id": "n:crud",
       "state": "refuted",
       "kind": "option",
-      "title": "单页表单 + 列表的纯 CRUD",
-      "reason": "无法表达状态流转与角色权限边界，与“审批”语义不符。",
+      "title": "Plain CRUD with a single-page form + list",
+      "reason": "Can't express state transitions or role permission boundaries — at odds with the semantics of \"approval.\"",
       "formerConfidence": 0.45
     }
   ],
   "outcome": {
     "nodeId": "n:built",
-    "label": "已生成 v0 · Grounded",
-    "text": "可跑的 v0 已生成（状态机骨架 + 三角色 RBAC + 本地自检通过）。",
-    "recommendation": "确认状态集与通知渠道后生成 v1；生产前把附件改对象存储。"
+    "label": "v0 generated · Grounded",
+    "text": "A runnable v0 is generated (state-machine skeleton + three-role RBAC + local self-check passing).",
+    "recommendation": "Generate v1 once the state set and notification channel are confirmed; switch attachments to object storage before production."
   },
   "steps": [
-    { "label": "理解需求", "hint": "把一句话需求锚定为 requirement：三角色 + 附件 + 状态流转 + 鉴权。", "visibleNodeIds": ["n:req", "n:crud"] },
-    { "label": "拐点", "hint": "啊哈：审批=状态机而非 CRUD，单页方案沉降。", "visibleNodeIds": ["n:req", "n:inflect", "n:crud"] },
-    { "label": "技术栈 + 落地", "hint": "技术栈定为 grounded 决策，已生成 7 文件并通过本地自检（可重跑）。", "visibleNodeIds": ["n:req", "n:inflect", "n:stack", "n:built", "n:crud"] },
-    { "label": "待你拍板", "hint": "诚实留下：状态集待确认、通知渠道未定、附件存储是生产风险。", "visibleNodeIds": ["n:req", "n:inflect", "n:stack", "n:built", "n:plan", "n:notify", "n:storage", "n:crud"] }
+    { "label": "Understand the ask", "hint": "Anchor the one-line requirement as a requirement: three roles + attachments + state transitions + auth.", "visibleNodeIds": ["n:req", "n:crud"] },
+    { "label": "Inflection", "hint": "Aha: approval = state machine, not CRUD, and the single-page plan settles.", "visibleNodeIds": ["n:req", "n:inflect", "n:crud"] },
+    { "label": "Stack + landed", "hint": "The stack settles into a grounded decision; 7 files generated and passing the local self-check (re-runnable).", "visibleNodeIds": ["n:req", "n:inflect", "n:stack", "n:built", "n:crud"] },
+    { "label": "Needs your call", "hint": "Honestly leaves it: the state set awaits confirmation, the notification channel is undecided, and attachment storage is a production risk.", "visibleNodeIds": ["n:req", "n:inflect", "n:stack", "n:built", "n:plan", "n:notify", "n:storage", "n:crud"] }
   ]
 }

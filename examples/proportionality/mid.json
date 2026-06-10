@@ -2,29 +2,29 @@
   "schemaVersion": "0.2",
   "latentLevel": "mid",
   "persona": "operator",
-  "task": { "title": "内部服务选 REST 还是 gRPC" },
+  "task": { "title": "REST or gRPC for an internal service" },
   "observablePrimitives": [
-    { "id": "op:bench:rpc", "kind": "benchmark", "label": "内部 RPC 延迟/带宽基准" },
-    { "id": "op:doc:clients", "kind": "source", "label": "各语言客户端成熟度文档" }
+    { "id": "op:bench:rpc", "kind": "benchmark", "label": "Internal RPC latency/bandwidth benchmark" },
+    { "id": "op:doc:clients", "kind": "source", "label": "Per-language client maturity docs" }
   ],
   "toolCalls": [
-    { "id": "tc:bench", "ts": "—", "fn": "run_bench", "summary": "小消息高频场景", "producedPrimitives": ["op:bench:rpc"] }
+    { "id": "tc:bench", "ts": "—", "fn": "run_bench", "summary": "small-message, high-frequency scenario", "producedPrimitives": ["op:bench:rpc"] }
   ],
   "nodes": [
     {
       "id": "n:pick",
       "state": "grounded",
       "kind": "decision",
-      "title": "高频小消息的内部链路，gRPC 在延迟与带宽上优于 REST/JSON",
+      "title": "For a high-frequency small-message internal path, gRPC beats REST/JSON on latency and bandwidth",
       "confidence": { "value": 0.71, "source": "self_consistency" },
       "evidence": [
-        { "id": "ev:lat", "label": "p50 延迟 -38% · 带宽 -55%", "primitives": ["op:bench:rpc"], "polarity": "supports" }
+        { "id": "ev:lat", "label": "p50 latency -38% · bandwidth -55%", "primitives": ["op:bench:rpc"], "polarity": "supports" }
       ],
       "provenance": {
         "mode": "verifiable",
         "reExecCmd": "bun bench/rpc.ts --pattern small-high-freq",
         "steps": [
-          { "toolCallId": "tc:bench", "observed": "gRPC p50 -38%, 带宽 -55%", "primitives": ["op:bench:rpc"] }
+          { "toolCallId": "tc:bench", "observed": "gRPC p50 -38%, bandwidth -55%", "primitives": ["op:bench:rpc"] }
         ]
       }
     },
@@ -32,22 +32,22 @@
       "id": "n:debug",
       "state": "hypothesis",
       "kind": "tradeoff",
-      "title": "REST 的可调试性/缓存生态在边缘网关侧更省事",
+      "title": "REST's debuggability / caching ecosystem is easier on the edge-gateway side",
       "confidence": { "value": 0.45, "source": "self_report" },
       "evidence": [],
-      "falsification": "若团队已具备 gRPC 可观测工具链，则该优势消失；当前工具链以 HTTP 为主，故仍是一项权衡。"
+      "falsification": "If the team already has a gRPC observability toolchain, this edge disappears; the current toolchain is HTTP-centric, so it remains a tradeoff."
     },
     {
       "id": "n:clients",
       "state": "open",
       "kind": "option",
-      "title": "目标语言的 gRPC 客户端成熟度未核实",
-      "needs": "核对实际使用语言的 gRPC 生成/重连/拦截器支持。"
+      "title": "gRPC client maturity for the target languages isn't verified",
+      "needs": "Check gRPC codegen / reconnection / interceptor support for the languages actually in use."
     }
   ],
   "outcome": {
     "nodeId": "n:pick",
-    "label": "建议 · Grounded",
-    "text": "内部高频链路推荐 gRPC；边缘对外仍可保留 REST。"
+    "label": "Recommendation · Grounded",
+    "text": "Recommend gRPC for high-frequency internal paths; REST can stay for the external edge."
   }
 }

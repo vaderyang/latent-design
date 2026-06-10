@@ -254,7 +254,7 @@ export const CognitiveState = z
      */
     userStory: z
       .object({
-        who: z.string().describe("the persona, e.g. 支付 SRE · 凌晨值班"),
+        who: z.string().describe("the persona, e.g. Payments SRE · on-call at 3am"),
         trigger: z.string().optional().describe("what brought them here"),
         goal: z.string().describe("what they want to accomplish"),
         reads: z.string().describe("what they SEE on this surface"),
@@ -270,7 +270,7 @@ export const CognitiveState = z
         nodeId: z.string(),
         text: z.string(),
         recommendation: z.string().optional(),
-        label: z.string().optional().describe("e.g. 结论 / 决定 / 建议 / 已完成 / 交付"),
+        label: z.string().optional().describe("e.g. Conclusion / Decision / Recommendation / Done / Delivered"),
       })
       .optional(),
     steps: z.array(Step).optional().describe("optional stepped demo narrative"),

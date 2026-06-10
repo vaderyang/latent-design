@@ -2,27 +2,21 @@
  *  for a domain expert who is an AI novice. It reads like a smart colleague's
  *  note, not a diagnostic dashboard:
  *
- *    你的问题  →  我的判断 (+ 词级确定度)  →  我为什么这么看 (白话, 依据可折叠)
- *    →  我中途改了主意  →  我还不确定 / 需要你定  →  我考虑过但排除了  →  你可以做什么
+ *    Your question  →  My read (+ word-level certainty)  →  Why I think so
+ *    →  Where I changed my mind  →  What I'm unsure about  →  Ruled out  →  Next
  *
  *  All AI-insider vocabulary (grounded / hypothesis / provenance / verifiable /
  *  confidence 0.89) is translated to human words; visual weight is carried by
- *  whitespace and type, not borders / badges / mono instrument readings. */
+ *  whitespace and type, not borders / badges / mono instrument readings.
+ *  Bilingual: chrome strings come from the i18n dictionary (English default). */
 import { useState } from "react";
 import type { CognitiveState, CognitiveNode, GroundedClaim, Hypothesis, Provenance } from "@latent/schema";
 import { InterventionRail } from "./activity.tsx";
 import type { InterventionAction } from "./activity.tsx";
+import { useStrings, certaintyWord } from "../i18n.ts";
+import type { Strings } from "../i18n.ts";
 
 type Tone = "firm" | "lean" | "open" | "out";
-
-function groundedCertainty(c: number): { word: string; tone: Tone } {
-  if (c >= 0.85) return { word: "比较确定", tone: "firm" };
-  if (c >= 0.7) return { word: "大致确定", tone: "firm" };
-  return { word: "初步判断", tone: "lean" };
-}
-function hypoCertainty(c: number): { word: string; tone: Tone } {
-  return c >= 0.5 ? { word: "倾向认为", tone: "lean" } : { word: "还在判断", tone: "lean" };
-}
 
 function Certainty({ word, tone }: { word: string; tone: Tone }) {
   return (
@@ -33,19 +27,20 @@ function Certainty({ word, tone }: { word: string; tone: Tone }) {
   );
 }
 
-function whyText(node: GroundedClaim | Hypothesis): string {
+function whyText(node: GroundedClaim | Hypothesis, t: Strings): string {
   const ev = node.evidence?.map((e) => e.label) ?? [];
-  return ev.length ? `因为${ev.join("；")}。` : "";
+  return ev.length ? t.plain.because(ev) : "";
 }
 
-/** "我是怎么确认的" — provenance rendered as plain prose, certainty caveat folded. */
+/** "How I confirmed it" — provenance rendered as plain prose, certainty caveat folded. */
 function HowIKnow({ provenance }: { provenance: Provenance }) {
+  const t = useStrings();
   const [open, setOpen] = useState(false);
   const lines = provenance.steps.map((s) => s.observed);
   return (
     <>
       <span className="more" onClick={() => setOpen((o) => !o)}>
-        {open ? "收起" : "我是怎么确认的 ▾"}
+        {open ? t.plain.collapse : t.plain.howIKnow}
       </span>
       {open && (
         <div className="detail-open">
@@ -53,9 +48,9 @@ function HowIKnow({ provenance }: { provenance: Provenance }) {
             <div key={i}>· {l}</div>
           ))}
           {provenance.mode === "verifiable" ? (
-            <div style={{ marginTop: 6, color: "var(--grounded)" }}>这一条可以复核（有可重跑的验证）。</div>
+            <div style={{ marginTop: 6, color: "var(--grounded)" }}>{t.plain.verifiable}</div>
           ) : (
-            <div style={{ marginTop: 6, color: "var(--ink-500)" }}>这一条是我根据已有信息的判断，暂不能自动复核。</div>
+            <div style={{ marginTop: 6, color: "var(--ink-500)" }}>{t.plain.asserted}</div>
           )}
         </div>
       )}
@@ -64,8 +59,9 @@ function HowIKnow({ provenance }: { provenance: Provenance }) {
 }
 
 function Reason({ node }: { node: GroundedClaim | Hypothesis }) {
-  const cert = node.state === "grounded" ? groundedCertainty(node.confidence.value) : hypoCertainty(node.confidence.value);
-  const why = whyText(node);
+  const t = useStrings();
+  const cert = certaintyWord(node.state, node.confidence.value, t);
+  const why = whyText(node, t);
   return (
     <div className={`reason ${cert.tone}`}>
       <span className="rdot" />
@@ -89,6 +85,7 @@ export function PlainView({
   actions?: InterventionAction[];
   showProblem?: boolean;
 }) {
+  const t = useStrings();
   const nodes = state.nodes;
   const reasons = nodes.filter((n): n is GroundedClaim => n.state === "grounded");
   const uncertain = nodes.filter((n): n is Hypothesis => n.state === "hypothesis");
@@ -99,14 +96,12 @@ export function PlainView({
   // overall certainty = the certainty of the node the outcome points at
   const answerNode = state.outcome ? nodes.find((n) => n.id === state.outcome!.nodeId) : undefined;
   const answerCert =
-    answerNode?.state === "grounded"
-      ? groundedCertainty((answerNode as GroundedClaim).confidence.value)
-      : answerNode?.state === "hypothesis"
-        ? hypoCertainty((answerNode as Hypothesis).confidence.value)
-        : { word: "初步", tone: "lean" as Tone };
+    answerNode?.state === "grounded" || answerNode?.state === "hypothesis"
+      ? certaintyWord(answerNode.state, (answerNode as GroundedClaim | Hypothesis).confidence.value, t)
+      : t.certainty.initial;
 
   const story = state.userStory;
-  const problem = story ? `${story.trigger ? story.trigger + "。" : ""}${story.goal}` : state.task.goal;
+  const problem = story ? `${story.trigger ? story.trigger + t.plain.sentenceEnd : ""}${story.goal}` : state.task.goal;
 
   const [showOut, setShowOut] = useState(false);
 
@@ -114,7 +109,7 @@ export function PlainView({
     <div className="plain">
       {showProblem && problem && (
         <div className="p-sec">
-          <div className="p-label">你的问题</div>
+          <div className="p-label">{t.plain.problem}</div>
           <div className="p-problem">{problem}</div>
         </div>
       )}
@@ -122,16 +117,21 @@ export function PlainView({
       {state.outcome && (
         <div className="p-sec p-answer-sec">
           <div className="p-label">
-            我的判断 <Certainty word={answerCert.word} tone={answerCert.tone} />
+            {t.plain.judgement} <Certainty word={answerCert.word} tone={answerCert.tone} />
           </div>
           <div className="p-answer">{state.outcome.text}</div>
-          {state.outcome.recommendation && <div className="p-rec">→ 我的建议：{state.outcome.recommendation}</div>}
+          {state.outcome.recommendation && (
+            <div className="p-rec">
+              {t.plain.suggestion}
+              {state.outcome.recommendation}
+            </div>
+          )}
         </div>
       )}
 
       {reasons.length > 0 && (
         <div className="p-sec">
-          <div className="p-label">我为什么这么看</div>
+          <div className="p-label">{t.plain.why}</div>
           {reasons.map((n) => (
             <Reason key={n.id} node={n} />
           ))}
@@ -140,11 +140,16 @@ export function PlainView({
 
       {changed.length > 0 && (
         <div className="p-sec">
-          <div className="p-label">我中途改了主意</div>
+          <div className="p-label">{t.plain.changedMind}</div>
           {changed.map((n) =>
             n.state === "inflection" ? (
               <div className="changed" key={n.id}>
-                原本以为<span className="old">{n.from}</span>，后来发现<span className="new">{n.to}</span>。{n.rationale}
+                {t.plain.inflectBefore}
+                <span className="old">{n.from}</span>
+                {t.plain.inflectAfter}
+                <span className="new">{n.to}</span>
+                {t.plain.inflectEnd}
+                {n.rationale}
               </div>
             ) : null,
           )}
@@ -153,7 +158,7 @@ export function PlainView({
 
       {(uncertain.length > 0 || needs.length > 0) && (
         <div className="p-sec">
-          <div className="p-label">我还不确定 / 需要你定</div>
+          <div className="p-label">{t.plain.unsure}</div>
           {uncertain.map((n) => (
             <div className="need lean" key={n.id}>
               <span className="rdot" />
@@ -180,13 +185,15 @@ export function PlainView({
       {ruledOut.length > 0 && (
         <div className="p-sec">
           <span className="more" onClick={() => setShowOut((o) => !o)}>
-            {showOut ? "收起" : `我考虑过但排除了 ${ruledOut.length} 个想法 ▾`}
+            {showOut ? t.plain.collapse : t.plain.ruledOut(ruledOut.length)}
           </span>
           {showOut &&
             ruledOut.map((n) =>
               n.state === "refuted" ? (
                 <div className="ruledout" key={n.id}>
-                  <b>{n.title}</b> —— {n.reason}
+                  <b>{n.title}</b>
+                  {t.plain.ruledOutSep}
+                  {n.reason}
                 </div>
               ) : null,
             )}
@@ -195,7 +202,7 @@ export function PlainView({
 
       {actions && actions.length > 0 && (
         <div className="p-sec p-actions-sec">
-          <div className="p-label">接下来你可以</div>
+          <div className="p-label">{t.plain.nextYouCan}</div>
           <InterventionRail actions={actions} column={false} />
         </div>
       )}

@@ -1,21 +1,32 @@
 /** The "stage" of an app — the agent's understanding as the lit primary plane.
- *  Validates the CognitiveState, then renders the embeddable UnderstandingPanel. */
+ *  Validates the CognitiveState, then renders the embeddable UnderstandingPanel.
+ *  Bilingual: pass English `data` + Chinese `dataZh`; picks per active language. */
 import { CognitiveState } from "@latent/schema";
-import { UnderstandingPanel } from "@latent/react";
+import { UnderstandingPanel, useLang } from "@latent/react";
 import type { InterventionAction } from "@latent/react";
 
 export default function StagePanel({
   data,
+  dataZh,
   heading,
+  headingZh,
   actions,
+  actionsZh,
 }: {
   data: unknown;
+  dataZh?: unknown;
   heading?: string;
+  headingZh?: string;
   actions?: InterventionAction[];
+  actionsZh?: InterventionAction[];
 }) {
-  const parsed = CognitiveState.safeParse(data);
+  const zh = useLang() === "zh";
+  const active = zh && dataZh ? dataZh : data;
+  const head = (zh && headingZh) || heading;
+  const acts = (zh && actionsZh) || actions;
+  const parsed = CognitiveState.safeParse(active);
   if (!parsed.success) {
     return <div className="contract-error">✗ invalid CognitiveState</div>;
   }
-  return <UnderstandingPanel state={parsed.data} heading={heading ?? null} actions={actions} />;
+  return <UnderstandingPanel state={parsed.data} heading={head ?? null} actions={acts} />;
 }

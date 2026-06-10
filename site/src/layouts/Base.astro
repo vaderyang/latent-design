@@ -9,12 +9,12 @@ interface Props {
 }
 const {
   title = "Latent · 潜 — An Agentic Design Language",
-  description = "注意力跟随理解，而非活动。An agentic design language where cognition is the lit primary plane and tool calls recede to an auditable rail.",
+  description = "An agentic design language where cognition is the lit primary plane and tool calls recede to an auditable rail. Attention follows understanding, not activity.",
 } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="zh">
+<html lang="en" data-lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -44,6 +44,25 @@ const {
         document.documentElement.dataset.theme = t;
       })();
     </script>
+    <script is:inline>
+      // set language before paint; ?lang= overrides + persists. English is default.
+      (function () {
+        var valid = { en: 1, zh: 1 };
+        var l = "en";
+        try {
+          var q = new URLSearchParams(location.search).get("lang");
+          if (q && valid[q]) {
+            l = q;
+            localStorage.setItem("latent-lang", l);
+          } else {
+            l = localStorage.getItem("latent-lang") || "en";
+            if (!valid[l]) l = "en";
+          }
+        } catch (e) {}
+        document.documentElement.dataset.lang = l;
+        document.documentElement.lang = l;
+      })();
+    </script>
   </head>
   <body>
     <div class="bg">
@@ -65,10 +84,16 @@ const {
     </div>
     <div class="grain"></div>
 
-    <div class="theme-toggle" role="group" aria-label="主题">
-      <button type="button" data-theme-set="dark">Dark</button>
-      <button type="button" data-theme-set="light">Light</button>
-      <button type="button" data-theme-set="kami">Kami</button>
+    <div class="chrome-toggles">
+      <div class="lang-toggle" role="group" aria-label="Language">
+        <button type="button" data-lang-set="en">EN</button>
+        <button type="button" data-lang-set="zh">中</button>
+      </div>
+      <div class="theme-toggle" role="group" aria-label="Theme">
+        <button type="button" data-theme-set="dark">Dark</button>
+        <button type="button" data-theme-set="light">Light</button>
+        <button type="button" data-theme-set="kami">Kami</button>
+      </div>
     </div>
     <script is:inline>
       (function () {
@@ -88,6 +113,32 @@ const {
               localStorage.setItem("latent-theme", t);
             } catch (e) {}
             sync(t);
+          });
+        });
+      })();
+    </script>
+    <script is:inline>
+      // language toggle — flips data-lang, persists, and notifies React islands
+      // (latent-langchange) so they re-render in the new language.
+      (function () {
+        var root = document.documentElement;
+        var btns = document.querySelectorAll(".lang-toggle [data-lang-set]");
+        function sync(l) {
+          btns.forEach(function (b) {
+            b.classList.toggle("active", b.getAttribute("data-lang-set") === l);
+          });
+        }
+        sync(root.dataset.lang || "en");
+        btns.forEach(function (b) {
+          b.addEventListener("click", function () {
+            var l = b.getAttribute("data-lang-set");
+            root.dataset.lang = l;
+            root.lang = l;
+            try {
+              localStorage.setItem("latent-lang", l);
+            } catch (e) {}
+            sync(l);
+            window.dispatchEvent(new Event("latent-langchange"));
           });
         });
       })();

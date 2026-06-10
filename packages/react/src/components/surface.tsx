@@ -1,6 +1,7 @@
 /** Understanding Surface — the persistent, primary plane of cognition. */
 import type { CognitiveState, CognitiveNode, EpistemicState } from "@latent/schema";
 import { CognitiveNodeView, GroundedClaimCard } from "./nodes.tsx";
+import { useStrings } from "../i18n.ts";
 
 /** Surface priority: inflections rise, refuted sinks. (Principle 03 + the sink discipline.) */
 const PRIORITY: Record<EpistemicState, number> = {
@@ -45,20 +46,15 @@ export function UnderstandingSurface({
   );
 }
 
-const LEVEL_NOTE: Record<CognitiveState["latentLevel"], string> = {
-  low: "Low latent · 直接任务 — 理解态退化为一行 grounded 结论 + provenance",
-  mid: "Mid latent · 多步综合 — 2–3 个 grounded 论点 + 1 个 open",
-  high: "High latent · 诊断/研究 — 完整假设板 + 拐点 + 沉降 + 溯源",
-};
-
 /**
  * Proportionality: the understanding surface scales with epistemic complexity.
  * Don't put a hypothesis board on "reformat this JSON".
  */
 export function ProportionalView({ state, showTag = true }: { state: CognitiveState; showTag?: boolean }) {
+  const t = useStrings();
   const tag = showTag ? (
     <div className="proportion-tag">
-      <b>{state.latentLevel}</b> {LEVEL_NOTE[state.latentLevel]}
+      <b>{state.latentLevel}</b> {t.level[state.latentLevel]}
     </div>
   ) : null;
 

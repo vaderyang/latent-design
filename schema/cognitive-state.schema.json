@@ -52,7 +52,7 @@
           "properties": {
             "who": {
               "type": "string",
-              "description": "the persona, e.g. 支付 SRE · 凌晨值班"
+              "description": "the persona, e.g. Payments SRE · on-call at 3am"
             },
             "trigger": {
               "type": "string",
@@ -525,7 +525,7 @@
             },
             "label": {
               "type": "string",
-              "description": "e.g. 结论 / 决定 / 建议 / 已完成 / 交付"
+              "description": "e.g. Conclusion / Decision / Recommendation / Done / Delivered"
             }
           },
           "required": [

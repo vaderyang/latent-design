@@ -1,169 +1,171 @@
-# Latent · 潜 — 产品设计规范
+**English** · [中文](README.zh.md)
 
-> 给设计师 / PM。本规范是把「Latent is attentioned」落到具体界面决策的手册。
-> tokens / 组件的真相源在代码里（`packages/tokens`、`packages/react`）与自演示站点（`site/`），本文解释**为什么**这样设计，以及接入时的红线。
+# Latent · 潜 — Product Design Spec
 
-## 1. 论点与倒置
+> For designers and PMs. This spec is the handbook for turning "Latent is attentioned" into concrete interface decisions.
+> The source of truth for tokens and components lives in the code (`packages/tokens`, `packages/react`) and the self-demonstrating site (`site/`); this document explains **why** it is designed this way, and the red lines for adopting it.
 
-现有 agentic 界面几乎都是 **tool-call-rooted**：UI 的生成源头是工具输出，推理被压成动作旁边的一行小字、一个事后辩护（先动作、后解释）。潛 把层级**倒过来**：
+## 1. The thesis and the inversion
 
-- **理解态（latent）= 主舞台。** agent 对问题不断演化、被证据锚定的理解占据主注意力。
-- **动作（tool calls）= 外围。** 退为可调取、可审计的 provenance 一行。
+Almost every agentic interface today is **tool-call-rooted**: the UI's generative source is tool output, and reasoning is compressed into a line of fine print beside the action — an after-the-fact justification (action first, explanation second). 潛 turns the hierarchy **upside down**:
 
-视觉权重的分配是**硬约束**，不是布局偏好。
+- **Understanding (latent) = the main stage.** The agent's continuously evolving, evidence-anchored understanding of the problem holds primary attention.
+- **Actions (tool calls) = the periphery.** They recede into a single retrievable, auditable line of provenance.
 
-## 2. 三区注意力模型
+The allocation of visual weight is a **hard constraint**, not a layout preference.
 
-| 区 | 角色 | 寿命 | 视觉权重 |
+## 2. The three-zone attention model
+
+| Zone | Role | Lifespan | Visual weight |
 |---|---|---|---|
-| ① Understanding Surface | 持续被改写的「问题状态」 | 持久（可回访） | 主体 |
-| ② Activity Stream | 工具调用流 | 短暂 | 外围、默认收起、永远可展开 |
-| ③ Intervention Rail | 人类干预（质疑/约束/采纳） | 常驻 | 一等特性，非边缘情况 |
+| ① Understanding Surface | the continuously rewritten "problem state" | persistent (revisitable) | primary |
+| ② Activity Stream | the tool-call stream | transient | peripheral, collapsed by default, always expandable |
+| ③ Intervention Rail | human intervention (challenge / constrain / adopt) | always present | first-class feature, not an edge case |
 
-「新证据进来 → 理解态变化」——那个**变化**（假设被提升/推翻）才是有意义的事件，也正是 ambient/后台 agent 时代用户「回来查看」的对象。
+"New evidence arrives → the understanding changes" — that **change** (a hypothesis promoted or refuted) is the meaningful event, and it is exactly what a user "comes back to check" in the era of ambient/background agents.
 
-## 2.5 用户故事与交互模型（降低认知负担）
+## 2.5 User story and interaction model (lowering cognitive load)
 
-一块抽象的认知板会让人不解「谁在这里做什么」。因此每个界面都由一个 **userStory** 框住：**谁 · 触发 · 目标 · 你在这里看到什么 · 你在这里可做什么**。
+An abstract cognition board leaves people unsure "who does what here." So every interface is framed by a **userStory**: **who · trigger · goal · what you see here · what you can do here**.
 
-**目标用户是「领域很懂、但 AI 是小白」的人**（医生、分析师、设计师…）。因此默认呈现必须是**人话**，不是认知机制：
+**The target user is someone who is a domain expert but an AI novice** (a doctor, an analyst, a designer…). So the default presentation must be **plain language**, not cognitive machinery:
 
-- **三档读法**（右上角切换，默认「简明」）：
-  - **简明** `<PlainView>` —— 像同事说话：**你的问题 → 我的判断（词级确定度）→ 我为什么这么看（依据可折叠）→ 我中途改了主意 → 还不确定/需要你定 → 我排除了 → 你可以做什么**。无置信数字、无 grounded/provenance 等内行词、无 mono 仪表感；靠留白与层级承重，不靠边框/徽标。
-  - **详细** —— 认知板（颜色=状态、置信、证据、溯源），给想看机制的 power user。
-  - **开发者** —— 原始 tool-call trace，给 builder/审计。
-- **置信度用词不用数字**：比较确定 / 大致确定 / 倾向认为 / 还在判断 / 待确认。内行概念一律翻译成人话（grounded→「比较确定」、provenance→「我是怎么确认的」、verifiable→「这条可以复核」、refuted→「我考虑过但排除了」）。
+- **Three reading levels** (switched from the top-right, "plain" by default):
+  - **Plain** `<PlainView>` — reads like a colleague talking: **your question → my judgement (word-level certainty) → why I see it this way (evidence collapsible) → I changed my mind partway → still uncertain / needs you to decide → I ruled this out → what you can do.** No confidence numbers, no insider terms like grounded/provenance, no mono-instrument feel; weight is carried by whitespace and hierarchy, not by borders or badges.
+  - **Detailed** — the cognition board (color = state, confidence, evidence, provenance), for the power user who wants to see the machinery.
+  - **Developer** — the raw tool-call trace, for builders and auditors.
+- **Confidence in words, not numbers**: fairly sure / mostly sure / inclined to think / still judging / to be confirmed. Translate every insider concept into plain language (grounded → "fairly sure", provenance → "how I confirmed it", verifiable → "this one can be re-checked", refuted → "I considered it but ruled it out").
 
-交互模型必须摆正——否则界面会反直觉：
+The interaction model must be set straight — otherwise the interface becomes counterintuitive:
 
-- **用户到达 → 读理解 → 干预。** 用户打开界面时看到的是 agent 的*当前理解*，因此**结论先行**（outcome 置顶），再展开支撑它的理解。
-- **agent 自己推进，用户不"驱动"思考。** 真实的用户动作是右侧干预栏（采纳 / 提异议 / 补约束）。
-- **「回放形成过程」是可选的演示/审查手段，不是主操作。** 早期把"推进"做成主按钮是错的——它暗示用户要一步步催 agent 思考。回放被降级、明确标注"演示用"。
+- **The user arrives → reads the understanding → intervenes.** When a user opens the interface, what they see is the agent's *current understanding* — so **lead with the conclusion** (outcome on top), then expand the understanding that supports it.
+- **The agent advances itself; the user does not "drive" the thinking.** The real user actions are in the intervention rail on the right (adopt / object / add a constraint).
+- **"Replaying how it formed" is an optional demonstration/review device, not the primary action.** Making "step forward" the primary button early on was wrong — it implies the user has to prod the agent's thinking step by step. The replay is demoted and clearly labeled "for demonstration."
 
-## 3. Grounding Contract（脊梁）
+## 3. The Grounding Contract (the spine)
 
-渲染出来的 latent **≠** 真实的 latent；链式推理常是事后合理化，做得越漂亮越危险。因此**只有可证伪、被证据锚定的认知才配占据主注意力**。任何进入主舞台的元素必须是以下合法形态之一：
+The rendered latent **≠** the real latent; chain-of-thought is often post-hoc rationalization, and the more beautifully you do it the more dangerous it becomes. So **only falsifiable, evidence-anchored cognition is worthy of occupying primary attention.** Any element that enters the main stage must be one of these legal forms:
 
-| 形态 | 颜色 | 必须携带 |
+| Form | Color | Must carry |
 |---|---|---|
-| **Grounded Claim** 已锚定结论 | 金 amber `#E7B45C` | 指向 evidence / observable primitives 的**可点开溯源** |
-| **Hypothesis** 在押假设 | 青 aqua `#54C7C0` | **置信度 + 「什么证据会改变它」** |
-| **Open Question** 诚实未知 | 靛 indigo `#9C8CCB` | **待查项 / 解决它需要什么** |
-| **Inflection** 认知拐点 | 珊瑚 `#F0795F` | from → to + 理由（研究证实拐点是 latent 中最忠实的部分） |
-| **Refuted** 已沉降 | 灰蓝 `#5C6B7A` | 沉降理由（**保留可审计，不删除**） |
+| **Grounded Claim** an anchored conclusion | amber `#E7B45C` | **openable provenance** pointing to evidence / observable primitives |
+| **Hypothesis** a wager in play | aqua `#54C7C0` | **confidence + "what evidence would change it"** |
+| **Open Question** an honest unknown | indigo `#9C8CCB` | **what it needs / what resolving it requires** |
+| **Inflection** a cognitive turning point | coral `#F0795F` | from → to + rationale (research confirms inflections are the most faithful part of the latent) |
+| **Refuted** sunk | slate `#5C6B7A` | reason for sinking (**kept auditable, not deleted**) |
 
-这正是五层诊断本体论（Observable Primitives → Evidence → Symptoms → Hypotheses → Conclusions）：上层是台前主体，但每一个都必须有一根线**栓回**下层可观测原语。
+This is exactly the five-layer diagnostic ontology (Observable Primitives → Evidence → Symptoms → Hypotheses → Conclusions): the upper layers are the on-stage protagonists, but each must have a thread tying it **back down** to the observable primitives below.
 
 ## 4. Foundations
 
-- **色彩 = 认识论状态**（不是装饰）。看到金色就知道「已锚定」，看到珊瑚色就知道「模型刚改了主意」。完整 token 见 `packages/tokens/tokens.json`。
-- **字体 = 三种声音**。Voice（认知，衬线 Fraunces/Noto Serif）— 思考应显得被斟酌过；UI（功能，Hanken/Noto Sans）— 清晰退后；Evidence（仪器，IBM Plex Mono）— 可核验的读数。
-- **动效 = 深度的语言**。Surface 浮现（新理解升起）/ Settle 凝定（青转金）/ Sink 沉降（被推翻者下沉但不删）/ Pulse 拐点（珊瑚闪现）。运动讲述状态迁移，从不只是装饰。
+- **Color = epistemic state** (not decoration). See amber and you know "anchored"; see coral and you know "the model just changed its mind." Full tokens in `packages/tokens/tokens.json`.
+- **Type = three voices.** Voice (cognition, serif Fraunces/Noto Serif) — thinking should look considered; UI (function, Hanken/Noto Sans) — clear and recessive; Evidence (instrument, IBM Plex Mono) — a verifiable reading.
+- **Motion = the language of depth.** Surface (new understanding rises) / Settle (aqua turning to amber) / Sink (the refuted descends but is not deleted) / Pulse (an inflection flashes coral). Motion narrates state transitions, never mere decoration.
 
-## 5. 组件目录
+## 5. Component catalog
 
-由 `@latent/react` 实时渲染，props 即 `@latent/schema` 子类型：
-`<UnderstandingSurface>` · `<GroundedClaimCard>` · `<HypothesisCard>` · `<OpenQuestionCard>` · `<RefutedCard>` · `<InflectionMarker>` · `<ConfidenceMeter>` · `<EvidenceChips>` · `<ProvenanceView>` · `<ActivityStream>` · `<InterventionRail>` · `<PersonaToggle>` · `<ProportionalView>` · `<TraceView>` · `<Scenario>`。
+Rendered live by `@latent/react`, with props that are `@latent/schema` subtypes:
+`<UnderstandingSurface>` · `<GroundedClaimCard>` · `<HypothesisCard>` · `<OpenQuestionCard>` · `<RefutedCard>` · `<InflectionMarker>` · `<ConfidenceMeter>` · `<EvidenceChips>` · `<ProvenanceView>` · `<ActivityStream>` · `<InterventionRail>` · `<PersonaToggle>` · `<ProportionalView>` · `<TraceView>` · `<Scenario>`.
 
-## 6. 比例原则
+## 6. Proportionality
 
-理解态体量随**问题的认识论复杂度**伸缩：
+The mass of the understanding surface scales with the **epistemic complexity of the problem**:
 
-- **Low**（格式化、改写、单步检索）→ 一行 grounded 结论 + provenance，无假设板。
-- **Mid**（起草、对比、规划）→ 2–3 个 grounded 论点 + 1 个 open，轻量。
-- **High**（诊断、研究、合规调查）→ 完整假设板 + 拐点 + 沉降 + 溯源。
+- **Low** (formatting, rewriting, single-step retrieval) → one grounded conclusion + provenance, no hypothesis board.
+- **Mid** (drafting, comparison, planning) → 2–3 grounded claims + 1 open, lightweight.
+- **High** (diagnosis, research, compliance investigation) → the full hypothesis board + inflections + sunk claims + provenance.
 
-别给「改写一句话」摆一块假设板（见反模式）。
+Don't put a hypothesis board on "rewrite this one sentence" (see anti-patterns).
 
-## 7. 两种人格
+## 7. Two personas
 
-- **Operator 视图**（latent 主导，默认）→ 服务终端用户。
-- **Trace 视图**（tool-call 主导）→ 服务调试与审计。
+- **Operator view** (latent-led, default) → serves the end user.
+- **Trace view** (tool-call-led) → serves debugging and audit.
 
-一个 toggle 化解「透明派 vs 认知优先」的张力，而非二选一。
+A single toggle resolves the tension between "the transparency camp vs. cognition-first" — rather than forcing a choice between them.
 
-## 8. 七原则（速记）
+## 8. The seven principles (shorthand)
 
-1. 注意力跟随理解，而非活动。
-2. 主舞台只接纳可证伪的认知。
-3. 浮现拐点，沉降叙述。
-4. 弱化 ≠ 隐藏（provenance 永远可调、可重建）。
-5. 不确定性是一等内容。
-6. 理解态持久，活动短暂。
-7. 两种人格，两种视图。
+1. Attention follows understanding, not activity.
+2. The main stage admits only falsifiable cognition.
+3. Surface inflections, sink narration.
+4. Weakened ≠ hidden (provenance is always retrievable and reconstructable).
+5. Uncertainty is first-class content.
+6. Understanding persists, activity is transient.
+7. Two personas, two views.
 
-## 9. 信任校准：verifiable vs asserted
+## 9. Trust calibration: verifiable vs asserted
 
-provenance 必须标注 `mode`：
+Provenance must be tagged with a `mode`:
 
-- **verifiable** — 证据链可被重新执行验证（携带 `reExecCmd`）。TraceForge / coding / log-triage 属此。
-- **asserted** — 仅自报、不可廉价重执行（金融合规的设备图关联属此）。
+- **verifiable** — the evidence chain can be re-executed and verified (carries `reExecCmd`). TraceForge / coding / log-triage belong here.
+- **asserted** — self-reported only, not cheaply re-executable (the device-graph correlation in financial compliance belongs here).
 
-UI 必须差异化标注，让用户据此校准信任。asserted 结论应触发人工复核。
+The UI must mark these differently so users can calibrate trust accordingly. Asserted conclusions should trigger human review.
 
-## 10. 采纳红线（会悄悄重建剧场）
+## 10. Adoption red lines (these quietly rebuild theater)
 
-- 把 CoT 原文直接灌进主舞台（未经契约过滤）。
-- 用 spinner/进度条制造「在忙」假象。
-- 把置信度做成无依据的「氛围数字」。
-- 为了「干净」删除被推翻的假设。
-- 给低 latent 任务硬套假设板。
-- 把 provenance 折成无法调取的死链。
+- Pouring raw CoT straight onto the main stage (unfiltered by the contract).
+- Faking "busy" with spinners/progress bars.
+- Making confidence into ungrounded "vibe numbers."
+- Deleting refuted hypotheses to look "clean."
+- Forcing a hypothesis board onto a low-latent task.
+- Folding provenance into a dead link that can't be retrieved.
 
-## 11. 通用化：内容角色（kind）、适用原型与主题
+## 11. Generalization: content roles (kind), applicable archetypes, and themes
 
-**这是一套通用语言，不是诊断专用。** 节点有两条正交轴：
+**This is a general language, not diagnosis-specific.** Nodes have two orthogonal axes:
 
-- `state`（认识论状态，**编码颜色**）：grounded / hypothesis / open / inflection / refuted。
-- `kind`（内容角色，**编码标签**）：observation / claim / decision / plan / requirement / option / tradeoff / answer / risk。
+- `state` (epistemic stance, **encodes color**): grounded / hypothesis / open / inflection / refuted.
+- `kind` (content role, **encodes the badge label**): observation / claim / decision / plan / requirement / option / tradeoff / answer / risk.
 
-Grounding Contract 跨原型成立：一个**决策**或一个**需求理解**占据主舞台，同样必须 grounded（挂在准则/证据/用户原话上）、或标为 tentative（带可证伪条件）、或留作诚实 open。上文「五层诊断本体论」只是诊断这一个域的 grounding ladder；其它原型有各自的 ladder 或不需要。
+The Grounding Contract holds across archetypes: a **decision** or a **requirement understanding** that takes the main stage must equally be grounded (hung on criteria/evidence/the user's own words), or marked tentative (with a falsification condition), or left as an honest open. The "five-layer diagnostic ontology" above is merely the grounding ladder for the one domain of diagnosis; other archetypes have their own ladders, or need none.
 
-| 原型 | 主要 kind | latent |
+| Archetype | Primary kind | latent |
 |---|---|---|
-| 诊断 / 根因 | claim | 高 |
-| 规划 / 决策 | decision · plan · tradeoff · risk | 高 |
-| 写作 / 生成 | requirement · option · decision | 中 |
-| 助手 / 建议 | answer · risk · tradeoff | 中 |
-| 代理操作 / ambient | decision(动作) · plan(待批) · risk | 高 |
-| RAD / 全栈 App | requirement · decision · plan · option · risk | 高 |
+| Diagnosis / root cause | claim | High |
+| Planning / decision | decision · plan · tradeoff · risk | High |
+| Authoring / generation | requirement · option · decision | Mid |
+| Assistant / advice | answer · risk · tradeoff | Mid |
+| Agentic action / ambient | decision (action) · plan (pending approval) · risk | High |
+| RAD / full-stack app | requirement · decision · plan · option · risk | High |
 
-**主题**：`<html data-theme="dark|light|kami">` 切换 dark（深海蓝）/ light（冷纸）/ kami（暖羊皮纸 + 靛蓝）。颜色仍编码认识论状态，三套主题只是同名语义 token 的值替换；组件不得硬编码 hex。
+**Themes**: `<html data-theme="dark|light|kami">` switches between dark (deep-sea blue), light (cool paper), and kami (warm parchment + indigo). Color still encodes epistemic state; the three themes are just value substitutions on the same-named semantic tokens — components must not hardcode hex.
 
-## 12. 应用层：App Attention Grammar（宏观）
+## 12. Application layer: App Attention Grammar (macro)
 
-设计语言不止于组件——它把三区模型**放大到整个 App**。每个 agentic 产品由五个注意力区域组成，视觉权重是硬规则：
+The design language is not limited to components — it scales the three-zone model **up to the whole app**. Every agentic product is composed of five attention zones, and the visual weight is a hard rule:
 
-| 区域 | 角色 | 注意力权重 |
+| Zone | Role | Attention weight |
 |---|---|---|
-| **① Stage · 理解** | agent 不断演化、被证据锚定的理解（用 `<UnderstandingPanel>`） | 主舞台 · 最高 · 最亮 |
-| **② Artifact · 工件** | 在造/在操作的对象：代码 · 画布 · 视频 · 文档 · 数据 | 同台 · 中性 |
-| **· Activity · 活动** | 工具调用 / 渲染任务 / 终端 | 外围 · 可审计 · 可收起 |
-| **· Context · 导航** | 文件 / 历史 | 退后 |
-| **③ Intervene · 干预** | 人类操作 | 一等 · 随时可达 |
+| **① Stage · Understanding** | the agent's continuously evolving, evidence-anchored understanding (use `<UnderstandingPanel>`) | main stage · highest · brightest |
+| **② Artifact** | the object being built or operated on: code · canvas · video · document · data | on stage · neutral |
+| **· Activity** | tool calls / render jobs / terminal | peripheral · auditable · collapsible |
+| **· Context** | files / history | recessive |
+| **③ Intervene** | human controls | first-class · always reachable |
 
-权重次序：**Stage > Artifact > { Context, Activity }**；Intervention 永远可达。
+Weight order: **Stage > Artifact > { Context, Activity }**; Intervention is always reachable.
 
-**宏观的倒置**：现有 agentic 产品常把 Activity（工具调用流）放在本该是 Stage 的位置——这套语法把「理解」搬上主舞台，把活动降到外围。
+**The macro inversion**: existing agentic products often put Activity (the tool-call stream) where the Stage belongs — this grammar moves *understanding* onto the main stage and demotes activity to the periphery.
 
-**怎么用**：`@latent/react/app` 提供 zone 角色样式（`.zone-stage / .zone-artifact / .zone-activity / .zone-context / .zone-intervene` + `.app-frame / .app-topbar`）；每个 App 自己用 `grid-template-areas` 排这五个区，Stage 区放 `<UnderstandingPanel state={…}/>`。两个参考实现：`/apps/vibe-ide`（Vibe Coding IDE）、`/apps/gen-studio`（Image/Video 生成）。
+**How to use it**: `@latent/react/app` provides the zone-role styles (`.zone-stage / .zone-artifact / .zone-activity / .zone-context / .zone-intervene` + `.app-frame / .app-topbar`); each app lays out these five zones with its own `grid-template-areas` and places `<UnderstandingPanel state={…}/>` in the Stage zone. Two reference implementations: `/apps/vibe-ide` (Vibe Coding IDE), `/apps/gen-studio` (Image/Video generation).
 
-## 13. 流式（LLM streaming）下的动效
+## 13. Motion under streaming (LLM streaming)
 
-核心：**流式呈现「理解的形成」，不是 token 的河流。** 见 `/demos/streaming`。
+The core idea: **stream the *forming of understanding*, not a river of tokens.** See `/demos/streaming`.
 
-- **原始流退外围**：raw token / 工具调用在 Activity 区快速流动、转瞬即逝、可审计；主舞台（理解）按**有意义的提交**更新，不逐字抖动。
-- **动效词汇即流式动态**：Surface（新判断浮现）· Sink（假设被推翻下沉）· Pulse（"改主意"拐点闪现）· Settle（答案从占位凝定）。
-- **答案位占位先行**：未出结论时「我的判断」是占位槽（微光"正在判断…"），提交时 Settle 填入。生命周期 `thinking → forming → settled / revising`。
-- **流事件而非 raw text**：推荐流式补丁 `node.add / confidence.update / refute / inflection / outcome.settle`，天然映射 UI 迁移，并能区分"暂定"与"已提交"——别把会被推翻的中间态过早渲染成"比较确定"（呼应 Grounding Contract）。
-- **稳，不抖**：按语义单元防抖更新、预留空间防回流（CLS）、尊重 `prefers-reduced-motion`。原始流可以快，理解要稳。
+- **The raw stream recedes to the periphery**: raw tokens and tool calls flow fast and ephemeral in the Activity zone, auditable; the main stage (understanding) updates on **meaningful commits**, not token-by-token jitter.
+- **The motion vocabulary *is* the streaming dynamics**: Surface (a new judgement emerges) · Sink (a refuted hypothesis descends) · Pulse (a "changed my mind" inflection flashes) · Settle (an answer settles in from its placeholder).
+- **The answer slot is a placeholder first**: before a conclusion is reached, "my judgement" is a placeholder slot (a faint "judging…"); on commit, Settle fills it in. Lifecycle: `thinking → forming → settled / revising`.
+- **Stream events, not raw text**: prefer streaming patches `node.add / confidence.update / refute / inflection / outcome.settle`, which map naturally onto UI transitions and can distinguish "tentative" from "committed" — don't render an intermediate state that will be refuted as "fairly sure" too early (echoing the Grounding Contract).
+- **Steady, not jittery**: debounce updates per semantic unit, reserve space to prevent reflow (CLS), respect `prefers-reduced-motion`. The raw stream may be fast; understanding must be steady.
 
-## 接入 checklist
+## Integration checklist
 
-- [ ] agent 输出先建模为 `CognitiveState` 实例。
-- [ ] `bun run validate` 通过（契约成立）。
-- [ ] latentLevel 诚实选择，`<ProportionalView>` 自动伸缩。
-- [ ] 颜色/字体只取自 tokens。
-- [ ] 每个 hypothesis 带 falsification；每个 grounded 带可点开 provenance。
-- [ ] provenance 标注 verifiable / asserted。
-- [ ] refuted 沉降而非删除。
+- [ ] Model the agent's output as a `CognitiveState` instance first.
+- [ ] `bun run validate` passes (the contract holds).
+- [ ] latentLevel chosen honestly; `<ProportionalView>` auto-scales.
+- [ ] Color/type drawn only from tokens.
+- [ ] Every hypothesis carries a falsification; every grounded claim carries openable provenance.
+- [ ] Provenance tagged verifiable / asserted.
+- [ ] Refuted claims are sunk, not deleted.

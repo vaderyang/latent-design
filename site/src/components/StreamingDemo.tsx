@@ -12,10 +12,13 @@
  *  / refute / inflection / outcome.settle). Here they're a scripted choreography
  *  so the dynamics are visible. Respects prefers-reduced-motion. */
 import { useEffect, useRef, useState } from "react";
+import { useLang } from "@latent/react";
 
 type Lead = { id: string; text: string; sunk?: boolean; sinkNote?: string };
 
-const ACTIVITY = [
+// the raw activity stream — telemetry tokens stay mono; only the Chinese tail of
+// the last line is translated.
+const activityLines = (zh: boolean) => [
   "alert_ingest · P99 12ms→340ms",
   "topology_resolve · 6 hops · 3 backends",
   "pcap_slice · 18.2GB → 2.1M pkt",
@@ -23,11 +26,49 @@ const ACTIVITY = [
   "align_timestamps · PCAP ⟷ safepoint.log",
   "connpool_probe · backlog 12→53",
   "query_safepoint · STW 280ms × 7",
-  "retrans_align · 滞后于延迟尖峰",
+  zh ? "retrans_align · 滞后于延迟尖峰" : "retrans_align · lags the latency spike",
 ];
 
 export default function StreamingDemo() {
-  const [status, setStatus] = useState("正在理解你的问题…");
+  const zh = useLang() === "zh";
+
+  // every user-facing string, keyed by language; the choreography below reads
+  // from `t` so a language toggle re-renders with the right literals.
+  const t = zh
+    ? {
+        statusThinking: "正在理解你的问题…",
+        statusChanged: "我改了主意…",
+        statusDone: "已得出判断",
+        leadA: "可能是上游 DNS 解析抖动",
+        leadB: "也可能是目标网段 TCP 重传",
+        sinkNote: "排除：DNS 响应 <2ms、零重传",
+        inflect: "重传滞后于延迟尖峰 → 它是症状，不是病因。注意力转向应用层。",
+        answer: "根因：instance-7 的 GC 长停顿，引发连接池排队。",
+        cert: "比较确定",
+        label: "我的判断",
+        forming: "正在判断你的问题，先别急着信我…",
+        inflectPrefix: "我改了主意：",
+        rawHead: "· 原始流 · token / 工具调用（外围 · 转瞬即逝）",
+        replay: "↻ 重放",
+      }
+    : {
+        statusThinking: "Reading your question…",
+        statusChanged: "I changed my mind…",
+        statusDone: "Reached a read",
+        leadA: "Could be upstream DNS resolution jitter",
+        leadB: "Could also be TCP retransmits on the target subnet",
+        sinkNote: "Ruled out: DNS responses <2ms, zero retransmits",
+        inflect: "Retransmits lag the latency spike → they're a symptom, not the cause. Attention shifts to the application layer.",
+        answer: "Root cause: a long GC pause on instance-7 backs up the connection pool.",
+        cert: "fairly sure",
+        label: "My read",
+        forming: "Still working out your question — don't take my word yet…",
+        inflectPrefix: "I changed my mind: ",
+        rawHead: "· raw stream · tokens / tool calls (peripheral · ephemeral)",
+        replay: "↻ Replay",
+      };
+
+  const [status, setStatus] = useState(t.statusThinking);
   const [done, setDone] = useState(false);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [inflect, setInflect] = useState<string | null>(null);
@@ -42,7 +83,7 @@ export default function StreamingDemo() {
     const at = (ms: number, fn: () => void) => timers.current.push(setTimeout(fn, ms * k));
 
     // reset
-    setStatus("正在理解你的问题…");
+    setStatus(t.statusThinking);
     setDone(false);
     setLeads([]);
     setInflect(null);
@@ -50,22 +91,22 @@ export default function StreamingDemo() {
     setAct([]);
 
     // raw stream (peripheral) — fast, ephemeral
-    ACTIVITY.forEach((line, i) => at(250 + i * 360, () => setAct((a) => [...a, line].slice(-5))));
+    activityLines(zh).forEach((line, i) => at(250 + i * 360, () => setAct((a) => [...a, line].slice(-5))));
 
     // understanding — meaningful commits
-    at(700, () => setLeads([{ id: "a", text: "可能是上游 DNS 解析抖动" }]));
-    at(1300, () => setLeads((l) => [...l, { id: "b", text: "也可能是目标网段 TCP 重传" }]));
+    at(700, () => setLeads([{ id: "a", text: t.leadA }]));
+    at(1300, () => setLeads((l) => [...l, { id: "b", text: t.leadB }]));
     at(2200, () =>
-      setLeads((l) => l.map((x) => (x.id === "a" ? { ...x, sunk: true, sinkNote: "排除：DNS 响应 <2ms、零重传" } : x))),
+      setLeads((l) => l.map((x) => (x.id === "a" ? { ...x, sunk: true, sinkNote: t.sinkNote } : x))),
     );
     at(3000, () => {
-      setStatus("我改了主意…");
-      setInflect("重传滞后于延迟尖峰 → 它是症状，不是病因。注意力转向应用层。");
+      setStatus(t.statusChanged);
+      setInflect(t.inflect);
     });
     at(3900, () => {
       setLeads((l) => l.filter((x) => x.id !== "b"));
-      setAnswer({ text: "根因：instance-7 的 GC 长停顿，引发连接池排队。", cert: "比较确定" });
-      setStatus("已得出判断");
+      setAnswer({ text: t.answer, cert: t.cert });
+      setStatus(t.statusDone);
       setDone(true);
     });
 
@@ -73,20 +114,22 @@ export default function StreamingDemo() {
       timers.current.forEach(clearTimeout);
       timers.current = [];
     };
-  }, [runId]);
+    // re-run choreography on replay AND on language toggle so all literals swap
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [runId, zh]);
 
   return (
     <div className="stream">
       {/* answer slot — reserved up top, "forming" until it settles */}
       <div className="stream-answer-wrap">
         <div className="p-label">
-          我的判断{answer && <span className="certainty firm"><span className="cdot" />{answer.cert}</span>}
+          {t.label}{answer && <span className="certainty firm"><span className="cdot" />{answer.cert}</span>}
         </div>
         {answer ? (
           <div className="stream-answer settle-in">{answer.text}</div>
         ) : (
           <div className="stream-answer forming">
-            <span className="shimmer">正在判断你的问题，先别急着信我…</span>
+            <span className="shimmer">{t.forming}</span>
           </div>
         )}
       </div>
@@ -104,7 +147,7 @@ export default function StreamingDemo() {
         ))}
         {inflect && (
           <div className="lead inflect pulse-in">
-            <b>我改了主意：</b>
+            <b>{t.inflectPrefix}</b>
             {inflect}
           </div>
         )}
@@ -112,7 +155,7 @@ export default function StreamingDemo() {
 
       {/* RAW stream — peripheral, fast, ephemeral */}
       <div className="stream-raw">
-        <div className="zhead">· 原始流 · token / 工具调用（外围 · 转瞬即逝）</div>
+        <div className="zhead">{t.rawHead}</div>
         <div className="raw-lines">
           {act.map((line, i) => (
             <div key={i} className="raw-line" style={{ opacity: 0.4 + (i / act.length) * 0.6 }}>
@@ -124,7 +167,7 @@ export default function StreamingDemo() {
       </div>
 
       <button className="ibtn" onClick={() => setRunId((n) => n + 1)} style={{ marginTop: 16 }}>
-        ↻ 重放
+        {t.replay}
       </button>
     </div>
   );

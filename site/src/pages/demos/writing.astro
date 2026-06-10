@@ -2,16 +2,22 @@
 import Base from "../../layouts/Base.astro";
 import DemoFrame from "../../components/DemoFrame.tsx";
 import data from "@examples/writing.json";
+import dataZh from "@examples/writing.zh.json";
 ---
 
-<Base title="写作 / 生成 · Latent demo" description="写作型 agent：主舞台是对意图与约束的理解、草稿背后的取舍、未定的选择。">
+<Base title="Writing / Generation · Latent 潜 demo" description="A writing agent: the primary plane is the understanding of intent and constraints, the tradeoffs behind the draft, and the choices left open.">
   <section class="wrap" style="padding-top:64px">
     <a class="demo-back" href="/">◂ Latent · 潜</a>
-    <div class="kicker">应用 Demo · 写作 / 生成</div>
-    <h2>起草发布说明 — 企业客户版</h2>
-    <p>
+    <div class="kicker" data-i18n="en">Application demo · Writing / generation</div>
+    <div class="kicker" data-i18n="zh">应用 Demo · 写作 / 生成</div>
+    <h2 data-i18n="en">Drafting release notes — enterprise customer edition</h2>
+    <h2 data-i18n="zh">起草发布说明 — 企业客户版</h2>
+    <p data-i18n="en">
+      In generative tasks, the understanding state is <strong>the read on "what you actually want" + structural tradeoffs + choices left open</strong>. The <span class="mono" style="color:var(--grounded)">requirement</span> is anchored to your own words (asserted), the structural <span class="mono">decision</span> hangs on a measurable benchmark, and the stylistic <span class="mono">option</span> plus compliance wording are kept as honest open items — rather than pretending the draft is final.
+    </p>
+    <p data-i18n="zh">
       生成类任务里，理解态是<strong>对“你到底想要什么”的理解 + 结构取舍 + 未定选择</strong>。<span class="mono" style="color:var(--grounded)">requirement</span> 锚定在你的原话上（asserted），结构 <span class="mono">decision</span> 挂在可量化的基准上，风格 <span class="mono">option</span> 与合规措辞作为诚实的 open 留着——而不是假装已经定稿。
     </p>
-    <DemoFrame data={data} mode="scenario" stepped client:load />
+    <DemoFrame data={data} dataZh={dataZh} mode="scenario" stepped client:load />
   </section>
 </Base>

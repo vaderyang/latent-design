@@ -3,69 +3,69 @@
   "latentLevel": "mid",
   "persona": "operator",
   "task": {
-    "title": "起草 v2.1 面向企业客户的发布说明",
-    "goal": "正式语气、突出合规与性能两条主线、可直接对外",
-    "context": "写作 / 生成 · Release Notes",
-    "status": "草案 v0"
+    "title": "Draft the v2.1 release notes for enterprise customers",
+    "goal": "Formal tone, foregrounding compliance and performance as the two throughlines, ready to publish as-is",
+    "context": "Writing / generation · Release Notes",
+    "status": "Draft v0"
   },
   "userStory": {
-    "who": "产品市场 · PMM",
-    "trigger": "v2.1 下周发布，需要对外发布说明",
-    "goal": "拿到一份正式、突出客户价值的发布说明草稿",
-    "reads": "agent 对你意图的理解、它选定的结构与取舍、以及还没定的风格与合规措辞",
-    "acts": "采纳结构定稿 / 改要求重写 / 拍板待定的章节与措辞"
+    "who": "Product marketing · PMM",
+    "trigger": "v2.1 ships next week and needs public-facing release notes",
+    "goal": "Get a formal release-notes draft that foregrounds customer value",
+    "reads": "The agent's read on your intent, the structure and tradeoffs it has chosen, and the style and compliance wording still undecided",
+    "acts": "Adopt the structure as final / change the brief and rewrite / make the call on the pending sections and wording"
   },
   "observablePrimitives": [
-    { "id": "op:req:brief", "kind": "user-statement", "label": "用户指令：正式、突出合规与性能" },
-    { "id": "op:src:changelog", "kind": "source", "label": "v2.1 变更日志（37 条）" },
-    { "id": "op:src:bench", "kind": "source", "label": "性能基准对比 v2.0→v2.1" }
+    { "id": "op:req:brief", "kind": "user-statement", "label": "User brief: formal, foreground compliance and performance" },
+    { "id": "op:src:changelog", "kind": "source", "label": "v2.1 changelog (37 entries)" },
+    { "id": "op:src:bench", "kind": "source", "label": "Performance benchmark comparison v2.0→v2.1" }
   ],
   "toolCalls": [
-    { "id": "tc:read", "ts": "—", "fn": "read_changelog", "summary": "归类 37 条变更", "producedPrimitives": ["op:src:changelog"] },
-    { "id": "tc:bench", "ts": "—", "fn": "read_bench", "summary": "p99 -32%、吞吐 +18%", "producedPrimitives": ["op:src:bench"] }
+    { "id": "tc:read", "ts": "—", "fn": "read_changelog", "summary": "categorized 37 changes", "producedPrimitives": ["op:src:changelog"] },
+    { "id": "tc:bench", "ts": "—", "fn": "read_bench", "summary": "p99 -32%, throughput +18%", "producedPrimitives": ["op:src:bench"] }
   ],
   "nodes": [
     {
       "id": "n:req",
       "state": "grounded",
       "kind": "requirement",
-      "title": "受众=企业 IT 决策者；语气正式；必须覆盖合规与性能",
+      "title": "Audience = enterprise IT decision-makers; tone formal; must cover compliance and performance",
       "confidence": { "value": 0.92, "source": "human" },
       "evidence": [
-        { "id": "ev:brief", "label": "用户原话指令", "primitives": ["op:req:brief"], "polarity": "supports" }
+        { "id": "ev:brief", "label": "the user's own words", "primitives": ["op:req:brief"], "polarity": "supports" }
       ],
       "provenance": {
         "mode": "asserted",
         "steps": [
-          { "toolCallId": "tc:read", "observed": "据用户指令固定受众与两条主线", "primitives": ["op:req:brief"] }
+          { "toolCallId": "tc:read", "observed": "fixed the audience and the two throughlines per the user brief", "primitives": ["op:req:brief"] }
         ]
       }
     },
     {
       "id": "n:inflect",
       "state": "inflection",
-      "title": "组织方式重排",
+      "title": "Reordering how it's organized",
       "inflectKind": "aha",
-      "from": "按功能逐条罗列变更",
-      "to": "按客户价值组织：合规 / 性能 / 可用性 三栏",
-      "rationale": "企业决策者关心“对我意味着什么”，价值导向比功能清单更契合受众与正式语气。",
+      "from": "List the changes one by one, feature by feature",
+      "to": "Organize by customer value: three columns — compliance / performance / availability",
+      "rationale": "Enterprise decision-makers care about \"what this means for me\"; a value-led framing fits the audience and the formal tone better than a feature list.",
       "affects": ["n:struct", "n:flat"]
     },
     {
       "id": "n:struct",
       "state": "grounded",
       "kind": "decision",
-      "title": "采用三栏价值结构，每条附一句量化收益",
+      "title": "Adopt the three-column value structure, with one quantified benefit per item",
       "confidence": { "value": 0.8, "source": "self_consistency" },
       "evidence": [
-        { "id": "ev:bench", "label": "性能可量化：p99 -32%、吞吐 +18%", "primitives": ["op:src:bench"], "polarity": "supports" },
-        { "id": "ev:cl", "label": "37 条变更可归入三栏", "primitives": ["op:src:changelog"], "polarity": "supports" }
+        { "id": "ev:bench", "label": "performance is quantifiable: p99 -32%, throughput +18%", "primitives": ["op:src:bench"], "polarity": "supports" },
+        { "id": "ev:cl", "label": "all 37 changes fit into the three columns", "primitives": ["op:src:changelog"], "polarity": "supports" }
       ],
       "provenance": {
         "mode": "asserted",
         "steps": [
-          { "toolCallId": "tc:bench", "observed": "量化收益来自基准对比", "primitives": ["op:src:bench"] },
-          { "toolCallId": "tc:read", "observed": "变更可三栏归类", "primitives": ["op:src:changelog"] }
+          { "toolCallId": "tc:bench", "observed": "quantified benefits come from the benchmark comparison", "primitives": ["op:src:bench"] },
+          { "toolCallId": "tc:read", "observed": "changes sort cleanly into three columns", "primitives": ["op:src:changelog"] }
         ]
       }
     },
@@ -73,37 +73,37 @@
       "id": "n:flat",
       "state": "refuted",
       "kind": "option",
-      "title": "按功能模块平铺罗列",
-      "reason": "对企业决策者信息密度过高、价值不突出，与正式发布说明的目的不符。",
+      "title": "A flat list by feature module",
+      "reason": "Too dense for enterprise decision-makers and the value doesn't stand out — at odds with the purpose of formal release notes.",
       "formerConfidence": 0.35
     },
     {
       "id": "n:migrate",
       "state": "hypothesis",
       "kind": "option",
-      "title": "是否加入“从 v1 升级指南”章节",
+      "title": "Whether to add a \"Upgrading from v1\" section",
       "confidence": { "value": 0.5, "source": "self_report" },
       "evidence": [],
-      "falsification": "若多数目标客户仍在 v1，则加入升级指南显著有用；需产品确认 v1 存量占比再定。"
+      "falsification": "If most target customers are still on v1, an upgrade guide is clearly useful; need product to confirm the v1 install base before deciding."
     },
     {
       "id": "n:legal",
       "state": "open",
       "kind": "requirement",
-      "title": "两处合规措辞需法务 / 市场确认",
-      "needs": "“通过 XX 认证”“满足 YY 条例”两句对外措辞，须法务签字、市场统一口径。"
+      "title": "Two pieces of compliance wording need legal / marketing sign-off",
+      "needs": "The two public-facing lines — \"certified to XX\" and \"compliant with YY regulation\" — require legal sign-off and a unified marketing line."
     }
   ],
   "outcome": {
     "nodeId": "n:struct",
-    "label": "交付草案 · Grounded",
-    "text": "已产出三栏价值结构草案（合规/性能/可用性），每条附量化收益。",
-    "recommendation": "待确认 v1 存量占比（决定是否加升级指南）与法务措辞后定稿。"
+    "label": "Draft delivered · Grounded",
+    "text": "Produced a three-column value-structured draft (compliance/performance/availability), each item with a quantified benefit.",
+    "recommendation": "Finalize once the v1 install base is confirmed (deciding the upgrade guide) and the legal wording is settled."
   },
   "steps": [
-    { "label": "理解需求", "hint": "先把用户意图与约束锚定为 requirement（受众/语气/两条主线）。", "visibleNodeIds": ["n:req", "n:flat"] },
-    { "label": "拐点", "hint": "啊哈：从功能罗列转为客户价值三栏，平铺方案沉降。", "visibleNodeIds": ["n:req", "n:inflect", "n:flat"] },
-    { "label": "结构决定", "hint": "三栏结构凝定为 grounded 决策，每条附量化收益。", "visibleNodeIds": ["n:req", "n:inflect", "n:struct", "n:migrate", "n:flat"] },
-    { "label": "待确认", "hint": "诚实留下：升级指南待数据、合规措辞待法务。", "visibleNodeIds": ["n:req", "n:inflect", "n:struct", "n:migrate", "n:legal", "n:flat"] }
+    { "label": "Understand the ask", "hint": "First anchor the user's intent and constraints as a requirement (audience / tone / the two throughlines).", "visibleNodeIds": ["n:req", "n:flat"] },
+    { "label": "Inflection", "hint": "Aha: shift from a feature list to a three-column value framing, and the flat list settles.", "visibleNodeIds": ["n:req", "n:inflect", "n:flat"] },
+    { "label": "Structure decided", "hint": "The three-column structure crystallizes into a grounded decision, each item with a quantified benefit.", "visibleNodeIds": ["n:req", "n:inflect", "n:struct", "n:migrate", "n:flat"] },
+    { "label": "Pending confirmation", "hint": "Honestly leaves it: the upgrade guide awaits data, the compliance wording awaits legal.", "visibleNodeIds": ["n:req", "n:inflect", "n:struct", "n:migrate", "n:legal", "n:flat"] }
   ]
 }

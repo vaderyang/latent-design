@@ -2,16 +2,22 @@
 import Base from "../../layouts/Base.astro";
 import DemoFrame from "../../components/DemoFrame.tsx";
 import data from "@examples/advisory.json";
+import dataZh from "@examples/advisory.zh.json";
 ---
 
-<Base title="助手 / 建议 · Latent demo" description="对话式建议 agent：主舞台是建议本身 + 它依赖的假设 + 注意事项 + 还需确认什么。">
+<Base title="Advisory · Latent 潜 demo" description="A conversational advisory agent: the primary plane is the answer itself + the assumptions it rests on + the caveats + what still needs confirming.">
   <section class="wrap" style="padding-top:64px">
     <a class="demo-back" href="/">◂ Latent · 潜</a>
-    <div class="kicker">应用 Demo · 助手 / 建议（对话）</div>
-    <h2>技术选型咨询 — 该上 K8s 吗</h2>
-    <p>
+    <div class="kicker" data-i18n="en">Application demo · Advisory / recommendation (conversational)</div>
+    <div class="kicker" data-i18n="zh">应用 Demo · 助手 / 建议（对话）</div>
+    <h2 data-i18n="en">Tech-stack advice — should we go with K8s?</h2>
+    <h2 data-i18n="zh">技术选型咨询 — 该上 K8s 吗</h2>
+    <p data-i18n="en">
+      The most dangerous thing in giving advice is <strong>dressing hidden assumptions up as confidence</strong>. Here the <span class="mono" style="color:var(--grounded)">answer</span> is given directly, but the <strong>assumptions</strong> it rests on are surfaced explicitly and annotated with "what would flip the conclusion"; the <span class="mono">tradeoff</span> says when the trade pays off, and the compliance <span class="mono" style="color:var(--open)">risk</span> is kept as an honest open — this is exactly what the Grounding Contract looks like in a conversation.
+    </p>
+    <p data-i18n="zh">
       给建议最危险的是<strong>把藏起来的假设包装成自信</strong>。这里 <span class="mono" style="color:var(--grounded)">answer</span> 直接给出，但它依赖的<strong>假设</strong>被显式亮出并标注“什么会让结论反转”，<span class="mono">tradeoff</span> 指出何时这笔交易划算，合规 <span class="mono" style="color:var(--open)">risk</span> 作为诚实的 open——这正是 Grounding Contract 在对话场景的样子。
     </p>
-    <DemoFrame data={data} mode="scenario" stepped client:load />
+    <DemoFrame data={data} dataZh={dataZh} mode="scenario" stepped client:load />
   </section>
 </Base>

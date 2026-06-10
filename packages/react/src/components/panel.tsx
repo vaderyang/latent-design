@@ -6,14 +6,21 @@ import { UnderstandingSurface } from "./surface.tsx";
 import { InterventionRail } from "./activity.tsx";
 import type { InterventionAction } from "./activity.tsx";
 import { PlainView } from "./plainview.tsx";
+import { useStrings } from "../i18n.ts";
 
 export function OutcomeBanner({ outcome }: { outcome: NonNullable<CognitiveState["outcome"]> }) {
+  const t = useStrings();
   return (
     <div className="conclusion">
-      <div className="cl">◆ {outcome.label ?? "Outcome · 结果"}</div>
+      <div className="cl">◆ {outcome.label ?? t.panel.outcome}</div>
       <div className="ctext">
         {outcome.text}
-        {outcome.recommendation && <> 建议：{outcome.recommendation}</>}
+        {outcome.recommendation && (
+          <>
+            {t.panel.suggestion}
+            {outcome.recommendation}
+          </>
+        )}
       </div>
     </div>
   );
@@ -36,6 +43,7 @@ export function UnderstandingPanel({
   heading?: string | null;
   showProblem?: boolean;
 }) {
+  const t = useStrings();
   return (
     <div className="upanel">
       {heading && <div className="upanel-head">① {heading}</div>}
@@ -47,7 +55,7 @@ export function UnderstandingPanel({
           <UnderstandingSurface state={state} />
           {intervene && actions && actions.length > 0 && (
             <div className="upanel-act">
-              <div className="rsub">③ 你可以做什么</div>
+              <div className="rsub">{t.panel.youCanDo}</div>
               <InterventionRail actions={actions} />
             </div>
           )}

@@ -3,56 +3,56 @@
   "latentLevel": "high",
   "persona": "operator",
   "task": {
-    "title": "迁移到多区域高可用部署 — 架构规划",
-    "goal": "在不停机前提下迁移到多区域，目标 RTO < 5min、跨区一致性可控",
-    "context": "单区单写 · 12 服务 · 金融级 SLA",
-    "status": "规划中"
+    "title": "Migrating to a multi-region HA deployment — architecture planning",
+    "goal": "Migrate to multi-region with zero downtime, targeting RTO < 5min and controllable cross-region consistency",
+    "context": "Single-region single-writer · 12 services · financial-grade SLA",
+    "status": "In planning"
   },
   "userStory": {
-    "who": "架构师 · 迁移项目负责人",
-    "trigger": "管理层要求 6 周内给出多区域迁移方案",
-    "goal": "在不停机与成本约束下选定一条可执行路线",
-    "reads": "agent 对方案空间的理解：一个被准则支撑的分阶段决策、一个在押的权衡、一个待确认的合规前置",
-    "acts": "采纳该决策进入排期 / 对权衡提出异议 / 补充预算或合规约束"
+    "who": "Architect · migration project lead",
+    "trigger": "Leadership wants a multi-region migration plan within 6 weeks",
+    "goal": "Pick one executable path under zero-downtime and cost constraints",
+    "reads": "The agent's read on the solution space: a phased decision backed by principle, a tradeoff still in play, and a compliance prerequisite awaiting confirmation",
+    "acts": "Adopt the decision and move it into scheduling / dispute the tradeoff / add a budget or compliance constraint"
   },
   "observablePrimitives": [
-    { "id": "op:req:goal", "kind": "user-statement", "label": "需求：不停机迁移、RTO<5min" },
-    { "id": "op:constraint:residency", "kind": "constraint", "label": "数据驻留合规约束（待法务确认）" },
-    { "id": "op:bench:xregion", "kind": "benchmark", "label": "跨区写入延迟压测", "ref": "bench://xregion/write-latency" },
-    { "id": "op:cost:model", "kind": "source", "label": "三方案 TCO 估算表" }
+    { "id": "op:req:goal", "kind": "user-statement", "label": "Requirement: zero-downtime migration, RTO<5min" },
+    { "id": "op:constraint:residency", "kind": "constraint", "label": "Data-residency compliance constraint (pending legal review)" },
+    { "id": "op:bench:xregion", "kind": "benchmark", "label": "Cross-region write-latency load test", "ref": "bench://xregion/write-latency" },
+    { "id": "op:cost:model", "kind": "source", "label": "TCO estimate across the three options" }
   ],
   "toolCalls": [
-    { "id": "tc:inventory", "ts": "—", "fn": "service_inventory", "summary": "12 服务 · 读写比 8:1", "producedPrimitives": ["op:req:goal"] },
-    { "id": "tc:bench", "ts": "—", "fn": "run_latency_bench", "summary": "跨区写 +40ms (p50)", "durationMs": 52000, "producedPrimitives": ["op:bench:xregion"] },
-    { "id": "tc:tco", "ts": "—", "fn": "estimate_cost", "summary": "双活双写 TCO 最高", "producedPrimitives": ["op:cost:model"] }
+    { "id": "tc:inventory", "ts": "—", "fn": "service_inventory", "summary": "12 services · read/write ratio 8:1", "producedPrimitives": ["op:req:goal"] },
+    { "id": "tc:bench", "ts": "—", "fn": "run_latency_bench", "summary": "cross-region write +40ms (p50)", "durationMs": 52000, "producedPrimitives": ["op:bench:xregion"] },
+    { "id": "tc:tco", "ts": "—", "fn": "estimate_cost", "summary": "active-active dual-write has the highest TCO", "producedPrimitives": ["op:cost:model"] }
   ],
   "nodes": [
     {
       "id": "n:inflect",
       "state": "inflection",
-      "title": "从“一步到位双活”转向“分阶段”",
+      "title": "From \"all-in active-active at once\" to \"phased\"",
       "inflectKind": "aha",
-      "from": "全量双活双写一步切换",
-      "to": "分阶段：先跨区只读副本，再引入写仲裁",
-      "rationale": "读写比 8:1 + 跨区写 +40ms：先用只读副本拿到大部分可用性收益，把高风险的跨区写延后并可灰度。",
+      "from": "Full active-active dual-write in a single cutover",
+      "to": "Phased: cross-region read replicas first, then introduce write arbitration",
+      "rationale": "Read/write ratio 8:1 plus +40ms cross-region writes: read replicas first capture most of the availability gains, while the high-risk cross-region writes can be deferred and rolled out gradually.",
       "affects": ["n:dualwrite", "n:decide"]
     },
     {
       "id": "n:decide",
       "state": "grounded",
       "kind": "decision",
-      "title": "采用分阶段方案：阶段1 跨区只读副本 + 全局负载均衡",
+      "title": "Adopt the phased plan: Phase 1 cross-region read replicas + global load balancing",
       "confidence": { "value": 0.78, "source": "self_consistency" },
       "evidence": [
-        { "id": "ev:rw", "label": "读写比 8:1 → 只读副本覆盖多数流量", "primitives": ["op:req:goal"], "polarity": "supports" },
-        { "id": "ev:tco", "label": "分阶段 TCO 显著低于双活双写", "primitives": ["op:cost:model"], "polarity": "supports" }
+        { "id": "ev:rw", "label": "read/write ratio 8:1 → read replicas cover most traffic", "primitives": ["op:req:goal"], "polarity": "supports" },
+        { "id": "ev:tco", "label": "phased TCO is markedly lower than active-active dual-write", "primitives": ["op:cost:model"], "polarity": "supports" }
       ],
       "provenance": {
         "mode": "verifiable",
         "reExecCmd": "bun plan/simulate.ts --strategy staged --assert rto_min<5",
         "steps": [
-          { "toolCallId": "tc:tco", "observed": "staged TCO < 双活双写", "primitives": ["op:cost:model"] },
-          { "toolCallId": "tc:inventory", "observed": "读写比 8:1", "primitives": ["op:req:goal"] }
+          { "toolCallId": "tc:tco", "observed": "staged TCO < active-active dual-write", "primitives": ["op:cost:model"] },
+          { "toolCallId": "tc:inventory", "observed": "read/write ratio 8:1", "primitives": ["op:req:goal"] }
         ]
       }
     },
@@ -60,48 +60,48 @@
       "id": "n:tradeoff",
       "state": "hypothesis",
       "kind": "tradeoff",
-      "title": "强一致跨区写 vs 最终一致 + 运维复杂度",
+      "title": "Strong-consistency cross-region writes vs. eventual consistency + operational complexity",
       "confidence": { "value": 0.5, "source": "self_report" },
       "evidence": [
-        { "id": "ev:lat", "label": "跨区写实测 +40ms (p50)", "primitives": ["op:bench:xregion"], "polarity": "supports" }
+        { "id": "ev:lat", "label": "measured cross-region write +40ms (p50)", "primitives": ["op:bench:xregion"], "polarity": "supports" }
       ],
-      "falsification": "若业务能接受 50ms 写延迟，则阶段2 直接上强一致；否则采用区域内强一致 + 跨区最终一致。取决于支付对账的时延容忍度。"
+      "falsification": "If the business can tolerate 50ms write latency, Phase 2 goes straight to strong consistency; otherwise use intra-region strong consistency + cross-region eventual consistency. It hinges on the latency tolerance of payment reconciliation."
     },
     {
       "id": "n:plan2",
       "state": "hypothesis",
       "kind": "plan",
-      "title": "阶段2：引入跨区写入仲裁（暂定）",
+      "title": "Phase 2: introduce cross-region write arbitration (tentative)",
       "confidence": { "value": 0.45, "source": "self_report" },
       "evidence": [],
-      "falsification": "阶段2 的形态取决于阶段1 上线后的真实跨区延迟与故障演练结果；现在锁定属过早承诺。"
+      "falsification": "The shape of Phase 2 depends on the real cross-region latency and failover-drill results after Phase 1 ships; locking it in now would be an early commitment."
     },
     {
       "id": "n:dualwrite",
       "state": "refuted",
       "kind": "option",
-      "title": "一步到位全量双活双写",
-      "reason": "写冲突解决复杂、TCO 最高、且不可灰度——风险与成本不可接受。",
+      "title": "Full active-active dual-write in one shot",
+      "reason": "Write-conflict resolution is complex, the TCO is the highest, and it can't be rolled out gradually — the risk and cost are unacceptable.",
       "formerConfidence": 0.4
     },
     {
       "id": "n:residency",
       "state": "open",
       "kind": "risk",
-      "title": "跨区数据驻留是否合规？",
-      "needs": "与法务确认目标区域是否满足数据驻留要求；这是阶段1 选址的前置条件。"
+      "title": "Is cross-region data residency compliant?",
+      "needs": "Confirm with legal whether the target regions meet data-residency requirements; this is a prerequisite for Phase 1 site selection."
     }
   ],
   "outcome": {
     "nodeId": "n:decide",
-    "label": "规划决定 · Grounded",
-    "text": "采用分阶段迁移：阶段1 跨区只读副本 + 全局 LB。",
-    "recommendation": "先解合规前置（见下方“需要你定”），再按阶段1 指标决定阶段2 写仲裁形态。"
+    "label": "Planning decision · Grounded",
+    "text": "Adopt a phased migration: Phase 1 cross-region read replicas + global LB.",
+    "recommendation": "Clear the compliance prerequisite first (see \"Needs your call\" below), then let Phase 1 metrics decide the shape of the Phase 2 write arbitration."
   },
   "steps": [
-    { "label": "初始方案", "hint": "起手考虑一步到位双活双写。", "visibleNodeIds": ["n:dualwrite", "n:tradeoff"] },
-    { "label": "拐点", "hint": "啊哈：读写比 8:1 + 跨区写延迟 ⇒ 改为分阶段，双活双写沉降。", "visibleNodeIds": ["n:inflect", "n:tradeoff", "n:dualwrite"] },
-    { "label": "决定凝定", "hint": "分阶段方案凝定为 grounded 决策（0.78），可模拟复算。", "visibleNodeIds": ["n:inflect", "n:decide", "n:tradeoff", "n:plan2", "n:dualwrite"] },
-    { "label": "前置风险", "hint": "诚实留一个 open risk：数据驻留合规是选址前置。", "visibleNodeIds": ["n:inflect", "n:decide", "n:tradeoff", "n:plan2", "n:residency", "n:dualwrite"] }
+    { "label": "Initial plan", "hint": "Open by considering an all-at-once active-active dual-write.", "visibleNodeIds": ["n:dualwrite", "n:tradeoff"] },
+    { "label": "Inflection", "hint": "Aha: read/write ratio 8:1 + cross-region write latency ⇒ switch to phased, and active-active dual-write settles.", "visibleNodeIds": ["n:inflect", "n:tradeoff", "n:dualwrite"] },
+    { "label": "Decision crystallizes", "hint": "The phased plan crystallizes into a grounded decision (0.78), reproducible by simulation.", "visibleNodeIds": ["n:inflect", "n:decide", "n:tradeoff", "n:plan2", "n:dualwrite"] },
+    { "label": "Prerequisite risk", "hint": "Honestly leaves one open risk: data-residency compliance is a prerequisite for site selection.", "visibleNodeIds": ["n:inflect", "n:decide", "n:tradeoff", "n:plan2", "n:residency", "n:dualwrite"] }
   ]
 }

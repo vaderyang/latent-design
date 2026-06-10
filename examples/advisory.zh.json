@@ -1,0 +1,92 @@
+{
+  "schemaVersion": "0.2",
+  "latentLevel": "mid",
+  "persona": "operator",
+  "task": {
+    "title": "技术选型咨询：现在该上 Kubernetes 吗？",
+    "goal": "基于团队规模与负载给出是否上 K8s 的建议",
+    "context": "团队 8 人 · 3 个服务 · 月活 5 万 · 无专职 SRE",
+    "status": "咨询"
+  },
+  "userStory": {
+    "who": "创业团队 CTO",
+    "trigger": "团队在纠结要不要上 Kubernetes",
+    "goal": "拿到一个有依据、把前提说明白的选型建议",
+    "reads": "agent 的建议、它依赖的假设（标了什么会让结论反转）、关键权衡与还需你确认的点",
+    "acts": "采纳建议 / 对假设提异议 / 补充你的真实约束（合规、团队、流量）"
+  },
+  "observablePrimitives": [
+    { "id": "op:in:team", "kind": "user-statement", "label": "现状：8 人、3 服务、月活 5 万、无专职 SRE" },
+    { "id": "op:src:tco", "kind": "source", "label": "托管容器 vs 自建 K8s 运维成本参考" }
+  ],
+  "toolCalls": [
+    { "id": "tc:profile", "ts": "—", "fn": "profile_workload", "summary": "流量平稳、无突发尖峰", "producedPrimitives": ["op:in:team"] },
+    { "id": "tc:cost", "ts": "—", "fn": "lookup_ops_cost", "summary": "自建 K8s 运维负担高", "producedPrimitives": ["op:src:tco"] }
+  ],
+  "nodes": [
+    {
+      "id": "n:answer",
+      "state": "grounded",
+      "kind": "answer",
+      "title": "现阶段不建议全量上 K8s；用托管容器（如 Cloud Run / ECS）+ IaC 更划算",
+      "confidence": { "value": 0.76, "source": "self_consistency" },
+      "evidence": [
+        { "id": "ev:team", "label": "无专职 SRE，运维带宽有限", "primitives": ["op:in:team"], "polarity": "supports" },
+        { "id": "ev:flat", "label": "流量平稳、3 服务，未触及 K8s 收益区", "primitives": ["op:in:team"], "polarity": "supports" },
+        { "id": "ev:cost", "label": "自建 K8s 运维成本显著更高", "primitives": ["op:src:tco"], "polarity": "supports" }
+      ],
+      "provenance": {
+        "mode": "asserted",
+        "steps": [
+          { "toolCallId": "tc:profile", "observed": "负载平稳、规模小", "primitives": ["op:in:team"] },
+          { "toolCallId": "tc:cost", "observed": "自建运维负担高于托管", "primitives": ["op:src:tco"] }
+        ]
+      }
+    },
+    {
+      "id": "n:assume",
+      "state": "hypothesis",
+      "kind": "requirement",
+      "title": "假设：没有专职平台团队，且无强弹性/多云需求",
+      "confidence": { "value": 0.55, "source": "self_report" },
+      "evidence": [],
+      "falsification": "若你们已有平台/SRE 团队，或有强突发弹性、多云可移植性硬需求，则建议反转——K8s 的收益开始压过其复杂度。"
+    },
+    {
+      "id": "n:tradeoff",
+      "state": "hypothesis",
+      "kind": "tradeoff",
+      "title": "K8s 换来弹性与可移植性，代价是显著的运维与认知负担",
+      "confidence": { "value": 0.6, "source": "self_report" },
+      "evidence": [],
+      "falsification": "当服务数与团队规模增长到需要细粒度调度/自愈时，这笔交易开始划算；当前规模未到该拐点。"
+    },
+    {
+      "id": "n:bandwagon",
+      "state": "refuted",
+      "kind": "claim",
+      "title": "“大厂都用 K8s，所以我们也该上”",
+      "reason": "无业务驱动的复杂度是负债；技术选型应由负载与团队能力决定，而非潮流。",
+      "formerConfidence": 0.3
+    },
+    {
+      "id": "n:compliance",
+      "state": "open",
+      "kind": "risk",
+      "title": "是否有合规要求强制私有化/特定部署形态？",
+      "needs": "确认是否有数据驻留或私有部署的硬合规约束——它会直接改变托管 vs 自建的结论。"
+    }
+  ],
+  "outcome": {
+    "nodeId": "n:answer",
+    "label": "建议 · Grounded",
+    "text": "建议先用托管容器 + IaC，把 K8s 留到规模/团队触及其收益区再上。",
+    "recommendation": "先确认合规约束（见下方“需要你定”）；若未来出现强弹性/多云需求，再重评。"
+  },
+  "steps": [
+    { "label": "给出建议", "hint": "直接给出 answer，并把支撑证据挂上。", "visibleNodeIds": ["n:answer", "n:bandwagon"] },
+    { "label": "亮出假设", "hint": "诚实标注建议所依赖的假设（无 SRE、无强弹性），而非藏起来。", "visibleNodeIds": ["n:answer", "n:assume", "n:bandwagon"] },
+    { "label": "权衡", "hint": "把 K8s 的权衡显式化，并指出何时这笔交易会划算。", "visibleNodeIds": ["n:answer", "n:assume", "n:tradeoff", "n:bandwagon"] },
+    { "label": "待确认", "hint": "留一个 open risk：合规约束会改变结论。", "visibleNodeIds": ["n:answer", "n:assume", "n:tradeoff", "n:compliance", "n:bandwagon"] }
+  ]
+}

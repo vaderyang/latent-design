@@ -1,9 +1,25 @@
 <!doctype html>
-<html lang="zh">
+<html lang="en" data-lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Latent · 潜 — An Agentic Design Language</title>
+<script>
+/* language state — runs before paint */
+(function(){
+  try{
+    var q=new URLSearchParams(location.search).get('lang');
+    var lang=q||localStorage.getItem('latent-lang')||'en';
+    if(lang!=='en'&&lang!=='zh')lang='en';
+    document.documentElement.dataset.lang=lang;
+    document.documentElement.lang=lang;
+    if(q==='en'||q==='zh')localStorage.setItem('latent-lang',q);
+  }catch(e){
+    document.documentElement.dataset.lang='en';
+    document.documentElement.lang='en';
+  }
+})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..500&family=Hanken+Grotesk:wght@300..700&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@300;400;600&display=swap" rel="stylesheet">
@@ -302,9 +318,27 @@ footer p{margin:14px auto 0;color:var(--ink-500);font-size:13px;font-family:var(
 ::selection{background:var(--hypo-dim);color:var(--ink-100)}
 .fade{opacity:0;transform:translateY(20px);transition:opacity .8s ease, transform .8s cubic-bezier(.2,.7,.2,1)}
 .fade.in{opacity:1;transform:none}
+
+/* ---------- bilingual show/hide ---------- */
+html[data-lang="en"] [data-i18n="zh"]{display:none}
+html[data-lang="zh"] [data-i18n="en"]{display:none}
+
+/* ---------- language toggle ---------- */
+.lang-toggle{position:fixed;top:14px;right:14px;z-index:60;display:flex;gap:2px;
+  background:rgba(10,14,21,.72);border:1px solid var(--line-2);border-radius:10px;padding:3px;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  box-shadow:0 8px 30px -16px rgba(0,0,0,.8)}
+.lang-toggle button{font-family:var(--mono);font-size:11px;letter-spacing:.06em;
+  color:var(--ink-400);background:none;border:none;border-radius:7px;padding:5px 11px;cursor:pointer;transition:.18s}
+.lang-toggle button:hover{color:var(--ink-200)}
+.lang-toggle button.active{background:var(--d-600);color:var(--hypo);box-shadow:0 0 0 1px var(--hypo-line)}
 </style>
 </head>
 <body>
+<div class="lang-toggle" role="group" aria-label="Language">
+  <button type="button" id="lang-en" data-lang="en">EN</button>
+  <button type="button" id="lang-zh" data-lang="zh">中</button>
+</div>
 <div class="bg">
   <svg viewBox="0 0 1200 900" preserveAspectRatio="xMidYMid slice" fill="none">
     <g stroke="rgba(84,199,192,0.5)" stroke-width="0.75">
@@ -329,9 +363,14 @@ footer p{margin:14px auto 0;color:var(--ink-500);font-size:13px;font-family:var(
   <div class="glyph">潛<small>QIÁN · v0.1</small></div>
   <div class="kicker">An Agentic Design Language · Netis</div>
   <h1><span class="it">Latent</span> is attentioned.</h1>
-  <div class="law">注意力跟随理解，而非活动。<br><span style="font-style:normal;font-size:.7em;color:var(--ink-400)">Attention follows understanding, not activity.</span></div>
-  <p class="lead">现有的 agentic 界面把注意力花在渲染工具调用上——搜索中、读取中、执行中。但工具调用是认知的<em>剧场</em>，不是认知本身。这套设计语言把用户有限的注意力，重新分配给问题的潜结构、以及 agent 对它不断演化的、被证据锚定的理解。</p>
-  <div class="meta">
+  <div class="law" data-i18n="en">Attention follows understanding, not activity.<br><span style="font-style:normal;font-size:.7em;color:var(--ink-400)">注意力跟随理解，而非活动。</span></div>
+  <div class="law" data-i18n="zh">注意力跟随理解，而非活动。<br><span style="font-style:normal;font-size:.7em;color:var(--ink-400)">Attention follows understanding, not activity.</span></div>
+  <p class="lead" data-i18n="en">Today's agentic interfaces spend attention rendering tool calls — searching, reading, executing. But the tool call is the <em>theater</em> of cognition, not cognition itself. This design language reallocates the user's finite attention to the latent structure of the problem, and to the agent's evolving, evidence-grounded understanding of it.</p>
+  <p class="lead" data-i18n="zh">现有的 agentic 界面把注意力花在渲染工具调用上——搜索中、读取中、执行中。但工具调用是认知的<em>剧场</em>，不是认知本身。这套设计语言把用户有限的注意力，重新分配给问题的潜结构、以及 agent 对它不断演化的、被证据锚定的理解。</p>
+  <div class="meta" data-i18n="en">
+    <span>Core Law <b>1</b></span><span>Principles <b>7</b></span><span>Grounding Contract <b>3 states</b></span><span>Worked Example <b>TraceForge</b></span>
+  </div>
+  <div class="meta" data-i18n="zh">
     <span>核心定律 <b>1</b></span><span>原则 <b>7</b></span><span>认识论契约 <b>3 态</b></span><span>工作示例 <b>TraceForge</b></span>
   </div>
   <div class="depthline"></div>
@@ -339,49 +378,65 @@ footer p{margin:14px auto 0;color:var(--ink-500);font-size:13px;font-family:var(
 
 <!-- THE INVERSION -->
 <section class="wrap fade">
-  <div class="kicker">立论 / The Inversion</div>
-  <h2>把视觉层级倒过来</h2>
-  <p>领域里几乎所有产品——包括被视为最前沿的 Generative UI——本质上都是 <span class="mono" style="color:var(--ink-100)">tool-call-rooted</span>：UI 的生成源头是工具的输出，推理被压成动作旁边的一行小字、一个事后的辩护。<strong>潛 把这个层级倒过来。</strong>动作退为外围、可调取的痕迹；agent 不断演化的理解占据主舞台。</p>
+  <div class="kicker" data-i18n="en">The Inversion</div>
+  <div class="kicker" data-i18n="zh">立论 / The Inversion</div>
+  <h2 data-i18n="en">Invert the visual hierarchy</h2>
+  <h2 data-i18n="zh">把视觉层级倒过来</h2>
+  <p data-i18n="en">Almost every product in the field — including the so-called frontier of Generative UI — is fundamentally <span class="mono" style="color:var(--ink-100)">tool-call-rooted</span>: the UI is generated from tool output, and reasoning is squeezed into a caption beside the action, an after-the-fact justification. <strong>潛 inverts this hierarchy.</strong> Actions recede into a peripheral, retrievable trace; the agent's evolving understanding takes the main stage.</p>
+  <p data-i18n="zh">领域里几乎所有产品——包括被视为最前沿的 Generative UI——本质上都是 <span class="mono" style="color:var(--ink-100)">tool-call-rooted</span>：UI 的生成源头是工具的输出，推理被压成动作旁边的一行小字、一个事后的辩护。<strong>潛 把这个层级倒过来。</strong>动作退为外围、可调取的痕迹；agent 不断演化的理解占据主舞台。</p>
   <div class="invert">
     <div class="panel old">
-      <div class="ptag">现有范式 — Action-rooted</div>
+      <div class="ptag" data-i18n="en">Today's paradigm — Action-rooted</div>
+      <div class="ptag" data-i18n="zh">现有范式 — Action-rooted</div>
       <div class="stack">
         <div class="row act"><span class="dot"></span>🔍 Searching the web…</div>
         <div class="row act"><span class="dot"></span>📄 Reading 5 results…</div>
         <div class="row act"><span class="dot"></span>⚙ Running pcap_analyze()…</div>
         <div class="row act"><span class="dot"></span>📄 Reading file…</div>
-        <div class="row lat"><span class="dot"></span>reasoning: 可能是网络层问题</div>
+        <div class="row lat" data-i18n="en"><span class="dot"></span>reasoning: probably a network-layer issue</div>
+        <div class="row lat" data-i18n="zh"><span class="dot"></span>reasoning: 可能是网络层问题</div>
       </div>
-      <div class="am-note">动作响亮、占满预算；认知被埋成脚注。用户看到“很忙”，却读不到“理解了什么”。</div>
+      <div class="am-note" data-i18n="en">Actions are loud and consume the whole budget; cognition is buried as a footnote. The user sees "busy," but can't read "what was understood."</div>
+      <div class="am-note" data-i18n="zh">动作响亮、占满预算；认知被埋成脚注。用户看到“很忙”，却读不到“理解了什么”。</div>
     </div>
     <div class="panel new">
       <div class="ptag" style="color:var(--hypo)">潛 — Understanding-rooted</div>
       <div class="stack">
-        <div class="row lat g"><span class="dot"></span>根因：instance-7 的 GC 长停顿</div>
-        <div class="row lat h"><span class="dot"></span>在押：下游连接池排队 · 0.71</div>
-        <div class="row lat o"><span class="dot"></span>未决：为何仅该实例？</div>
+        <div class="row lat g" data-i18n="en"><span class="dot"></span>Root cause: long GC pause on instance-7</div>
+        <div class="row lat g" data-i18n="zh"><span class="dot"></span>根因：instance-7 的 GC 长停顿</div>
+        <div class="row lat h" data-i18n="en"><span class="dot"></span>In play: downstream connection-pool queueing · 0.71</div>
+        <div class="row lat h" data-i18n="zh"><span class="dot"></span>在押：下游连接池排队 · 0.71</div>
+        <div class="row lat o" data-i18n="en"><span class="dot"></span>Open: why this instance only?</div>
+        <div class="row lat o" data-i18n="zh"><span class="dot"></span>未决：为何仅该实例？</div>
         <div class="row act"><span class="dot"></span>provenance · pcap_slice · align_ts · 4 calls</div>
       </div>
-      <div class="am-note">认知是主体，按证据强度分级着色；工具调用收成可溯源的一行。注意力对齐到“理解发生了什么变化”。</div>
+      <div class="am-note" data-i18n="en">Cognition is the subject, color-graded by evidence strength; tool calls collapse into a single traceable line. Attention aligns to "what changed in the understanding."</div>
+      <div class="am-note" data-i18n="zh">认知是主体，按证据强度分级着色；工具调用收成可溯源的一行。注意力对齐到“理解发生了什么变化”。</div>
     </div>
   </div>
 </section>
 
 <!-- ATTENTION MODEL -->
 <section class="wrap fade">
-  <div class="kicker">架构 / The Attention Model</div>
-  <h2>三个区域，一种比例</h2>
-  <p>每个 agentic 界面被分解为三个注意力区域。它们的视觉权重是设计语言的硬约束，不是布局偏好。</p>
+  <div class="kicker" data-i18n="en">The Attention Model</div>
+  <div class="kicker" data-i18n="zh">架构 / The Attention Model</div>
+  <h2 data-i18n="en">Three zones, one proportion</h2>
+  <h2 data-i18n="zh">三个区域，一种比例</h2>
+  <p data-i18n="en">Every agentic interface decomposes into three attention zones. Their visual weight is a hard constraint of the design language, not a layout preference.</p>
+  <p data-i18n="zh">每个 agentic 界面被分解为三个注意力区域。它们的视觉权重是设计语言的硬约束，不是布局偏好。</p>
   <div class="am">
     <div class="am-main">
-      <span class="zlabel">① Understanding Surface · 持久 · 主体</span>
-      <div class="minihyp"><div class="t">根因：下游 GC 停顿引发连接池排队</div><div class="c">GROUNDED · conf 0.89 · 4 evidence</div></div>
-      <div class="minihyp h"><div class="t">次因：目标段 0.3% 重传</div><div class="c">HYPOTHESIS · conf 0.34 · 症状而非病因</div></div>
-      <div class="am-note" style="margin-top:14px">一个持续存在、不断被改写的问题状态。新证据进来时，<em>它变化</em>——而那个变化（假设被提升、被推翻）才是有意义的事件。这是 ambient/后台 agent 时代你“回来查看”的那个东西。</div>
+      <span class="zlabel" data-i18n="en">① Understanding Surface · persistent · primary</span>
+      <span class="zlabel" data-i18n="zh">① Understanding Surface · 持久 · 主体</span>
+      <div class="minihyp"><div class="t" data-i18n="en">Root cause: downstream GC pause drives connection-pool queueing</div><div class="t" data-i18n="zh">根因：下游 GC 停顿引发连接池排队</div><div class="c" data-i18n="en">GROUNDED · conf 0.89 · 4 evidence</div><div class="c" data-i18n="zh">GROUNDED · conf 0.89 · 4 evidence</div></div>
+      <div class="minihyp h"><div class="t" data-i18n="en">Secondary: 0.3% retransmission on target segment</div><div class="t" data-i18n="zh">次因：目标段 0.3% 重传</div><div class="c" data-i18n="en">HYPOTHESIS · conf 0.34 · symptom, not cause</div><div class="c" data-i18n="zh">HYPOTHESIS · conf 0.34 · 症状而非病因</div></div>
+      <div class="am-note" style="margin-top:14px" data-i18n="en">A problem state that persists and is continuously rewritten. When new evidence arrives, <em>it changes</em> — and that change (a hypothesis promoted, a hypothesis refuted) is the meaningful event. This is the thing you "come back to check" in the era of ambient / background agents.</div>
+      <div class="am-note" style="margin-top:14px" data-i18n="zh">一个持续存在、不断被改写的问题状态。新证据进来时，<em>它变化</em>——而那个变化（假设被提升、被推翻）才是有意义的事件。这是 ambient/后台 agent 时代你“回来查看”的那个东西。</div>
     </div>
     <div class="am-side">
       <div class="am-rail" style="flex:0 0 auto">
-        <span class="zlabel">② Activity Stream · 短暂 · 外围</span>
+        <span class="zlabel" data-i18n="en">② Activity Stream · transient · peripheral</span>
+        <span class="zlabel" data-i18n="zh">② Activity Stream · 短暂 · 外围</span>
         <div class="act-mini">pcap_slice(t=12:04:31)</div>
         <div class="act-mini">retrans_analyze()</div>
         <div class="act-mini">align_timestamps()</div>
@@ -390,10 +445,13 @@ footer p{margin:14px auto 0;color:var(--ink-500);font-size:13px;font-family:var(
       <div class="am-rail" style="border-color:var(--hypo-line)">
         <span class="zlabel" style="color:var(--hypo)">③ Intervention Rail</span>
         <div class="interv" style="flex-direction:column">
-          <button class="ibtn">质疑这个假设</button>
-          <button class="ibtn">提供约束</button>
+          <button class="ibtn" data-i18n="en">Challenge this hypothesis</button>
+          <button class="ibtn" data-i18n="zh">质疑这个假设</button>
+          <button class="ibtn" data-i18n="en">Provide a constraint</button>
+          <button class="ibtn" data-i18n="zh">提供约束</button>
         </div>
-        <div class="am-note" style="margin-top:10px">人类干预是核心特性，不是边缘情况。</div>
+        <div class="am-note" style="margin-top:10px" data-i18n="en">Human intervention is a core feature, not an edge case.</div>
+        <div class="am-note" style="margin-top:10px" data-i18n="zh">人类干预是核心特性，不是边缘情况。</div>
       </div>
     </div>
   </div>
@@ -401,98 +459,129 @@ footer p{margin:14px auto 0;color:var(--ink-500);font-size:13px;font-family:var(
 
 <!-- GROUNDING CONTRACT -->
 <section class="wrap fade">
-  <div class="kicker">认识论纪律 / The Grounding Contract</div>
-  <h2>对抗 reasoning theater 的脊梁</h2>
-  <p>这是潛 区别于一切现有方案的核心，也是它的安全底座。渲染出来的 latent <strong>不等于</strong>真实的 latent——链式推理常是事后合理化，做得越漂亮越容易给不忠实的认知贴上“可信”的金箔。因此：<strong>只有可证伪、被证据锚定的认知，才配占据主注意力。</strong>任何想进入主舞台的元素，必须是以下三种合法形态之一。</p>
+  <div class="kicker" data-i18n="en">The Grounding Contract</div>
+  <div class="kicker" data-i18n="zh">认识论纪律 / The Grounding Contract</div>
+  <h2 data-i18n="en">The backbone against reasoning theater</h2>
+  <h2 data-i18n="zh">对抗 reasoning theater 的脊梁</h2>
+  <p data-i18n="en">This is what sets 潛 apart from every existing approach, and it is its safety foundation. The rendered latent is <strong>not</strong> the real latent — chain-of-thought is often post-hoc rationalization, and the prettier it looks, the more easily it gilds unfaithful cognition with the gold leaf of "credible." Therefore: <strong>only falsifiable, evidence-grounded cognition earns the main attention.</strong> Any element that wants the main stage must be one of three legitimate forms.</p>
+  <p data-i18n="zh">这是潛 区别于一切现有方案的核心，也是它的安全底座。渲染出来的 latent <strong>不等于</strong>真实的 latent——链式推理常是事后合理化，做得越漂亮越容易给不忠实的认知贴上“可信”的金箔。因此：<strong>只有可证伪、被证据锚定的认知，才配占据主注意力。</strong>任何想进入主舞台的元素，必须是以下三种合法形态之一。</p>
   <div class="gc">
     <div class="gc-card g">
       <div class="lbl">◆ Grounded Claim</div>
-      <h3>已锚定结论</h3>
-      <p>一个被证据支撑的论断。占据最高视觉权重——金 amber，意为“已落地、可验证”。</p>
-      <div class="req">必须携带：<b>指向 evidence / observable primitives 的可点开溯源</b></div>
+      <h3 data-i18n="en">Grounded conclusion</h3>
+      <h3 data-i18n="zh">已锚定结论</h3>
+      <p data-i18n="en">An assertion backed by evidence. It carries the highest visual weight — gold amber, meaning "landed, verifiable."</p>
+      <p data-i18n="zh">一个被证据支撑的论断。占据最高视觉权重——金 amber，意为“已落地、可验证”。</p>
+      <div class="req" data-i18n="en">Must carry: <b>click-through provenance pointing to evidence / observable primitives</b></div>
+      <div class="req" data-i18n="zh">必须携带：<b>指向 evidence / observable primitives 的可点开溯源</b></div>
     </div>
     <div class="gc-card h">
       <div class="lbl">◇ Hypothesis</div>
-      <h3>在押假设</h3>
-      <p>一个被以不确定性持有的信念。青 aqua，意为“在水中、探查中”。永远显示置信度。</p>
-      <div class="req">必须携带：<b>置信度 + “什么证据会改变它”</b></div>
+      <h3 data-i18n="en">Hypothesis in play</h3>
+      <h3 data-i18n="zh">在押假设</h3>
+      <p data-i18n="en">A belief held with uncertainty. Aqua, meaning "in the water, under investigation." Always shows confidence.</p>
+      <p data-i18n="zh">一个被以不确定性持有的信念。青 aqua，意为“在水中、探查中”。永远显示置信度。</p>
+      <div class="req" data-i18n="en">Must carry: <b>confidence + "what evidence would change it"</b></div>
+      <div class="req" data-i18n="zh">必须携带：<b>置信度 + “什么证据会改变它”</b></div>
     </div>
     <div class="gc-card o">
       <div class="lbl">○ Open Question</div>
-      <h3>诚实的未知</h3>
-      <p>一个 agent 明确不知道的事。靛 indigo，低权重但<em>可见</em>——隐藏未知本身就是一种 theater。</p>
-      <div class="req">必须携带：<b>待查项 / 解决它需要什么</b></div>
+      <h3 data-i18n="en">An honest unknown</h3>
+      <h3 data-i18n="zh">诚实的未知</h3>
+      <p data-i18n="en">Something the agent explicitly does not know. Indigo, low weight but <em>visible</em> — hiding the unknown is itself a form of theater.</p>
+      <p data-i18n="zh">一个 agent 明确不知道的事。靛 indigo，低权重但<em>可见</em>——隐藏未知本身就是一种 theater。</p>
+      <div class="req" data-i18n="en">Must carry: <b>the open item / what it would take to resolve it</b></div>
+      <div class="req" data-i18n="zh">必须携带：<b>待查项 / 解决它需要什么</b></div>
     </div>
   </div>
-  <p style="margin-top:24px;color:var(--ink-400);font-size:14px">这条契约正是你的<strong>五层诊断本体论</strong>：本体论上层（假设、结论）是台前主体，但每一个都必须有一根线栓回下层的 Observable Primitives。Reasoning theater 之所以危险，正因为它的叙述<em>悬空</em>；Grounding Contract 用“必须可证伪、必须落到证据”把悬空的断言挡在主舞台之外。</p>
+  <p style="margin-top:24px;color:var(--ink-400);font-size:14px" data-i18n="en">This contract is precisely your <strong>five-layer diagnostic ontology</strong>: the upper ontological layers (hypotheses, conclusions) are the on-stage subject, but each must have a thread tying it back to the lower-layer Observable Primitives. Reasoning theater is dangerous precisely because its narrative <em>floats free</em>; the Grounding Contract keeps free-floating assertions off the main stage by demanding "must be falsifiable, must land on evidence."</p>
+  <p style="margin-top:24px;color:var(--ink-400);font-size:14px" data-i18n="zh">这条契约正是你的<strong>五层诊断本体论</strong>：本体论上层（假设、结论）是台前主体，但每一个都必须有一根线栓回下层的 Observable Primitives。Reasoning theater 之所以危险，正因为它的叙述<em>悬空</em>；Grounding Contract 用“必须可证伪、必须落到证据”把悬空的断言挡在主舞台之外。</p>
 </section>
 
 <!-- FOUNDATIONS: COLOR -->
 <section class="wrap fade">
-  <div class="kicker">基础 / Foundations — 色彩</div>
-  <h2>颜色即认识论状态</h2>
-  <p>潛 不用颜色装饰。色彩是承载意义的维度：它编码一个认知元素的<em>认识论状态</em>。看到金色就知道“已锚定”，看到珊瑚色就知道“模型刚刚改变了主意”。</p>
+  <div class="kicker" data-i18n="en">Foundations — Color</div>
+  <div class="kicker" data-i18n="zh">基础 / Foundations — 色彩</div>
+  <h2 data-i18n="en">Color is epistemic state</h2>
+  <h2 data-i18n="zh">颜色即认识论状态</h2>
+  <p data-i18n="en">潛 doesn't use color for decoration. Color is a meaning-bearing dimension: it encodes the <em>epistemic state</em> of a cognitive element. See gold and you know "grounded"; see coral and you know "the model just changed its mind."</p>
+  <p data-i18n="zh">潛 不用颜色装饰。色彩是承载意义的维度：它编码一个认知元素的<em>认识论状态</em>。看到金色就知道“已锚定”，看到珊瑚色就知道“模型刚刚改变了主意”。</p>
   <div class="swatches">
-    <div class="sw"><div class="chip" style="background:var(--grounded)"></div><div class="info"><div class="nm">grounded</div><div class="mn">已锚定 · 高置信 · #E7B45C</div></div></div>
-    <div class="sw"><div class="chip" style="background:var(--hypo)"></div><div class="info"><div class="nm">hypothesis</div><div class="mn">在押 · 探查中 · #54C7C0</div></div></div>
-    <div class="sw"><div class="chip" style="background:var(--open)"></div><div class="info"><div class="nm">open</div><div class="mn">未决 · 诚实未知 · #9C8CCB</div></div></div>
-    <div class="sw"><div class="chip" style="background:var(--inflect)"></div><div class="info"><div class="nm">inflection</div><div class="mn">认知拐点 · 啊哈/推翻 · #F0795F</div></div></div>
-    <div class="sw"><div class="chip" style="background:var(--refuted)"></div><div class="info"><div class="nm">refuted</div><div class="mn">已沉降 · 被推翻 · #5C6B7A</div></div></div>
-    <div class="sw"><div class="chip" style="background:var(--activity)"></div><div class="info"><div class="nm">activity</div><div class="mn">工具/动作 · 刻意低调 · #4C5A69</div></div></div>
-    <div class="sw"><div class="chip" style="background:linear-gradient(180deg,#15202E,#080B11)"></div><div class="info"><div class="nm">depth</div><div class="mn">深度层 · 抬升=浮向水面</div></div></div>
-    <div class="sw"><div class="chip" style="background:var(--ink-100)"></div><div class="info"><div class="nm">ink</div><div class="mn">认知文本 · #ECF1F7</div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--grounded)"></div><div class="info"><div class="nm">grounded</div><div class="mn" data-i18n="en">grounded · high confidence · #E7B45C</div><div class="mn" data-i18n="zh">已锚定 · 高置信 · #E7B45C</div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--hypo)"></div><div class="info"><div class="nm">hypothesis</div><div class="mn" data-i18n="en">in play · under investigation · #54C7C0</div><div class="mn" data-i18n="zh">在押 · 探查中 · #54C7C0</div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--open)"></div><div class="info"><div class="nm">open</div><div class="mn" data-i18n="en">open · honest unknown · #9C8CCB</div><div class="mn" data-i18n="zh">未决 · 诚实未知 · #9C8CCB</div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--inflect)"></div><div class="info"><div class="nm">inflection</div><div class="mn" data-i18n="en">inflection · aha / refuted · #F0795F</div><div class="mn" data-i18n="zh">认知拐点 · 啊哈/推翻 · #F0795F</div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--refuted)"></div><div class="info"><div class="nm">refuted</div><div class="mn" data-i18n="en">sunk · refuted · #5C6B7A</div><div class="mn" data-i18n="zh">已沉降 · 被推翻 · #5C6B7A</div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--activity)"></div><div class="info"><div class="nm">activity</div><div class="mn" data-i18n="en">tool / action · deliberately recessive · #4C5A69</div><div class="mn" data-i18n="zh">工具/动作 · 刻意低调 · #4C5A69</div></div></div>
+    <div class="sw"><div class="chip" style="background:linear-gradient(180deg,#15202E,#080B11)"></div><div class="info"><div class="nm">depth</div><div class="mn" data-i18n="en">depth layer · rising = surfacing</div><div class="mn" data-i18n="zh">深度层 · 抬升=浮向水面</div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--ink-100)"></div><div class="info"><div class="nm">ink</div><div class="mn" data-i18n="en">cognitive text · #ECF1F7</div><div class="mn" data-i18n="zh">认知文本 · #ECF1F7</div></div></div>
   </div>
 </section>
 
 <!-- FOUNDATIONS: TYPE -->
 <section class="wrap fade">
-  <div class="kicker">基础 / Foundations — 字体</div>
-  <h2>三种声音</h2>
-  <p>排版按角色分工：agent 的认知“声音”、界面的功能文本、以及作为仪器读数的证据/溯源。声音用衬线，因为思考应当显得<em>被斟酌过</em>；证据用等宽，因为它应当显得像可核验的仪器读数。</p>
+  <div class="kicker" data-i18n="en">Foundations — Type</div>
+  <div class="kicker" data-i18n="zh">基础 / Foundations — 字体</div>
+  <h2 data-i18n="en">Three voices</h2>
+  <h2 data-i18n="zh">三种声音</h2>
+  <p data-i18n="en">Typography divides labor by role: the agent's cognitive "voice," the interface's functional text, and evidence / provenance read as instrument output. The voice is serif, because thinking should look <em>deliberated</em>; evidence is monospace, because it should look like a verifiable instrument reading.</p>
+  <p data-i18n="zh">排版按角色分工：agent 的认知“声音”、界面的功能文本、以及作为仪器读数的证据/溯源。声音用衬线，因为思考应当显得<em>被斟酌过</em>；证据用等宽，因为它应当显得像可核验的仪器读数。</p>
   <div class="type-roles">
-    <div class="tr voice"><div class="role">Voice · 认知</div><div class="spec">根因是 GC 长停顿</div><div class="desc">Fraunces / Noto Serif SC — 假设、结论、拐点。斟酌过的、文学性的。</div></div>
-    <div class="tr uiF"><div class="role">UI · 功能</div><div class="spec">质疑这个假设</div><div class="desc">Hanken Grotesk / Noto Sans SC — 标签、控件、导航。清晰、退后。</div></div>
-    <div class="tr evid"><div class="role">Evidence · 仪器</div><div class="spec">pcap[t=12:04:31]</div><div class="desc">IBM Plex Mono — 证据、溯源、置信数值、工具调用。可核验的读数。</div></div>
+    <div class="tr voice"><div class="role" data-i18n="en">Voice · Cognition</div><div class="role" data-i18n="zh">Voice · 认知</div><div class="spec" data-i18n="en">The root cause is a long GC pause</div><div class="spec" data-i18n="zh">根因是 GC 长停顿</div><div class="desc" data-i18n="en">Fraunces / Noto Serif SC — hypotheses, conclusions, inflections. Deliberated, literary.</div><div class="desc" data-i18n="zh">Fraunces / Noto Serif SC — 假设、结论、拐点。斟酌过的、文学性的。</div></div>
+    <div class="tr uiF"><div class="role" data-i18n="en">UI · Function</div><div class="role" data-i18n="zh">UI · 功能</div><div class="spec" data-i18n="en">Challenge this hypothesis</div><div class="spec" data-i18n="zh">质疑这个假设</div><div class="desc" data-i18n="en">Hanken Grotesk / Noto Sans SC — labels, controls, navigation. Clear, recessive.</div><div class="desc" data-i18n="zh">Hanken Grotesk / Noto Sans SC — 标签、控件、导航。清晰、退后。</div></div>
+    <div class="tr evid"><div class="role" data-i18n="en">Evidence · Instrument</div><div class="role" data-i18n="zh">Evidence · 仪器</div><div class="spec">pcap[t=12:04:31]</div><div class="desc" data-i18n="en">IBM Plex Mono — evidence, provenance, confidence values, tool calls. Verifiable readings.</div><div class="desc" data-i18n="zh">IBM Plex Mono — 证据、溯源、置信数值、工具调用。可核验的读数。</div></div>
   </div>
 </section>
 
 <!-- MOTION -->
 <section class="wrap fade">
-  <div class="kicker">基础 / Foundations — 动效</div>
-  <h2>深度的语言：浮现与沉降</h2>
-  <p>动效服务于隐喻：latent 即深度（潛）。理解从深处<em>浮现</em>；置信度<em>凝定</em>；被推翻的假设<em>沉降</em>。运动从不只是装饰——它讲述认识论状态的迁移。（悬停查看）</p>
+  <div class="kicker" data-i18n="en">Foundations — Motion</div>
+  <div class="kicker" data-i18n="zh">基础 / Foundations — 动效</div>
+  <h2 data-i18n="en">The language of depth: surfacing and sinking</h2>
+  <h2 data-i18n="zh">深度的语言：浮现与沉降</h2>
+  <p data-i18n="en">Motion serves the metaphor: latent is depth (潛). Understanding <em>surfaces</em> from the deep; confidence <em>settles</em>; refuted hypotheses <em>sink</em>. Movement is never mere decoration — it narrates the migration of epistemic state. (Hover to see.)</p>
+  <p data-i18n="zh">动效服务于隐喻：latent 即深度（潛）。理解从深处<em>浮现</em>；置信度<em>凝定</em>；被推翻的假设<em>沉降</em>。运动从不只是装饰——它讲述认识论状态的迁移。（悬停查看）</p>
   <div class="motion-grid">
-    <div class="mo"><div class="nm">Surface 浮现</div><div class="d">新理解从下方升起，由模糊转清晰。出现 = 浮向水面。</div><div class="demo surf-demo"><span>new hypothesis</span></div></div>
-    <div class="mo"><div class="nm">Settle 凝定</div><div class="d">假设积累证据、提升为结论：字距收紧，青转金。</div><div class="demo settle-demo"><span>conf 0.34 → 0.89</span></div></div>
-    <div class="mo"><div class="nm">Sink 沉降</div><div class="d">被推翻的假设下沉、去饱和、折叠——但不删除（可审计）。</div><div class="demo sink-demo"><span>H1 · DNS 抖动</span></div></div>
-    <div class="mo"><div class="nm">Pulse 拐点</div><div class="d">啊哈/推翻时刻短促闪现珊瑚光——研究证实这是 latent 中最忠实的部分。</div><div class="demo pulse-demo"><span>◆ backtrack</span></div></div>
+    <div class="mo"><div class="nm" data-i18n="en">Surface</div><div class="nm" data-i18n="zh">Surface 浮现</div><div class="d" data-i18n="en">New understanding rises from below, from blur to clarity. Appearing = surfacing.</div><div class="d" data-i18n="zh">新理解从下方升起，由模糊转清晰。出现 = 浮向水面。</div><div class="demo surf-demo"><span>new hypothesis</span></div></div>
+    <div class="mo"><div class="nm" data-i18n="en">Settle</div><div class="nm" data-i18n="zh">Settle 凝定</div><div class="d" data-i18n="en">A hypothesis accrues evidence and is promoted to a conclusion: letter-spacing tightens, aqua turns gold.</div><div class="d" data-i18n="zh">假设积累证据、提升为结论：字距收紧，青转金。</div><div class="demo settle-demo"><span>conf 0.34 → 0.89</span></div></div>
+    <div class="mo"><div class="nm" data-i18n="en">Sink</div><div class="nm" data-i18n="zh">Sink 沉降</div><div class="d" data-i18n="en">A refuted hypothesis sinks, desaturates, folds away — but is not deleted (auditable).</div><div class="d" data-i18n="zh">被推翻的假设下沉、去饱和、折叠——但不删除（可审计）。</div><div class="demo sink-demo"><span>H1 · DNS jitter</span></div></div>
+    <div class="mo"><div class="nm" data-i18n="en">Pulse</div><div class="nm" data-i18n="zh">Pulse 拐点</div><div class="d" data-i18n="en">An aha / refutation moment flashes coral briefly — research confirms this is the most faithful part of the latent.</div><div class="d" data-i18n="zh">啊哈/推翻时刻短促闪现珊瑚光——研究证实这是 latent 中最忠实的部分。</div><div class="demo pulse-demo"><span>◆ backtrack</span></div></div>
   </div>
 </section>
 
 <!-- COMPONENTS -->
 <section class="wrap fade">
-  <div class="kicker">组件库 / Components（实时渲染）</div>
-  <h2>核心组件</h2>
-  <p>下列组件按 Grounding Contract 构建。点开任意 <span class="mono" style="color:var(--ink-200)">provenance</span> 看“弱化 ≠ 隐藏”——工具调用在视觉上退后，但永远一键可调、可审计。</p>
+  <div class="kicker" data-i18n="en">Components (live render)</div>
+  <div class="kicker" data-i18n="zh">组件库 / Components（实时渲染）</div>
+  <h2 data-i18n="en">Core components</h2>
+  <h2 data-i18n="zh">核心组件</h2>
+  <p data-i18n="en">The components below are built to the Grounding Contract. Open any <span class="mono" style="color:var(--ink-200)">provenance</span> to see that "recede ≠ hide" — tool calls step back visually, but are always one click away and auditable.</p>
+  <p data-i18n="zh">下列组件按 Grounding Contract 构建。点开任意 <span class="mono" style="color:var(--ink-200)">provenance</span> 看“弱化 ≠ 隐藏”——工具调用在视觉上退后，但永远一键可调、可审计。</p>
 
   <div class="comp-shell">
     <!-- inflection marker -->
     <div class="inflect-mark">
-      <div class="it">Inflection · 认知拐点</div>
-      <div class="body">对齐时间戳后，模型放弃了<span class="from">网络层假设（重传）</span>，转向<span class="to">应用层根因（GC 停顿）</span>。重传是症状，不是病因。</div>
+      <div class="it" data-i18n="en">Inflection · cognitive turn</div>
+      <div class="it" data-i18n="zh">Inflection · 认知拐点</div>
+      <div class="body" data-i18n="en">After aligning timestamps, the model dropped the <span class="from">network-layer hypothesis (retransmission)</span> and turned to the <span class="to">application-layer root cause (GC pause)</span>. Retransmission is a symptom, not the cause.</div>
+      <div class="body" data-i18n="zh">对齐时间戳后，模型放弃了<span class="from">网络层假设（重传）</span>，转向<span class="to">应用层根因（GC 停顿）</span>。重传是症状，不是病因。</div>
     </div>
 
     <!-- grounded hypothesis card -->
     <div class="hcard grounded">
       <div class="hhead">
-        <div class="htitle">下游 instance-7 的 GC 长停顿，引发连接池排队</div>
+        <div class="htitle" data-i18n="en">Long GC pause on downstream instance-7 drives connection-pool queueing</div>
+        <div class="htitle" data-i18n="zh">下游 instance-7 的 GC 长停顿，引发连接池排队</div>
         <div class="badge g">Grounded</div>
       </div>
       <div class="conf"><span class="lab">confidence</span><div class="track"><div class="fill g" style="width:89%"></div></div><span class="val">0.89</span></div>
       <div class="evid-row">
-        <div class="echip"><span class="ic">◆</span> 延迟尖峰 ⟷ safepoint 窗口对齐</div>
-        <div class="echip"><span class="ic">◆</span> RTT inflation 仅见于该后端</div>
-        <div class="echip"><span class="ic">◆</span> 连接池 backlog +340%</div>
+        <div class="echip" data-i18n="en"><span class="ic">◆</span> Latency spike ⟷ safepoint window aligned</div>
+        <div class="echip" data-i18n="zh"><span class="ic">◆</span> 延迟尖峰 ⟷ safepoint 窗口对齐</div>
+        <div class="echip" data-i18n="en"><span class="ic">◆</span> RTT inflation seen only on this backend</div>
+        <div class="echip" data-i18n="zh"><span class="ic">◆</span> RTT inflation 仅见于该后端</div>
+        <div class="echip" data-i18n="en"><span class="ic">◆</span> Connection-pool backlog +340%</div>
+        <div class="echip" data-i18n="zh"><span class="ic">◆</span> 连接池 backlog +340%</div>
       </div>
       <div class="prov-toggle" onclick="tog(this,'prov-1')">▸ provenance · 4 tool calls · observable primitives</div>
       <div class="prov" id="prov-1">
@@ -506,39 +595,46 @@ footer p{margin:14px auto 0;color:var(--ink-500);font-size:13px;font-family:var(
     <!-- downgraded hypothesis -->
     <div class="hcard hypo">
       <div class="hhead">
-        <div class="htitle">目标网段 0.3% TCP 重传导致超时</div>
+        <div class="htitle" data-i18n="en">0.3% TCP retransmission on target segment causes timeouts</div>
+        <div class="htitle" data-i18n="zh">目标网段 0.3% TCP 重传导致超时</div>
         <div class="badge h">Hypothesis</div>
       </div>
       <div class="conf"><span class="lab">confidence</span><div class="track"><div class="fill h" style="width:34%"></div></div><span class="val">0.34</span></div>
-      <div class="falsify"><b>什么会改变它</b>若重传尖峰在时间上领先延迟尖峰，则升级为病因；目前观测到的是滞后 → 判定为<em>症状</em>，已降级。</div>
+      <div class="falsify" data-i18n="en"><b>What would change it</b>If the retransmission spike led the latency spike in time, it would be promoted to cause; what we observe is a lag → judged a <em>symptom</em>, downgraded.</div>
+      <div class="falsify" data-i18n="zh"><b>什么会改变它</b>若重传尖峰在时间上领先延迟尖峰，则升级为病因；目前观测到的是滞后 → 判定为<em>症状</em>，已降级。</div>
     </div>
 
     <!-- refuted (sunk) -->
     <div class="hcard refuted">
       <div class="hhead">
-        <div class="htitle">上游 DNS 解析抖动</div>
+        <div class="htitle" data-i18n="en">Upstream DNS resolution jitter</div>
+        <div class="htitle" data-i18n="zh">上游 DNS 解析抖动</div>
         <div class="badge r">Refuted</div>
       </div>
-      <div class="falsify" style="background:var(--refuted-dim);border-color:var(--line)"><b style="color:var(--refuted)">为何沉降</b>PCAP 显示 DNS 响应 &lt; 2ms、零重传。被推翻但保留可审计，未删除。</div>
+      <div class="falsify" style="background:var(--refuted-dim);border-color:var(--line)" data-i18n="en"><b style="color:var(--refuted)">Why it sank</b>PCAP shows DNS responses &lt; 2ms with zero retransmission. Refuted but kept auditable, not deleted.</div>
+      <div class="falsify" style="background:var(--refuted-dim);border-color:var(--line)" data-i18n="zh"><b style="color:var(--refuted)">为何沉降</b>PCAP 显示 DNS 响应 &lt; 2ms、零重传。被推翻但保留可审计，未删除。</div>
     </div>
 
     <!-- open question -->
     <div class="hcard" style="border-color:var(--open-line)">
       <div class="hhead">
-        <div class="htitle" style="font-style:italic">为何唯独 instance-7？</div>
+        <div class="htitle" style="font-style:italic" data-i18n="en">Why instance-7 alone?</div>
+        <div class="htitle" style="font-style:italic" data-i18n="zh">为何唯独 instance-7？</div>
         <div class="badge" style="background:var(--open-dim);color:var(--open);border:1px solid var(--open-line)">Open</div>
       </div>
-      <div class="falsify"><b style="color:var(--open)">待查</b>是否该实例承载了某热点大客户的流量倾斜？需 query 路由权重 + 客户分片表。</div>
+      <div class="falsify" data-i18n="en"><b style="color:var(--open)">Open item</b>Does this instance carry traffic skew from some hot large customer? Needs a query of routing weights + the customer shard table.</div>
+      <div class="falsify" data-i18n="zh"><b style="color:var(--open)">待查</b>是否该实例承载了某热点大客户的流量倾斜？需 query 路由权重 + 客户分片表。</div>
     </div>
 
     <!-- activity stream peripheral -->
     <div class="activity-stream">
       <div class="as-head" onclick="togAS(this)">
-        <span class="l">▸ Activity Stream</span><span class="r">14 calls · 收起中 · 点击展开</span>
+        <span class="l">▸ Activity Stream</span><span class="r" data-i18n="en">14 calls · collapsed · click to expand</span><span class="r" data-i18n="zh">14 calls · 收起中 · 点击展开</span>
       </div>
       <div class="as-body">
         <div class="as-line"><span class="tt">12:04:09</span><span class="fn">alert_ingest</span> P99 12ms→340ms, core-pay</div>
-        <div class="as-line"><span class="tt">12:04:18</span><span class="fn">topology_resolve</span> 6 hops, 3 微服务后端</div>
+        <div class="as-line" data-i18n="en"><span class="tt">12:04:18</span><span class="fn">topology_resolve</span> 6 hops, 3 microservice backends</div>
+        <div class="as-line" data-i18n="zh"><span class="tt">12:04:18</span><span class="fn">topology_resolve</span> 6 hops, 3 微服务后端</div>
         <div class="as-line"><span class="tt">12:04:31</span><span class="fn">pcap_slice</span> 18.2GB → 2.1M pkt</div>
         <div class="as-line"><span class="tt">12:04:44</span><span class="fn">dns_check</span> resp &lt;2ms, 0 retrans</div>
         <div class="as-line"><span class="tt">12:04:58</span><span class="fn">align_timestamps</span> PCAP⟷safepoint.log</div>
@@ -550,15 +646,20 @@ footer p{margin:14px auto 0;color:var(--ink-500);font-size:13px;font-family:var(
 
 <!-- WORKED EXAMPLE -->
 <section class="wrap fade">
-  <div class="kicker">工作示例 / TraceForge</div>
-  <h2>语言运转起来的样子</h2>
-  <p>一次真实形态的网络故障诊断，完整用潛 渲染。理解态是主角；动作是外围溯源。点 <strong>推进诊断</strong> 看理解如何演化——一个假设沉降、一个拐点浮现、根因凝定。右上角切到 <strong>Trace</strong> 视图，看“两种人格”如何用一个 toggle 化解“透明派 vs 认知优先”的张力。</p>
+  <div class="kicker" data-i18n="en">Worked Example / TraceForge</div>
+  <div class="kicker" data-i18n="zh">工作示例 / TraceForge</div>
+  <h2 data-i18n="en">What the language looks like in motion</h2>
+  <h2 data-i18n="zh">语言运转起来的样子</h2>
+  <p data-i18n="en">A realistic network-fault diagnosis, rendered entirely in 潛. The understanding state is the protagonist; actions are peripheral provenance. Click <strong>Advance diagnosis</strong> to watch understanding evolve — a hypothesis sinks, an inflection surfaces, the root cause settles. Switch to the <strong>Trace</strong> view at top right to see how "two personas" use a single toggle to dissolve the tension between "transparency camp vs. cognition-first."</p>
+  <p data-i18n="zh">一次真实形态的网络故障诊断，完整用潛 渲染。理解态是主角；动作是外围溯源。点 <strong>推进诊断</strong> 看理解如何演化——一个假设沉降、一个拐点浮现、根因凝定。右上角切到 <strong>Trace</strong> 视图，看“两种人格”如何用一个 toggle 化解“透明派 vs 认知优先”的张力。</p>
 
   <div class="scenario" id="scenario">
     <div class="sc-bar">
       <div class="inc">
-        <div class="ttl">核心支付链路 P99 延迟异常</div>
-        <div class="meta">某股份制银行 · core-pay · 间歇性 · 持续 ~40min</div>
+        <div class="ttl" data-i18n="en">P99 latency anomaly on the core payment path</div>
+        <div class="ttl" data-i18n="zh">核心支付链路 P99 延迟异常</div>
+        <div class="meta" data-i18n="en">A joint-stock bank · core-pay · intermittent · ~40min ongoing</div>
+        <div class="meta" data-i18n="zh">某股份制银行 · core-pay · 间歇性 · 持续 ~40min</div>
       </div>
       <div style="display:flex;gap:14px;align-items:center">
         <span class="sev">P99 12ms → 340ms</span>
@@ -576,11 +677,11 @@ footer p{margin:14px auto 0;color:var(--ink-500);font-size:13px;font-family:var(
         <!-- step 1 -->
         <div class="step-blk" data-step="1">
           <div class="hcard hypo" style="margin-bottom:12px">
-            <div class="hhead"><div class="htitle">可能为上游 DNS 解析抖动</div><div class="badge h">Hypothesis</div></div>
+            <div class="hhead"><div class="htitle" data-i18n="en">Possibly upstream DNS resolution jitter</div><div class="htitle" data-i18n="zh">可能为上游 DNS 解析抖动</div><div class="badge h">Hypothesis</div></div>
             <div class="conf"><span class="lab">conf</span><div class="track"><div class="fill h" style="width:42%"></div></div><span class="val">0.42</span></div>
           </div>
           <div class="hcard hypo">
-            <div class="hhead"><div class="htitle">或为目标网段 TCP 重传 / 丢包</div><div class="badge h">Hypothesis</div></div>
+            <div class="hhead"><div class="htitle" data-i18n="en">Or TCP retransmission / loss on the target segment</div><div class="htitle" data-i18n="zh">或为目标网段 TCP 重传 / 丢包</div><div class="badge h">Hypothesis</div></div>
             <div class="conf"><span class="lab">conf</span><div class="track"><div class="fill h" style="width:55%"></div></div><span class="val">0.55</span></div>
           </div>
         </div>
@@ -588,11 +689,12 @@ footer p{margin:14px auto 0;color:var(--ink-500);font-size:13px;font-family:var(
         <!-- step 2 -->
         <div class="step-blk hidden-step" data-step="2">
           <div class="hcard refuted" style="margin-bottom:12px">
-            <div class="hhead"><div class="htitle">上游 DNS 解析抖动</div><div class="badge r">Refuted</div></div>
-            <div class="falsify" style="background:var(--refuted-dim);border-color:var(--line)"><b style="color:var(--refuted)">沉降</b>PCAP: DNS resp &lt;2ms, 0 retrans。</div>
+            <div class="hhead"><div class="htitle" data-i18n="en">Upstream DNS resolution jitter</div><div class="htitle" data-i18n="zh">上游 DNS 解析抖动</div><div class="badge r">Refuted</div></div>
+            <div class="falsify" style="background:var(--refuted-dim);border-color:var(--line)" data-i18n="en"><b style="color:var(--refuted)">Sunk</b>PCAP: DNS resp &lt;2ms, 0 retrans.</div>
+            <div class="falsify" style="background:var(--refuted-dim);border-color:var(--line)" data-i18n="zh"><b style="color:var(--refuted)">沉降</b>PCAP: DNS resp &lt;2ms, 0 retrans。</div>
           </div>
           <div class="hcard hypo">
-            <div class="hhead"><div class="htitle">目标网段 0.3% TCP 重传导致超时</div><div class="badge h">Hypothesis</div></div>
+            <div class="hhead"><div class="htitle" data-i18n="en">0.3% TCP retransmission on target segment causes timeouts</div><div class="htitle" data-i18n="zh">目标网段 0.3% TCP 重传导致超时</div><div class="badge h">Hypothesis</div></div>
             <div class="conf"><span class="lab">conf</span><div class="track"><div class="fill h" style="width:61%"></div></div><span class="val">0.61</span></div>
             <div class="evid-row"><div class="echip"><span class="ic">◆</span> retrans 0.3% on core-pay-seg</div></div>
           </div>
@@ -601,29 +703,34 @@ footer p{margin:14px auto 0;color:var(--ink-500);font-size:13px;font-family:var(
         <!-- step 3 -->
         <div class="step-blk hidden-step" data-step="3">
           <div class="inflect-mark" style="margin-bottom:14px">
-            <div class="it">Inflection · 拐点</div>
-            <div class="body">时间戳对齐后：重传尖峰<span class="to">滞后于</span>延迟尖峰 ⇒ 重传是<span class="from">病因</span>的判断被推翻，重判为<span class="to">症状</span>。注意力转向应用层。</div>
+            <div class="it" data-i18n="en">Inflection · turn</div>
+            <div class="it" data-i18n="zh">Inflection · 拐点</div>
+            <div class="body" data-i18n="en">After timestamp alignment: the retransmission spike <span class="to">lags</span> the latency spike ⇒ the judgment that retransmission is the <span class="from">cause</span> is refuted, re-judged as a <span class="to">symptom</span>. Attention turns to the application layer.</div>
+            <div class="body" data-i18n="zh">时间戳对齐后：重传尖峰<span class="to">滞后于</span>延迟尖峰 ⇒ 重传是<span class="from">病因</span>的判断被推翻，重判为<span class="to">症状</span>。注意力转向应用层。</div>
           </div>
           <div class="hcard hypo" style="margin-bottom:12px">
-            <div class="hhead"><div class="htitle">目标网段 TCP 重传（重判为症状）</div><div class="badge h">Hypothesis</div></div>
+            <div class="hhead"><div class="htitle" data-i18n="en">Target-segment TCP retransmission (re-judged as symptom)</div><div class="htitle" data-i18n="zh">目标网段 TCP 重传（重判为症状）</div><div class="badge h">Hypothesis</div></div>
             <div class="conf"><span class="lab">conf</span><div class="track"><div class="fill h" style="width:30%"></div></div><span class="val">0.30</span></div>
-            <div class="falsify"><b>降级理由</b>重传滞后延迟 → 非病因。</div>
+            <div class="falsify" data-i18n="en"><b>Downgrade rationale</b>Retransmission lags latency → not the cause.</div>
+            <div class="falsify" data-i18n="zh"><b>降级理由</b>重传滞后延迟 → 非病因。</div>
           </div>
           <div class="hcard hypo">
-            <div class="hhead"><div class="htitle">下游某微服务 GC 停顿引发连接池排队</div><div class="badge h">Hypothesis</div></div>
+            <div class="hhead"><div class="htitle" data-i18n="en">A downstream microservice GC pause drives connection-pool queueing</div><div class="htitle" data-i18n="zh">下游某微服务 GC 停顿引发连接池排队</div><div class="badge h">Hypothesis</div></div>
             <div class="conf"><span class="lab">conf</span><div class="track"><div class="fill h" style="width:68%"></div></div><span class="val">0.68</span></div>
-            <div class="evid-row"><div class="echip"><span class="ic">◆</span> 延迟周期 ≈ 280ms，疑似 STW</div></div>
+            <div class="evid-row"><div class="echip" data-i18n="en"><span class="ic">◆</span> Latency period ≈ 280ms, suspected STW</div><div class="echip" data-i18n="zh"><span class="ic">◆</span> 延迟周期 ≈ 280ms，疑似 STW</div></div>
           </div>
         </div>
 
         <!-- step 4 -->
         <div class="step-blk hidden-step" data-step="4">
           <div class="hcard grounded" style="margin-bottom:12px">
-            <div class="hhead"><div class="htitle">instance-7 的 GC 长停顿，引发连接池排队</div><div class="badge g">Grounded</div></div>
+            <div class="hhead"><div class="htitle" data-i18n="en">Long GC pause on instance-7 drives connection-pool queueing</div><div class="htitle" data-i18n="zh">instance-7 的 GC 长停顿，引发连接池排队</div><div class="badge g">Grounded</div></div>
             <div class="conf"><span class="lab">conf</span><div class="track"><div class="fill g" style="width:89%"></div></div><span class="val">0.89</span></div>
             <div class="evid-row">
-              <div class="echip"><span class="ic">◆</span> 尖峰 ⟷ safepoint 对齐</div>
-              <div class="echip"><span class="ic">◆</span> RTT inflation 仅该后端</div>
+              <div class="echip" data-i18n="en"><span class="ic">◆</span> Spike ⟷ safepoint aligned</div>
+              <div class="echip" data-i18n="zh"><span class="ic">◆</span> 尖峰 ⟷ safepoint 对齐</div>
+              <div class="echip" data-i18n="en"><span class="ic">◆</span> RTT inflation on this backend only</div>
+              <div class="echip" data-i18n="zh"><span class="ic">◆</span> RTT inflation 仅该后端</div>
             </div>
             <div class="prov-toggle" onclick="tog(this,'prov-w')">▸ provenance · observable primitives</div>
             <div class="prov" id="prov-w">
@@ -632,25 +739,31 @@ footer p{margin:14px auto 0;color:var(--ink-500);font-size:13px;font-family:var(
             </div>
           </div>
           <div class="hcard" style="border-color:var(--open-line)">
-            <div class="hhead"><div class="htitle" style="font-style:italic">为何唯独 instance-7？</div><div class="badge" style="background:var(--open-dim);color:var(--open);border:1px solid var(--open-line)">Open</div></div>
-            <div class="falsify"><b style="color:var(--open)">待查</b>热点大客户流量倾斜？需路由权重 + 分片表。</div>
+            <div class="hhead"><div class="htitle" style="font-style:italic" data-i18n="en">Why instance-7 alone?</div><div class="htitle" style="font-style:italic" data-i18n="zh">为何唯独 instance-7？</div><div class="badge" style="background:var(--open-dim);color:var(--open);border:1px solid var(--open-line)">Open</div></div>
+            <div class="falsify" data-i18n="en"><b style="color:var(--open)">Open item</b>Traffic skew from a hot large customer? Needs routing weights + the shard table.</div>
+            <div class="falsify" data-i18n="zh"><b style="color:var(--open)">待查</b>热点大客户流量倾斜？需路由权重 + 分片表。</div>
           </div>
           <div class="conclusion">
             <div class="cl">◆ Conclusion · Grounded</div>
-            <div class="ctext">根因为 <b>instance-7 的 GC 长停顿</b>；网络层重传是<b>症状</b>非病因。建议：扩容/调优该实例堆与 GC，临时将其权重降级。</div>
+            <div class="ctext" data-i18n="en">Root cause: <b>long GC pause on instance-7</b>; network-layer retransmission is a <b>symptom</b>, not the cause. Recommendation: scale out / tune the instance's heap and GC, and temporarily downgrade its weight.</div>
+            <div class="ctext" data-i18n="zh">根因为 <b>instance-7 的 GC 长停顿</b>；网络层重传是<b>症状</b>非病因。建议：扩容/调优该实例堆与 GC，临时将其权重降级。</div>
           </div>
         </div>
 
         <div class="step-ctl">
-          <button id="prevBtn" onclick="step(-1)" disabled>◂ 回退</button>
-          <button id="nextBtn" onclick="step(1)">推进诊断 ▸</button>
+          <button id="prevBtn" onclick="step(-1)" disabled data-i18n="en">◂ Back</button>
+          <button id="prevBtn-zh" onclick="step(-1)" disabled data-i18n="zh">◂ 回退</button>
+          <button id="nextBtn" onclick="step(1)" data-i18n="en">Advance diagnosis ▸</button>
+          <button id="nextBtn-zh" onclick="step(1)" data-i18n="zh">推进诊断 ▸</button>
           <span class="prog" id="prog">1 / 4</span>
-          <span class="hint" id="hint">观察理解态如何演化——而非工具执行了哪一步。</span>
+          <span class="hint" id="hint" data-i18n="en">Watch how the understanding state evolves — not which step a tool executed.</span>
+          <span class="hint" id="hint-zh" data-i18n="zh">观察理解态如何演化——而非工具执行了哪一步。</span>
         </div>
       </div>
 
       <div class="sc-rail">
-        <div class="rlabel">② Activity（外围）</div>
+        <div class="rlabel" data-i18n="en">② Activity (peripheral)</div>
+        <div class="rlabel" data-i18n="zh">② Activity（外围）</div>
         <div class="act-mini">alert_ingest</div>
         <div class="act-mini">topology_resolve</div>
         <div class="act-mini">pcap_slice 18.2GB</div>
@@ -659,16 +772,20 @@ footer p{margin:14px auto 0;color:var(--ink-500);font-size:13px;font-family:var(
         <div class="act-mini" id="a-sp">query_safepoint</div>
         <div class="rsub">③ Intervene</div>
         <div class="interv" style="flex-direction:column">
-          <button class="ibtn primary">采纳结论</button>
-          <button class="ibtn">质疑根因</button>
-          <button class="ibtn">补充约束</button>
+          <button class="ibtn primary" data-i18n="en">Adopt conclusion</button>
+          <button class="ibtn primary" data-i18n="zh">采纳结论</button>
+          <button class="ibtn" data-i18n="en">Challenge root cause</button>
+          <button class="ibtn" data-i18n="zh">质疑根因</button>
+          <button class="ibtn" data-i18n="en">Add a constraint</button>
+          <button class="ibtn" data-i18n="zh">补充约束</button>
         </div>
       </div>
     </div>
 
     <!-- TRACE MODE -->
     <div class="trace-panel">
-      <div class="tlabel">Trace View · builder / 审计人格 — 此处 tool-call 才是主体</div>
+      <div class="tlabel" data-i18n="en">Trace View · builder / audit persona — here the tool call is the subject</div>
+      <div class="tlabel" data-i18n="zh">Trace View · builder / 审计人格 — 此处 tool-call 才是主体</div>
       <div class="trace-line"><span class="tt">12:04:09</span><span class="fn">alert_ingest()</span><span class="dur">— 12ms</span></div>
       <div class="trace-line"><span class="tt">12:04:18</span><span class="fn">topology_resolve(core-pay)</span><span class="dur">340ms</span></div>
       <div class="trace-line"><span class="tt">12:04:31</span><span class="fn">pcap_slice(seg, 40min)</span><span class="dur">8.2s · 18.2GB</span></div>
@@ -676,73 +793,95 @@ footer p{margin:14px auto 0;color:var(--ink-500);font-size:13px;font-family:var(
       <div class="trace-line"><span class="tt">12:04:58</span><span class="fn">align_timestamps(pcap, safepoint)</span><span class="dur">2.4s</span></div>
       <div class="trace-line"><span class="tt">12:05:12</span><span class="fn">connpool_probe(instance-7)</span><span class="dur">0.9s</span></div>
       <div class="trace-line"><span class="tt">12:05:40</span><span class="fn">query_safepoint_log(instance-7)</span><span class="dur">1.3s · 7 STW</span></div>
-      <p class="am-note" style="margin-top:14px">同一会话、同一真相，不同人格的注意力分配。Operator 看认知；Trace 看执行与审计。一个 toggle，而非二选一。</p>
+      <p class="am-note" style="margin-top:14px" data-i18n="en">Same session, same truth, a different persona's attention allocation. Operator sees cognition; Trace sees execution and audit. One toggle, not an either-or.</p>
+      <p class="am-note" style="margin-top:14px" data-i18n="zh">同一会话、同一真相，不同人格的注意力分配。Operator 看认知；Trace 看执行与审计。一个 toggle，而非二选一。</p>
     </div>
   </div>
 </section>
 
 <!-- PROPORTIONALITY + MODES -->
 <section class="wrap fade">
-  <div class="kicker">伸缩 / Proportionality</div>
-  <h2>理解态随复杂度伸缩</h2>
-  <p>“给所有 AI 应用”意味着有些任务认知很浅。理解态的体量应随<em>问题的认识论复杂度</em>伸缩——别给“格式化这段 JSON”摆一块假设板。</p>
+  <div class="kicker" data-i18n="en">Proportionality</div>
+  <div class="kicker" data-i18n="zh">伸缩 / Proportionality</div>
+  <h2 data-i18n="en">The understanding state scales with complexity</h2>
+  <h2 data-i18n="zh">理解态随复杂度伸缩</h2>
+  <p data-i18n="en">"For all AI applications" means some tasks are cognitively shallow. The mass of the understanding state should scale with the <em>epistemic complexity of the problem</em> — don't put up a hypothesis board for "format this JSON."</p>
+  <p data-i18n="zh">“给所有 AI 应用”意味着有些任务认知很浅。理解态的体量应随<em>问题的认识论复杂度</em>伸缩——别给“格式化这段 JSON”摆一块假设板。</p>
   <div class="invert" style="grid-template-columns:1fr 1fr 1fr">
-    <div class="panel"><div class="ptag">Low latent · 直接任务</div><div class="am-note">格式化、改写、单步检索。理解态退化为一行 grounded 结论 + provenance。无假设板。</div></div>
-    <div class="panel"><div class="ptag">Mid latent · 多步综合</div><div class="am-note">起草、对比、规划。理解态显示 2–3 个 grounded 论点 + 1 个 open。轻量。</div></div>
-    <div class="panel new"><div class="ptag" style="color:var(--hypo)">High latent · 诊断/研究</div><div class="am-note">故障根因、深度研究、科学假设。完整假设板 + 拐点 + 沉降 + 溯源。TraceForge 即此档。</div></div>
+    <div class="panel"><div class="ptag" data-i18n="en">Low latent · direct task</div><div class="ptag" data-i18n="zh">Low latent · 直接任务</div><div class="am-note" data-i18n="en">Format, rewrite, single-step retrieval. The understanding state collapses to one grounded conclusion + provenance. No hypothesis board.</div><div class="am-note" data-i18n="zh">格式化、改写、单步检索。理解态退化为一行 grounded 结论 + provenance。无假设板。</div></div>
+    <div class="panel"><div class="ptag" data-i18n="en">Mid latent · multi-step synthesis</div><div class="ptag" data-i18n="zh">Mid latent · 多步综合</div><div class="am-note" data-i18n="en">Drafting, comparison, planning. The understanding state shows 2–3 grounded claims + 1 open. Lightweight.</div><div class="am-note" data-i18n="zh">起草、对比、规划。理解态显示 2–3 个 grounded 论点 + 1 个 open。轻量。</div></div>
+    <div class="panel new"><div class="ptag" style="color:var(--hypo)">High latent · diagnosis/research</div><div class="am-note" data-i18n="en">Fault root cause, deep research, scientific hypotheses. Full hypothesis board + inflections + sinking + provenance. TraceForge is this tier.</div><div class="am-note" data-i18n="zh">故障根因、深度研究、科学假设。完整假设板 + 拐点 + 沉降 + 溯源。TraceForge 即此档。</div></div>
   </div>
 </section>
 
 <!-- PRINCIPLES -->
 <section class="wrap fade">
-  <div class="kicker">原则 / Principles</div>
-  <h2>七条原则</h2>
+  <div class="kicker" data-i18n="en">Principles</div>
+  <div class="kicker" data-i18n="zh">原则 / Principles</div>
+  <h2 data-i18n="en">Seven principles</h2>
+  <h2 data-i18n="zh">七条原则</h2>
   <div class="principles">
-    <div class="prin"><div class="num">01</div><div><h3>注意力跟随理解，而非活动</h3><p>唯一的根定律。视觉权重分配给“理解了什么 / 理解发生了什么变化”，而非“执行了哪一步”。一切其余皆由此推出。</p></div></div>
-    <div class="prin"><div class="num">02</div><div><h3>主舞台只接纳可证伪的认知</h3><p>Grounding Contract。进入主注意力的元素必须是 grounded claim、hypothesis（带置信度与可证伪条件）、或 open question 三者之一。悬空断言被挡在门外——这是对抗 reasoning theater 的脊梁。</p></div></div>
-    <div class="prin"><div class="num">03</div><div><h3>浮现拐点，沉降叙述</h3><p>优先高亮 backtrack / 啊哈 / 推翻——研究证实这些是 latent 中最忠实、信息量最高的部分。把“我在读文件”这类程序性叙述（不忠实的温床）沉到外围。</p></div></div>
-    <div class="prin"><div class="num">04</div><div><h3>弱化 ≠ 隐藏</h3><p>工具调用视觉退后，但 provenance 永远一键可调、可重建。在金融客户处，“agent 碰了哪些数据”是合规问题，审计能力不可让渡。</p></div></div>
-    <div class="prin"><div class="num">05</div><div><h3>不确定性是一等内容</h3><p>置信度、open question、降级理由都被显式渲染，不被抹平。诚实的“我不确定”比自信的错误更可信，也更安全。</p></div></div>
-    <div class="prin"><div class="num">06</div><div><h3>理解态持久，活动短暂</h3><p>动作流过即逝；理解态留存、累积、可回访。这正是 ambient / 后台 agent 时代用户“回来查看”的那个对象。</p></div></div>
-    <div class="prin"><div class="num">07</div><div><h3>两种人格，两种视图</h3><p>Operator 视图（latent 主导，默认）服务终端用户；Trace 视图（tool-call 主导）服务调试与审计。一个 toggle 化解“透明 vs 认知优先”的张力，而非二选一。</p></div></div>
+    <div class="prin"><div class="num">01</div><div><h3 data-i18n="en">Attention follows understanding, not activity</h3><h3 data-i18n="zh">注意力跟随理解，而非活动</h3><p data-i18n="en">The single root law. Visual weight goes to "what was understood / what changed in the understanding," not "which step executed." Everything else follows from this.</p><p data-i18n="zh">唯一的根定律。视觉权重分配给“理解了什么 / 理解发生了什么变化”，而非“执行了哪一步”。一切其余皆由此推出。</p></div></div>
+    <div class="prin"><div class="num">02</div><div><h3 data-i18n="en">The main stage admits only falsifiable cognition</h3><h3 data-i18n="zh">主舞台只接纳可证伪的认知</h3><p data-i18n="en">The Grounding Contract. An element entering the main attention must be one of: a grounded claim, a hypothesis (with confidence and a falsification condition), or an open question. Free-floating assertions are kept out — this is the backbone against reasoning theater.</p><p data-i18n="zh">Grounding Contract。进入主注意力的元素必须是 grounded claim、hypothesis（带置信度与可证伪条件）、或 open question 三者之一。悬空断言被挡在门外——这是对抗 reasoning theater 的脊梁。</p></div></div>
+    <div class="prin"><div class="num">03</div><div><h3 data-i18n="en">Surface inflections, sink narration</h3><h3 data-i18n="zh">浮现拐点，沉降叙述</h3><p data-i18n="en">Prioritize highlighting backtracks / ahas / refutations — research confirms these are the most faithful, highest-information parts of the latent. Sink procedural narration like "I'm reading a file" (the breeding ground of unfaithfulness) to the periphery.</p><p data-i18n="zh">优先高亮 backtrack / 啊哈 / 推翻——研究证实这些是 latent 中最忠实、信息量最高的部分。把“我在读文件”这类程序性叙述（不忠实的温床）沉到外围。</p></div></div>
+    <div class="prin"><div class="num">04</div><div><h3 data-i18n="en">Recede ≠ hide</h3><h3 data-i18n="zh">弱化 ≠ 隐藏</h3><p data-i18n="en">Tool calls step back visually, but provenance is always one click away and reconstructible. At a financial customer, "which data did the agent touch" is a compliance question; auditability is non-negotiable.</p><p data-i18n="zh">工具调用视觉退后，但 provenance 永远一键可调、可重建。在金融客户处，“agent 碰了哪些数据”是合规问题，审计能力不可让渡。</p></div></div>
+    <div class="prin"><div class="num">05</div><div><h3 data-i18n="en">Uncertainty is first-class content</h3><h3 data-i18n="zh">不确定性是一等内容</h3><p data-i18n="en">Confidence, open questions, and downgrade rationales are rendered explicitly, not smoothed away. An honest "I'm not sure" is more credible — and safer — than a confident error.</p><p data-i18n="zh">置信度、open question、降级理由都被显式渲染，不被抹平。诚实的“我不确定”比自信的错误更可信，也更安全。</p></div></div>
+    <div class="prin"><div class="num">06</div><div><h3 data-i18n="en">Understanding persists, activity is transient</h3><h3 data-i18n="zh">理解态持久，活动短暂</h3><p data-i18n="en">Actions flow past and vanish; the understanding state remains, accumulates, and can be revisited. This is exactly the object users "come back to check" in the era of ambient / background agents.</p><p data-i18n="zh">动作流过即逝；理解态留存、累积、可回访。这正是 ambient / 后台 agent 时代用户“回来查看”的那个对象。</p></div></div>
+    <div class="prin"><div class="num">07</div><div><h3 data-i18n="en">Two personas, two views</h3><h3 data-i18n="zh">两种人格，两种视图</h3><p data-i18n="en">The Operator view (latent-dominant, default) serves the end user; the Trace view (tool-call-dominant) serves debugging and audit. One toggle dissolves the "transparency vs. cognition-first" tension, rather than forcing an either-or.</p><p data-i18n="zh">Operator 视图（latent 主导，默认）服务终端用户；Trace 视图（tool-call 主导）服务调试与审计。一个 toggle 化解“透明 vs 认知优先”的张力，而非二选一。</p></div></div>
   </div>
 </section>
 
 <!-- VOICE -->
 <section class="wrap fade">
-  <div class="kicker">语态 / Voice</div>
-  <h2>认识论诚实，而非剧场</h2>
-  <p>设计语言也约束 agent 怎么说话。潛 的语态拒绝“正在努力工作”的表演，也拒绝把事后叙述伪装成洞见。它陈述置信、标注未知、对“叙述与计算之间的落差”保持诚实。</p>
+  <div class="kicker" data-i18n="en">Voice</div>
+  <div class="kicker" data-i18n="zh">语态 / Voice</div>
+  <h2 data-i18n="en">Epistemic honesty, not theater</h2>
+  <h2 data-i18n="zh">认识论诚实，而非剧场</h2>
+  <p data-i18n="en">The design language also governs how the agent speaks. The 潛 voice refuses the "working hard" performance, and refuses to dress post-hoc narration up as insight. It states confidence, flags the unknown, and stays honest about "the gap between narration and computation."</p>
+  <p data-i18n="zh">设计语言也约束 agent 怎么说话。潛 的语态拒绝“正在努力工作”的表演，也拒绝把事后叙述伪装成洞见。它陈述置信、标注未知、对“叙述与计算之间的落差”保持诚实。</p>
   <div class="voice-grid">
     <div class="vcol dont">
-      <div class="vh">✕ Theater 剧场语态</div>
-      <div class="vex">“让我深入分析一下这个复杂的问题……”</div>
-      <div class="vex">“正在仔细检查所有可能性，请稍候。”</div>
-      <div class="vex">“经过缜密推理，我确信根因是……”</div>
-      <div class="vex">“我已经全面排查了网络层。”</div>
+      <div class="vh" data-i18n="en">✕ Theater voice</div>
+      <div class="vh" data-i18n="zh">✕ Theater 剧场语态</div>
+      <div class="vex" data-i18n="en">"Let me dive deep into this complex problem…"</div>
+      <div class="vex" data-i18n="zh">“让我深入分析一下这个复杂的问题……”</div>
+      <div class="vex" data-i18n="en">"Carefully examining all the possibilities, please wait."</div>
+      <div class="vex" data-i18n="zh">“正在仔细检查所有可能性，请稍候。”</div>
+      <div class="vex" data-i18n="en">"After rigorous reasoning, I'm certain the root cause is…"</div>
+      <div class="vex" data-i18n="zh">“经过缜密推理，我确信根因是……”</div>
+      <div class="vex" data-i18n="en">"I've thoroughly investigated the entire network layer."</div>
+      <div class="vex" data-i18n="zh">“我已经全面排查了网络层。”</div>
     </div>
     <div class="vcol do">
-      <div class="vh">◆ Grounded 语态</div>
-      <div class="vex">“两个在押假设：网络层 / 应用层。前者置信更高。”</div>
-      <div class="vex">“DNS 已排除（resp &lt;2ms）。重传可疑但时间不对齐。”</div>
-      <div class="vex">“根因 0.89：GC 停顿。重传是症状。一个未决：为何仅 instance-7。”</div>
-      <div class="vex">“我改了主意：重传滞后延迟，故重判为症状。”</div>
+      <div class="vh" data-i18n="en">◆ Grounded voice</div>
+      <div class="vh" data-i18n="zh">◆ Grounded 语态</div>
+      <div class="vex" data-i18n="en">"Two hypotheses in play: network layer / application layer. The former has higher confidence."</div>
+      <div class="vex" data-i18n="zh">“两个在押假设：网络层 / 应用层。前者置信更高。”</div>
+      <div class="vex" data-i18n="en">"DNS ruled out (resp &lt;2ms). Retransmission is suspicious but its timing doesn't align."</div>
+      <div class="vex" data-i18n="zh">“DNS 已排除（resp &lt;2ms）。重传可疑但时间不对齐。”</div>
+      <div class="vex" data-i18n="en">"Root cause 0.89: GC pause. Retransmission is a symptom. One open question: why instance-7 only."</div>
+      <div class="vex" data-i18n="zh">“根因 0.89：GC 停顿。重传是症状。一个未决：为何仅 instance-7。”</div>
+      <div class="vex" data-i18n="en">"I changed my mind: retransmission lags latency, so I re-judged it as a symptom."</div>
+      <div class="vex" data-i18n="zh">“我改了主意：重传滞后延迟，故重判为症状。”</div>
     </div>
   </div>
 </section>
 
 <!-- ANTI-PATTERNS / GOVERNANCE -->
 <section class="wrap fade">
-  <div class="kicker">治理 / Anti-patterns</div>
-  <h2>采纳红线</h2>
-  <p>任何团队接入潛 时，以下是会悄悄背叛该语言核心的反模式。它们看起来像“在展示推理”，实则在重建剧场。</p>
+  <div class="kicker" data-i18n="en">Anti-patterns</div>
+  <div class="kicker" data-i18n="zh">治理 / Anti-patterns</div>
+  <h2 data-i18n="en">Adoption red lines</h2>
+  <h2 data-i18n="zh">采纳红线</h2>
+  <p data-i18n="en">When any team adopts 潛, the following are anti-patterns that quietly betray the core of the language. They look like "showing the reasoning," but in fact they rebuild the theater.</p>
+  <p data-i18n="zh">任何团队接入潛 时，以下是会悄悄背叛该语言核心的反模式。它们看起来像“在展示推理”，实则在重建剧场。</p>
   <div class="anti">
-    <div class="acard"><div class="an">把 CoT 原文直接灌进主舞台</div><div class="ap">未经 Grounding Contract 过滤的 raw 推理是 reasoning theater 的温床。必须解析为 grounded/hypothesis/open 三态。</div></div>
-    <div class="acard"><div class="an">用 spinner 和进度条制造“在忙”的假象</div><div class="ap">活动量 ≠ 理解。把活动剧场升级为认知剧场没有改善，只是换了块幕布。</div></div>
-    <div class="acard"><div class="an">把置信度做成无依据的“氛围数字”</div><div class="ap">置信必须挂在“什么证据支撑/反驳它”上，否则就是给随机数贴金箔。</div></div>
-    <div class="acard"><div class="an">为了“干净”而删除被推翻的假设</div><div class="ap">沉降而非删除。审计与信任都依赖“模型考虑过、又排除了什么”的可追溯。</div></div>
-    <div class="acard"><div class="an">给低 latent 任务硬套假设板</div><div class="ap">违反比例原则。诊断界面套在“改写一句话”上只会制造噪声与表演感。</div></div>
-    <div class="acard"><div class="an">把 provenance 折成无法调取的死链</div><div class="ap">弱化 ≠ 隐藏。一旦 provenance 不可重建，整套语言在合规上就破产了。</div></div>
+    <div class="acard"><div class="an" data-i18n="en">Pour raw CoT straight onto the main stage</div><div class="an" data-i18n="zh">把 CoT 原文直接灌进主舞台</div><div class="ap" data-i18n="en">Raw reasoning unfiltered by the Grounding Contract is a breeding ground for reasoning theater. It must be parsed into the grounded / hypothesis / open three states.</div><div class="ap" data-i18n="zh">未经 Grounding Contract 过滤的 raw 推理是 reasoning theater 的温床。必须解析为 grounded/hypothesis/open 三态。</div></div>
+    <div class="acard"><div class="an" data-i18n="en">Use spinners and progress bars to fake "being busy"</div><div class="an" data-i18n="zh">用 spinner 和进度条制造“在忙”的假象</div><div class="ap" data-i18n="en">Activity volume ≠ understanding. Upgrading activity theater to cognition theater is no improvement — it just swaps the backdrop.</div><div class="ap" data-i18n="zh">活动量 ≠ 理解。把活动剧场升级为认知剧场没有改善，只是换了块幕布。</div></div>
+    <div class="acard"><div class="an" data-i18n="en">Turn confidence into ungrounded "vibe numbers"</div><div class="an" data-i18n="zh">把置信度做成无依据的“氛围数字”</div><div class="ap" data-i18n="en">Confidence must hang on "what evidence supports / refutes it," otherwise it's just gilding random numbers.</div><div class="ap" data-i18n="zh">置信必须挂在“什么证据支撑/反驳它”上，否则就是给随机数贴金箔。</div></div>
+    <div class="acard"><div class="an" data-i18n="en">Delete refuted hypotheses for the sake of "cleanliness"</div><div class="an" data-i18n="zh">为了“干净”而删除被推翻的假设</div><div class="ap" data-i18n="en">Sink, don't delete. Both audit and trust depend on the traceability of "what the model considered, and then ruled out."</div><div class="ap" data-i18n="zh">沉降而非删除。审计与信任都依赖“模型考虑过、又排除了什么”的可追溯。</div></div>
+    <div class="acard"><div class="an" data-i18n="en">Force a hypothesis board onto low-latent tasks</div><div class="an" data-i18n="zh">给低 latent 任务硬套假设板</div><div class="ap" data-i18n="en">Violates proportionality. Bolting a diagnostic interface onto "rewrite this sentence" only creates noise and a sense of performance.</div><div class="ap" data-i18n="zh">违反比例原则。诊断界面套在“改写一句话”上只会制造噪声与表演感。</div></div>
+    <div class="acard"><div class="an" data-i18n="en">Fold provenance into a dead link that can't be retrieved</div><div class="an" data-i18n="zh">把 provenance 折成无法调取的死链</div><div class="ap" data-i18n="en">Recede ≠ hide. The moment provenance can't be reconstructed, the whole language is bankrupt on compliance.</div><div class="ap" data-i18n="zh">弱化 ≠ 隐藏。一旦 provenance 不可重建，整套语言在合规上就破产了。</div></div>
   </div>
 </section>
 
@@ -752,28 +891,55 @@ footer p{margin:14px auto 0;color:var(--ink-500);font-size:13px;font-family:var(
 </footer>
 
 <script>
+/* L(en,zh) — pick the string for the current language */
+function L(en,zh){return document.documentElement.dataset.lang==='zh'?zh:en;}
+
 function tog(el,id){var p=document.getElementById(id);p.classList.toggle('open');el.textContent=(p.classList.contains('open')?'▾':'▸')+el.textContent.slice(1);}
-function togAS(el){var b=el.parentElement.querySelector('.as-body');b.classList.toggle('open');el.querySelector('.r').textContent=b.classList.contains('open')?'14 calls · 展开 · 点击收起':'14 calls · 收起中 · 点击展开';el.querySelector('.l').textContent=(b.classList.contains('open')?'▾':'▸')+' Activity Stream';}
+function togAS(el){var b=el.parentElement.querySelector('.as-body');b.classList.toggle('open');var open=b.classList.contains('open');el.querySelector('.r').textContent=open?L('14 calls · expanded · click to collapse','14 calls · 展开 · 点击收起'):L('14 calls · collapsed · click to expand','14 calls · 收起中 · 点击展开');el.querySelector('.l').textContent=(open?'▾':'▸')+' Activity Stream';}
 function setMode(m,btn){document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.body.classList.toggle('trace',m==='tr');}
 
 /* worked-example step-through */
 var cur=1,max=4;
-var hints={1:'两个并列假设，认知刚浮现，置信都不高。',2:'DNS 假设沉降——但保留可审计，未删除。',3:'拐点：模型推翻网络层判断，注意力转向应用层 GC。',4:'根因凝定为 grounded，并诚实留下一个 open question。'};
+var hints={
+  1:function(){return L('Two parallel hypotheses; cognition has just surfaced and confidence is low for both.','两个并列假设，认知刚浮现，置信都不高。');},
+  2:function(){return L('The DNS hypothesis sinks — but is kept auditable, not deleted.','DNS 假设沉降——但保留可审计，未删除。');},
+  3:function(){return L('Inflection: the model refutes the network-layer judgment and turns attention to application-layer GC.','拐点：模型推翻网络层判断，注意力转向应用层 GC。');},
+  4:function(){return L('The root cause settles to grounded, and honestly leaves one open question.','根因凝定为 grounded，并诚实留下一个 open question。');}
+};
+function setText(id,txt){var el=document.getElementById(id);if(el)el.textContent=txt;}
 function render(){
   document.querySelectorAll('.step-blk').forEach(function(b){
     var s=+b.dataset.step;
     if(s===cur){b.classList.remove('hidden-step');b.classList.add('step-in');}
     else{b.classList.add('hidden-step');b.classList.remove('step-in');}
   });
-  document.getElementById('prog').textContent=cur+' / '+max;
-  document.getElementById('ustate').textContent='step '+cur+' / '+max;
-  document.getElementById('hint').textContent=hints[cur];
-  document.getElementById('prevBtn').disabled=cur===1;
-  document.getElementById('nextBtn').disabled=cur===max;
-  document.getElementById('nextBtn').textContent=cur===max?'诊断完成':'推进诊断 ▸';
+  setText('prog',cur+' / '+max);
+  setText('ustate','step '+cur+' / '+max);
+  var hint=hints[cur]();
+  setText('hint',hint);setText('hint-zh',hint);
+  var atStart=cur===1,atEnd=cur===max;
+  ['prevBtn','prevBtn-zh'].forEach(function(id){var el=document.getElementById(id);if(el)el.disabled=atStart;});
+  ['nextBtn','nextBtn-zh'].forEach(function(id){var el=document.getElementById(id);if(el)el.disabled=atEnd;});
+  setText('nextBtn',atEnd?L('Diagnosis complete','诊断完成'):L('Advance diagnosis ▸','推进诊断 ▸'));
+  setText('nextBtn-zh',atEnd?'诊断完成':'推进诊断 ▸');
 }
 function step(d){cur=Math.min(max,Math.max(1,cur+d));render();}
 render();
+
+/* language toggle */
+function setLang(lang){
+  if(lang!=='en'&&lang!=='zh')lang='en';
+  document.documentElement.dataset.lang=lang;
+  document.documentElement.lang=lang;
+  try{localStorage.setItem('latent-lang',lang);}catch(e){}
+  document.getElementById('lang-en').classList.toggle('active',lang==='en');
+  document.getElementById('lang-zh').classList.toggle('active',lang==='zh');
+  render(); /* refresh JS-injected strings for the new language */
+}
+document.getElementById('lang-en').addEventListener('click',function(){setLang('en');});
+document.getElementById('lang-zh').addEventListener('click',function(){setLang('zh');});
+/* reflect initial state on the toggle (lang already set pre-paint) */
+(function(){var l=document.documentElement.dataset.lang;document.getElementById('lang-en').classList.toggle('active',l!=='zh');document.getElementById('lang-zh').classList.toggle('active',l==='zh');})();
 
 /* scroll reveal */
 var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.12});

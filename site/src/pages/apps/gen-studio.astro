@@ -3,45 +3,54 @@ import Base from "../../layouts/Base.astro";
 import StagePanel from "../../components/StagePanel.tsx";
 import "@latent/react/app";
 import studio from "@examples/gen-studio.json";
+import studioZh from "@examples/gen-studio.zh.json";
 
 const actions = [
+  { label: "Pick style A (photoreal texture)", variant: "primary" },
+  { label: "Pick style B (miniature fantasy)" },
+  { label: "Flag shots to re-render" },
+];
+const actionsZh = [
   { label: "选定风格 A（写实质感）", variant: "primary" },
   { label: "选定风格 B（微缩奇幻）" },
   { label: "标注重渲镜头" },
 ];
 
 const frames = [
-  { g: "linear-gradient(135deg,#2c1d12,#8a5e2e 70%,#caa15c)", t: "01 产品空镜" },
-  { g: "linear-gradient(135deg,#1f1810,#6e4a28 80%)", t: "02 暖光起幅" },
-  { g: "linear-gradient(160deg,#3a2614,#9b6c33)", t: "03 金属反光" },
-  { g: "linear-gradient(135deg,#241a10,#7a5530 75%,#b98c4e)", t: "04 玻璃质感" },
-  { g: "linear-gradient(135deg,#1b140d,#5e3f22)", t: "05 推镜中段" },
-  { g: "repeating-linear-gradient(45deg,#15110b,#15110b 8px,#1c160e 8px,#1c160e 16px)", t: "06 渲染中…", rendering: true },
-  { g: "linear-gradient(135deg,#2a1d11,#86592c)", t: "07 logo 定格" },
-  { g: "repeating-linear-gradient(45deg,#15110b,#15110b 8px,#1c160e 8px,#1c160e 16px)", t: "08 渲染中…", rendering: true },
+  { g: "linear-gradient(135deg,#2c1d12,#8a5e2e 70%,#caa15c)", t: "01 product establishing" },
+  { g: "linear-gradient(135deg,#1f1810,#6e4a28 80%)", t: "02 warm-light opener" },
+  { g: "linear-gradient(160deg,#3a2614,#9b6c33)", t: "03 metal highlight" },
+  { g: "linear-gradient(135deg,#241a10,#7a5530 75%,#b98c4e)", t: "04 glass texture" },
+  { g: "linear-gradient(135deg,#1b140d,#5e3f22)", t: "05 push-in mid" },
+  { g: "repeating-linear-gradient(45deg,#15110b,#15110b 8px,#1c160e 8px,#1c160e 16px)", t: "06 rendering…", rendering: true },
+  { g: "linear-gradient(135deg,#2a1d11,#86592c)", t: "07 logo freeze" },
+  { g: "repeating-linear-gradient(45deg,#15110b,#15110b 8px,#1c160e 8px,#1c160e 16px)", t: "08 rendering…", rendering: true },
 ];
 ---
 
-<Base title="潛 Studio · Image/Video 生成（应用层设计）" description="把设计语言用到生成工具：agent 对创作意图的理解占据主舞台，渲染任务退为外围队列。">
+<Base title="潛 Studio · Image/Video generation (applied layer)" description="The design language applied to a generation tool: the agent's read of your creative intent holds the primary Stage, while render jobs recede to a peripheral queue.">
   <div class="app-frame app-studio">
     <!-- top chrome -->
     <div class="app-topbar">
-      <div class="brand"><span class="mk">潛 Studio</span> 产品宣传短片</div>
-      <div class="tcrumb">16:9 · 30s · golden-hour · 渲染 12/48</div>
-      <div class="tright"><span class="mono" style="font-size:11px;color:var(--ink-500)">A/B 风格待选</span></div>
+      <div class="brand"><span class="mk">潛 Studio</span> <span data-i18n="en">product promo film</span><span data-i18n="zh">产品宣传短片</span></div>
+      <div class="tcrumb">16:9 · 30s · golden-hour · <span data-i18n="en">render 12/48</span><span data-i18n="zh">渲染 12/48</span></div>
+      <div class="tright"><span class="mono" style="font-size:11px;color:var(--ink-500)"><span data-i18n="en">A/B styles pending</span><span data-i18n="zh">A/B 风格待选</span></span></div>
     </div>
 
     <!-- ① Stage — the agent's understanding of creative intent (lit primary) -->
     <div class="zone zone-stage">
-      <div class="zone-note">
+      <div class="zone-note" data-i18n="en">
+        Other generation tools put the <b>render queue</b> front and center (rows of thumbnails and progress bars). 潛 Studio puts the agent's <b>read of your creative intent</b> on the primary Stage — the tone decision, the style options still in play, the artifact-prone risks; the canvas sits in the middle and render jobs recede to a queue on the right.
+      </div>
+      <div class="zone-note" data-i18n="zh">
         别家生成工具把<b>渲染队列</b>放在主位（一排排缩略图与进度条）。潛 Studio 把 agent 对<b>你创作意图的理解</b>放主舞台——定调决策、在押的风格选项、易出伪影的风险；画布在中间、渲染任务退为右侧队列。
       </div>
-      <StagePanel data={studio} heading="agent 对创作意图的理解" actions={actions} client:load />
+      <StagePanel data={studio} dataZh={studioZh} heading="the agent's read of your creative intent" headingZh="agent 对创作意图的理解" actions={actions} actionsZh={actionsZh} client:load />
     </div>
 
     <!-- ② Artifact — the canvas / generated frames (co-present, neutral) -->
     <div class="zone zone-artifact">
-      <div class="zone-head">② Artifact · 画布 <span class="zn">关键帧 · golden-hour 定调</span></div>
+      <div class="zone-head">② Artifact · <span data-i18n="en">Canvas</span><span data-i18n="zh">画布</span> <span class="zn"><span data-i18n="en">keyframes · golden-hour tone</span><span data-i18n="zh">关键帧 · golden-hour 定调</span></span></div>
       <div class="canvas">
         {frames.map((f) => (
           <div class="frame" style={`background:${f.g}`}>
@@ -53,16 +62,16 @@ const frames = [
 
     <!-- ③ Intervention — prompt bar (the creative control) -->
     <div class="zone zone-intervene promptbar">
-      <div class="pinput">▸ 30s 产品短片 · 黄金时刻暖光 · 浅景深 · 缓慢推镜 · 突出金属/玻璃质感<span class="caret"></span></div>
+      <div class="pinput"><span data-i18n="en">▸ 30s product film · golden-hour warm light · shallow depth of field · slow push-in · emphasize metal/glass texture</span><span data-i18n="zh">▸ 30s 产品短片 · 黄金时刻暖光 · 浅景深 · 缓慢推镜 · 突出金属/玻璃质感</span><span class="caret"></span></div>
       <div class="pbtns">
-        <button class="ibtn primary">批量渲染（待选风格）</button>
-        <button class="ibtn">改定调</button>
+        <button class="ibtn primary"><span data-i18n="en">Batch render (pending styles)</span><span data-i18n="zh">批量渲染（待选风格）</span></button>
+        <button class="ibtn"><span data-i18n="en">Adjust tone</span><span data-i18n="zh">改定调</span></button>
       </div>
     </div>
 
     <!-- · Activity — render queue / jobs (peripheral, recede) -->
     <div class="zone zone-activity">
-      <div class="zone-head">· Activity · 渲染队列（外围）</div>
+      <div class="zone-head">· Activity · <span data-i18n="en">render queue (peripheral)</span><span data-i18n="zh">渲染队列（外围）</span></div>
       <div class="app-row"><span class="dot"></span>render · frame 12/48</div>
       <div class="app-row"><span class="dot"></span>upscale · 1080→4K</div>
       <div class="app-row"><span class="dot"></span>style_A · preview</div>

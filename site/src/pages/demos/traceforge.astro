@@ -2,16 +2,22 @@
 import Base from "../../layouts/Base.astro";
 import DemoFrame from "../../components/DemoFrame.tsx";
 import data from "@examples/traceforge.json";
+import dataZh from "@examples/traceforge.zh.json";
 ---
 
-<Base title="TraceForge · Latent demo" description="高 latent — 网络/系统故障根因诊断，完整用潛 渲染。">
+<Base title="TraceForge · Latent 潜 demo" description="High latent — root-cause diagnosis for network/system incidents, fully rendered with Latent 潜.">
   <section class="wrap" style="padding-top:64px">
     <a class="demo-back" href="/">◂ Latent · 潜</a>
-    <div class="kicker">应用 Demo · High latent / 故障诊断</div>
-    <h2>TraceForge — 核心支付链路诊断</h2>
-    <p>
+    <div class="kicker" data-i18n="en">Application demo · High latent / incident diagnosis</div>
+    <div class="kicker" data-i18n="zh">应用 Demo · High latent / 故障诊断</div>
+    <h2 data-i18n="en">TraceForge — diagnosing the core payment path</h2>
+    <h2 data-i18n="zh">TraceForge — 核心支付链路诊断</h2>
+    <p data-i18n="en">
+      Here's what this SRE sees on opening the interface: <strong>the agent's current understanding of the incident</strong> (conclusion first), with actions demoted to peripheral provenance. To watch that understanding <em>form step by step</em>, hit <strong>"Replay"</strong> below the card (for the demo); switch to <strong>Trace</strong> for the builder/audit persona. Provenance is marked <span class="mono" style="color:var(--grounded)">verifiable</span> — the evidence chain can be re-executed to verify.
+    </p>
+    <p data-i18n="zh">
       下面是这位 SRE 打开界面时看到的东西：<strong>agent 当前对故障的理解</strong>（结论先行），动作退为外围溯源。想看这份理解<em>怎么一步步形成</em>，点卡片下方的<strong>「回放」</strong>（演示用）；切到 <strong>Trace</strong> 看 builder/审计人格。provenance 标注为 <span class="mono" style="color:var(--grounded)">verifiable</span>——证据链可重新执行验证。
     </p>
-    <DemoFrame data={data} mode="scenario" stepped client:load />
+    <DemoFrame data={data} dataZh={dataZh} mode="scenario" stepped client:load />
   </section>
 </Base>

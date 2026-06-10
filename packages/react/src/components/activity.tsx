@@ -1,6 +1,7 @@
 /** Peripheral & control components: Activity Stream, Trace view, Intervention, Persona toggle. */
 import { useState } from "react";
 import type { ToolCall, Persona } from "@latent/schema";
+import { useStrings } from "../i18n.ts";
 
 /** The recessive, auditable stream of tool calls. Weakened, never hidden. */
 export function ActivityStream({
@@ -12,6 +13,7 @@ export function ActivityStream({
   collapsedByDefault?: boolean;
   maxWhenOpen?: number;
 }) {
+  const t = useStrings();
   const [open, setOpen] = useState(!collapsedByDefault);
   const shown = toolCalls.slice(0, maxWhenOpen);
   const rest = toolCalls.length - shown.length;
@@ -20,7 +22,7 @@ export function ActivityStream({
       <div className="as-head" onClick={() => setOpen((o) => !o)}>
         <span className="l">{open ? "▾" : "▸"} Activity Stream</span>
         <span className="r">
-          {toolCalls.length} calls · {open ? "展开 · 点击收起" : "收起中 · 点击展开"}
+          {toolCalls.length} calls · {open ? t.activity.expanded : t.activity.collapsed}
         </span>
       </div>
       <div className={`as-body${open ? " open" : ""}`}>
@@ -57,9 +59,10 @@ export function TraceView({
   toolCalls: ToolCall[];
   note?: string;
 }) {
+  const t = useStrings();
   return (
     <div className="trace-panel">
-      <div className="tlabel">Trace View · builder / 审计人格 — 此处 tool-call 才是主体</div>
+      <div className="tlabel">{t.activity.traceLabel}</div>
       {toolCalls.map((c) => (
         <div className="trace-line" key={c.id}>
           <span className="tt">{c.ts}</span>

@@ -1,0 +1,121 @@
+{
+  "schemaVersion": "0.2",
+  "latentLevel": "high",
+  "persona": "operator",
+  "task": {
+    "title": "生成 30s 产品宣传短片",
+    "goal": "电影感、暖调、突出产品质感（金属/玻璃）",
+    "context": "Image/Video 生成 · 16:9 · 30s",
+    "status": "渲染 12 / 48"
+  },
+  "userStory": {
+    "who": "品牌设计师",
+    "trigger": "市场部要一支 30s 产品短片，下周提案",
+    "goal": "拿到一个能用的初剪方向，再决定批量渲染",
+    "reads": "agent 对你创作意图的理解：定调决策、在押的两条风格方向、以及它不确定/易出问题的地方",
+    "acts": "选定 A/B 风格 / 调整定调决策 / 标注要重渲的镜头"
+  },
+  "observablePrimitives": [
+    { "id": "op:brief", "kind": "user-statement", "label": "创作简报：电影感、暖调、突出质感" },
+    { "id": "op:moodboard", "kind": "source", "label": "参考情绪板（12 张）" },
+    { "id": "op:brand", "kind": "constraint", "label": "品牌规范：克制、高级、低饱和" },
+    { "id": "op:testrender", "kind": "tool-result", "label": "定调测试渲染（4 帧）" }
+  ],
+  "toolCalls": [
+    { "id": "tc:brief", "ts": "—", "fn": "parse_brief", "summary": "抽取调性/比例/时长", "producedPrimitives": ["op:brief"] },
+    { "id": "tc:keyframes", "ts": "—", "fn": "gen_keyframes", "summary": "12 关键帧候选", "producedPrimitives": ["op:moodboard"] },
+    { "id": "tc:test", "ts": "—", "fn": "render_preview", "summary": "定调 4 帧 · 黄金时刻暖光", "durationMs": 42000, "producedPrimitives": ["op:testrender"] },
+    { "id": "tc:upscale", "ts": "—", "fn": "upscale", "summary": "排队中 12/48", "producedPrimitives": ["op:testrender"] }
+  ],
+  "nodes": [
+    {
+      "id": "n:req",
+      "state": "grounded",
+      "kind": "requirement",
+      "title": "理解到的意图：电影感 + 暖调 + 16:9，突出金属/玻璃质感",
+      "confidence": { "value": 0.86, "source": "human" },
+      "evidence": [
+        { "id": "ev:brief", "label": "简报关键词 + 情绪板倾向一致", "primitives": ["op:brief", "op:moodboard"], "polarity": "supports" }
+      ],
+      "provenance": {
+        "mode": "asserted",
+        "steps": [
+          { "toolCallId": "tc:brief", "observed": "调性=电影感/暖调，比例 16:9，时长 30s", "primitives": ["op:brief"] }
+        ]
+      }
+    },
+    {
+      "id": "n:inflect",
+      "state": "inflection",
+      "title": "定调重判",
+      "inflectKind": "aha",
+      "from": "明亮高对比的商业广告风",
+      "to": "黄金时刻暖光 + 浅景深的质感片",
+      "rationale": "品牌规范要求克制高级、低饱和；明亮商业风与之冲突，暖光浅景深更能托出金属/玻璃质感。",
+      "affects": ["n:bright", "n:tone"]
+    },
+    {
+      "id": "n:tone",
+      "state": "grounded",
+      "kind": "decision",
+      "title": "定调：黄金时刻暖光 + 浅景深 + 缓慢推镜",
+      "confidence": { "value": 0.81, "source": "self_consistency" },
+      "evidence": [
+        { "id": "ev:test", "label": "定调测试 4 帧获认可", "primitives": ["op:testrender"], "polarity": "supports" },
+        { "id": "ev:brand", "label": "符合品牌克制/低饱和", "primitives": ["op:brand"], "polarity": "supports" }
+      ],
+      "provenance": {
+        "mode": "verifiable",
+        "reExecCmd": "studio render --preview --style golden-hour-shallow --frames 4",
+        "steps": [
+          { "toolCallId": "tc:test", "observed": "暖光浅景深定调 4 帧", "primitives": ["op:testrender"] }
+        ]
+      }
+    },
+    {
+      "id": "n:style",
+      "state": "hypothesis",
+      "kind": "option",
+      "title": "两条风格方向待你选：A 写实质感 / B 微缩奇幻",
+      "confidence": { "value": 0.5, "source": "self_report" },
+      "evidence": [],
+      "falsification": "B（微缩奇幻）更出彩但偏离写实；若品牌可接受非写实表达则选 B，否则 A。需你拍板。"
+    },
+    {
+      "id": "n:artifact",
+      "state": "hypothesis",
+      "kind": "risk",
+      "title": "手部特写与产品 logo 文字易出现伪影",
+      "confidence": { "value": 0.6, "source": "self_consistency" },
+      "evidence": [],
+      "falsification": "若改用产品空镜避开手部、logo 用后期合成而非生成，则风险消除；当前镜头表含 2 个手部特写。"
+    },
+    {
+      "id": "n:ending",
+      "state": "open",
+      "kind": "option",
+      "title": "结尾 logo 呈现方式未定",
+      "needs": "logo 是实拍质感合成、粒子汇聚、还是简洁定格？需你给方向。"
+    },
+    {
+      "id": "n:bright",
+      "state": "refuted",
+      "kind": "option",
+      "title": "明亮高饱和商业广告风",
+      "reason": "与品牌“克制高级、低饱和”调性冲突，且压平了金属/玻璃质感。",
+      "formerConfidence": 0.4
+    }
+  ],
+  "outcome": {
+    "nodeId": "n:tone",
+    "label": "当前方向 · Grounded",
+    "text": "定调为黄金时刻暖光浅景深质感片；A/B 两条风格方向待你选。",
+    "recommendation": "选定 A/B 后批量渲染；手部镜头改空镜、logo 后期合成以避伪影。"
+  },
+  "steps": [
+    { "label": "理解意图", "hint": "先把简报与情绪板锚定为 requirement。", "visibleNodeIds": ["n:req", "n:bright"] },
+    { "label": "定调拐点", "hint": "啊哈：品牌规范 ⇒ 暖光浅景深质感片，商业亮风沉降。", "visibleNodeIds": ["n:req", "n:inflect", "n:bright"] },
+    { "label": "定调凝定", "hint": "定调成 grounded 决策，测试 4 帧可重渲验证。", "visibleNodeIds": ["n:req", "n:inflect", "n:tone", "n:style", "n:bright"] },
+    { "label": "待你拍板", "hint": "诚实留下：A/B 风格、伪影风险、结尾方式都等你定。", "visibleNodeIds": ["n:req", "n:inflect", "n:tone", "n:style", "n:artifact", "n:ending", "n:bright"] }
+  ]
+}

@@ -3,12 +3,17 @@ import Base from "../../layouts/Base.astro";
 import StreamingDemo from "../../components/StreamingDemo.tsx";
 ---
 
-<Base title="流式 · Latent demo" description="LLM streaming 下的动效：流式呈现理解的形成，而不是 token 的河流。">
+<Base title="Streaming · Latent 潜 demo" description="Motion under LLM streaming: stream the formation of understanding, not a river of tokens.">
   <section class="wrap" style="padding-top:64px">
     <a class="demo-back" href="/">◂ Latent · 潜</a>
-    <div class="kicker">应用 Demo · LLM Streaming</div>
-    <h2>流式：呈现理解的形成，而非 token 的河流</h2>
-    <p>
+    <div class="kicker" data-i18n="en">Application demo · LLM Streaming</div>
+    <div class="kicker" data-i18n="zh">应用 Demo · LLM Streaming</div>
+    <h2 data-i18n="en">Streaming: render the formation of understanding, not a river of tokens</h2>
+    <h2 data-i18n="zh">流式：呈现理解的形成，而非 token 的河流</h2>
+    <p data-i18n="en">
+      Most streaming UIs flush <strong>raw tokens</strong> straight onto the primary plane (the typewriter effect) — exactly the "activity theater" this language argues against. The Latent 潜 approach: the raw stream recedes to the <strong>periphery</strong> (fast, ephemeral, auditable), the primary plane updates on <strong>meaningful commits</strong>, and the existing motion vocabulary carries the streaming dynamics. Hit <strong>↻ Replay</strong> to watch.
+    </p>
+    <p data-i18n="zh">
       多数流式 UI 把<strong>原始 token</strong> 直接刷在主舞台（打字机效果）——这恰是这套语言反对的"活动剧场"。潛 的做法：原始流退到<strong>外围</strong>（快、转瞬即逝、可审计），主舞台按<strong>有意义的提交</strong>更新，用已有的动效词汇承载流式动态。点 <strong>↻ 重放</strong> 观察。
     </p>
 
@@ -18,20 +23,28 @@ import StreamingDemo from "../../components/StreamingDemo.tsx";
 
     <div class="anti" style="margin-top:26px">
       <div class="acard" style="border-left-color:var(--hypo)">
-        <div class="an">答案位占位先行</div>
-        <div class="ap">答案没出来时不能 answer-first——「我的判断」是占位槽（微光"正在判断…"），模型提交时 <em>Settle</em> 填入。生命周期 thinking → forming → settled。</div>
+        <div class="an" data-i18n="en">Reserve the answer slot first</div>
+        <div class="an" data-i18n="zh">答案位占位先行</div>
+        <div class="ap" data-i18n="en">When the answer isn't in yet, you can't be answer-first — "My read" is a placeholder slot (a shimmering "forming…") that <em>Settle</em> fills in when the model commits. Lifecycle: thinking → forming → settled.</div>
+        <div class="ap" data-i18n="zh">答案没出来时不能 answer-first——「我的判断」是占位槽（微光"正在判断…"），模型提交时 <em>Settle</em> 填入。生命周期 thinking → forming → settled。</div>
       </div>
       <div class="acard" style="border-left-color:var(--inflect)">
-        <div class="an">动效词汇 = 流式动态</div>
-        <div class="ap"><em>Surface</em> 新判断浮现 · <em>Sink</em> 某假设被推翻下沉 · <em>Pulse</em> "改主意"拐点闪现 · <em>Settle</em> 答案凝定。流式就是把这些状态迁移实时播放。</div>
+        <div class="an" data-i18n="en">Motion vocabulary = streaming dynamics</div>
+        <div class="an" data-i18n="zh">动效词汇 = 流式动态</div>
+        <div class="ap" data-i18n="en"><em>Surface</em> a new read emerges · <em>Sink</em> a hypothesis is refuted and drops · <em>Pulse</em> a "change of mind" inflection flashes · <em>Settle</em> the answer firms up. Streaming is just playing these state transitions in real time.</div>
+        <div class="ap" data-i18n="zh"><em>Surface</em> 新判断浮现 · <em>Sink</em> 某假设被推翻下沉 · <em>Pulse</em> "改主意"拐点闪现 · <em>Settle</em> 答案凝定。流式就是把这些状态迁移实时播放。</div>
       </div>
       <div class="acard" style="border-left-color:var(--grounded)">
-        <div class="an">流事件，而非 raw text</div>
-        <div class="ap">推荐流式<strong>事件/补丁</strong>（node.add · confidence.update · refute · inflection · outcome.settle），而非 raw token 或脆弱的 partial-JSON。事件天然映射 UI 迁移，且能区分"暂定"与"已提交"。</div>
+        <div class="an" data-i18n="en">Stream events, not raw text</div>
+        <div class="an" data-i18n="zh">流事件，而非 raw text</div>
+        <div class="ap" data-i18n="en">Prefer streaming <strong>events/patches</strong> (node.add · confidence.update · refute · inflection · outcome.settle) over raw tokens or fragile partial-JSON. Events map naturally onto UI transitions and distinguish "tentative" from "committed."</div>
+        <div class="ap" data-i18n="zh">推荐流式<strong>事件/补丁</strong>（node.add · confidence.update · refute · inflection · outcome.settle），而非 raw token 或脆弱的 partial-JSON。事件天然映射 UI 迁移，且能区分"暂定"与"已提交"。</div>
       </div>
       <div class="acard" style="border-left-color:var(--ink-400)">
-        <div class="an">稳，不抖</div>
-        <div class="ap">对"理解"按语义单元防抖更新（非逐字），预留空间防回流（CLS），尊重 <span class="mono">prefers-reduced-motion</span>。原始流可以快，理解要稳。别把会被推翻的中间态过早渲染成"比较确定"。</div>
+        <div class="an" data-i18n="en">Steady, not jittery</div>
+        <div class="an" data-i18n="zh">稳，不抖</div>
+        <div class="ap" data-i18n="en">Debounce updates to the "understanding" by semantic unit (not character by character), reserve space to prevent reflow (CLS), and respect <span class="mono">prefers-reduced-motion</span>. The raw stream can be fast; the understanding must be steady. Don't render an intermediate state that may get refuted as "fairly sure" too early.</div>
+        <div class="ap" data-i18n="zh">对"理解"按语义单元防抖更新（非逐字），预留空间防回流（CLS），尊重 <span class="mono">prefers-reduced-motion</span>。原始流可以快，理解要稳。别把会被推翻的中间态过早渲染成"比较确定"。</div>
       </div>
     </div>
   </section>
