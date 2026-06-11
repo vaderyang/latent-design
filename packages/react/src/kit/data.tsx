@@ -39,7 +39,7 @@ export function Table<T>({
       <thead>
         <tr>
           {columns.map((c) => (
-            <th key={c.key} className={cellClass(c)} style={c.width != null ? { width: c.width } : undefined}>
+            <th key={c.key} scope="col" className={cellClass(c)} style={c.width != null ? { width: c.width } : undefined}>
               {c.header}
             </th>
           ))}

@@ -29,7 +29,14 @@ export function ConfidenceMeter({
 }) {
   const pct = Math.round(confidence.value * 100);
   return (
-    <div className="conf">
+    <div
+      className="conf"
+      role="meter"
+      aria-valuemin={0}
+      aria-valuemax={1}
+      aria-valuenow={confidence.value}
+      aria-label={label}
+    >
       <span className="lab">{label}</span>
       <div className="track">
         <div className={`fill ${tone}`} style={{ width: `${pct}%` }} />

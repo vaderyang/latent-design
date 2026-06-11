@@ -50,17 +50,17 @@ The rendered latent **≠** the real latent; chain-of-thought is often post-hoc 
 |---|---|---|
 | **Grounded Claim** an anchored conclusion | amber `#E7B45C` | **openable provenance** pointing to evidence / observable primitives |
 | **Hypothesis** a wager in play | aqua `#54C7C0` | **confidence + "what evidence would change it"** |
-| **Open Question** an honest unknown | indigo `#9C8CCB` | **what it needs / what resolving it requires** |
-| **Inflection** a cognitive turning point | coral `#F0795F` | from → to + rationale (research confirms inflections are the most faithful part of the latent) |
+| **Open Question** an honest unknown | indigo `#8F79C2` | **what it needs / what resolving it requires** |
+| **Inflection** a cognitive turning point | blue `#82A7F2` | from → to + rationale (research confirms inflections are the most faithful part of the latent) |
 | **Refuted** sunk | slate `#5C6B7A` | reason for sinking (**kept auditable, not deleted**) |
 
 This is exactly the five-layer diagnostic ontology (Observable Primitives → Evidence → Symptoms → Hypotheses → Conclusions): the upper layers are the on-stage protagonists, but each must have a thread tying it **back down** to the observable primitives below.
 
 ## 4. Foundations
 
-- **Color = epistemic state** (not decoration). See amber and you know "anchored"; see coral and you know "the model just changed its mind." Full tokens in `packages/tokens/tokens.json`.
+- **Color = epistemic state** (not decoration). See amber and you know "anchored"; see blue and you know "the model just changed its mind." Full tokens in `packages/tokens/tokens.json` (the generated source of truth for every hex on this page). **And color is never the only channel**: every epistemic state must also be carried by text or shape — the state word on a badge, the ◆/◇ polarity glyph, the strikethrough on a sunk claim — so the contract survives color-blindness and grayscale. `StateDot` carries its state word for screen readers built-in.
 - **Type = three voices.** Voice (cognition, serif Fraunces/Noto Serif) — thinking should look considered; UI (function, Hanken/Noto Sans) — clear and recessive; Evidence (instrument, IBM Plex Mono) — a verifiable reading.
-- **Motion = the language of depth.** Surface (new understanding rises) / Settle (aqua turning to amber) / Sink (the refuted descends but is not deleted) / Pulse (an inflection flashes coral). Motion narrates state transitions, never mere decoration.
+- **Motion = the language of depth.** Surface (new understanding rises) / Settle (aqua turning to amber) / Sink (the refuted descends but is not deleted) / Pulse (an inflection flashes blue). Motion narrates state transitions, never mere decoration.
 
 ## 5. Component catalog
 

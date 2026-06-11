@@ -46,5 +46,20 @@ for (const [file, expect] of Object.entries(plainChecks)) {
   }
 }
 
+// the streaming demo's prerecorded events must SETTLE into a contract-valid state
+{
+  const { validateStream } = await import("@latent/schema");
+  const { buildEvents } = await import("../src/components/StreamingDemo.tsx");
+  for (const zh of [false, true]) {
+    const v = validateStream(buildEvents(zh));
+    if (!v.ok) {
+      console.log(`\u2717 StreamingDemo (${zh ? "zh" : "en"}) — settled stream violates the contract: ${v.issues.map((i) => i.message).join("; ")}`);
+      fail++;
+    } else {
+      console.log(`\u2713 StreamingDemo (${zh ? "zh" : "en"}) — prerecorded stream settles valid (${v.state.nodes.length} nodes)`);
+    }
+  }
+}
+
 console.log(fail === 0 ? "\nALL RENDER CHECKS PASS" : `\n${fail} RENDER CHECK(S) FAILED`);
 process.exit(fail === 0 ? 0 : 1);

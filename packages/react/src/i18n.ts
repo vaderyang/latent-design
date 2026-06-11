@@ -109,7 +109,7 @@ const en = {
     answer: "Answer",
     risk: "Risk",
   } as Record<NodeKind, string>,
-  state: { grounded: "Grounded", hypothesis: "Hypothesis", open: "Open", refuted: "Refuted" },
+  state: { grounded: "Grounded", hypothesis: "Hypothesis", open: "Open", inflection: "Inflection", refuted: "Refuted" },
   inflect: {
     prefix: "Inflection · ",
     backtrack: "Backtrack",
@@ -216,7 +216,7 @@ const zh: Strings = {
     answer: "回答",
     risk: "风险",
   },
-  state: { grounded: "Grounded", hypothesis: "Hypothesis", open: "Open", refuted: "Refuted" },
+  state: { grounded: "已锚定", hypothesis: "假设", open: "未决", inflection: "拐点", refuted: "已推翻" },
   inflect: {
     prefix: "Inflection · 拐点 / ",
     backtrack: "回退",

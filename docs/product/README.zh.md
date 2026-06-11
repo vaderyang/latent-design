@@ -50,17 +50,17 @@
 |---|---|---|
 | **Grounded Claim** 已锚定结论 | 金 amber `#E7B45C` | 指向 evidence / observable primitives 的**可点开溯源** |
 | **Hypothesis** 在押假设 | 青 aqua `#54C7C0` | **置信度 + 「什么证据会改变它」** |
-| **Open Question** 诚实未知 | 靛 indigo `#9C8CCB` | **待查项 / 解决它需要什么** |
-| **Inflection** 认知拐点 | 珊瑚 `#F0795F` | from → to + 理由（研究证实拐点是 latent 中最忠实的部分） |
+| **Open Question** 诚实未知 | 靛 indigo `#8F79C2` | **待查项 / 解决它需要什么** |
+| **Inflection** 认知拐点 | 蓝 `#82A7F2` | from → to + 理由（研究证实拐点是 latent 中最忠实的部分） |
 | **Refuted** 已沉降 | 灰蓝 `#5C6B7A` | 沉降理由（**保留可审计，不删除**） |
 
 这正是五层诊断本体论（Observable Primitives → Evidence → Symptoms → Hypotheses → Conclusions）：上层是台前主体，但每一个都必须有一根线**栓回**下层可观测原语。
 
 ## 4. Foundations
 
-- **色彩 = 认识论状态**（不是装饰）。看到金色就知道「已锚定」，看到珊瑚色就知道「模型刚改了主意」。完整 token 见 `packages/tokens/tokens.json`。
+- **色彩 = 认识论状态**（不是装饰）。看到金色就知道「已锚定」，看到蓝色就知道「模型刚改了主意」。完整 token 见 `packages/tokens/tokens.json`（本页所有 hex 的生成源真值）。**且颜色从不是唯一通道**：每个认识论状态必须同时由文字或形状承载——badge 上的状态词、◆/◇ 极性符号、沉降论断的删除线——让契约在色盲与灰度下依然成立。`StateDot` 内建了给屏幕阅读器的状态词。
 - **字体 = 三种声音**。Voice（认知，衬线 Fraunces/Noto Serif）— 思考应显得被斟酌过；UI（功能，Hanken/Noto Sans）— 清晰退后；Evidence（仪器，IBM Plex Mono）— 可核验的读数。
-- **动效 = 深度的语言**。Surface 浮现（新理解升起）/ Settle 凝定（青转金）/ Sink 沉降（被推翻者下沉但不删）/ Pulse 拐点（珊瑚闪现）。运动讲述状态迁移，从不只是装饰。
+- **动效 = 深度的语言**。Surface 浮现（新理解升起）/ Settle 凝定（青转金）/ Sink 沉降（被推翻者下沉但不删）/ Pulse 拐点（蓝色闪现）。运动讲述状态迁移，从不只是装饰。
 
 ## 5. 组件目录
 

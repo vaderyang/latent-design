@@ -90,6 +90,14 @@ app.<span class="c-f">post</span>(<span class="c-s">"/requests/:id/approve"</spa
         "ctx art stage"
         "ctx act stage";
     }
+    @media (max-width: 1080px) {
+      .app-vibe {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+        grid-template-areas: "top" "stage" "art" "act" "ctx";
+        height: auto;
+      }
+    }
     .code {
       margin: 0;
       padding: 14px 16px;

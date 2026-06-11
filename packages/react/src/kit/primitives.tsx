@@ -99,9 +99,9 @@ export function Chip({ children, tone = "hypothesis", pressed, onToggle, onRemov
     >
       {children}
       {onRemove && (
-        <span
+        <button
+          type="button"
           className="lk-chip__x"
-          role="button"
           aria-label="remove"
           onClick={(e) => {
             e.stopPropagation();
@@ -109,7 +109,7 @@ export function Chip({ children, tone = "hypothesis", pressed, onToggle, onRemov
           }}
         >
           ×
-        </span>
+        </button>
       )}
     </span>
   );
@@ -183,7 +183,14 @@ export interface MeterProps {
 export function Meter({ value, tone = "hypothesis", gradient, label, showValue = true, format, caption, className }: MeterProps) {
   const pct = Math.max(0, Math.min(1, value)) * 100;
   return (
-    <div className={cx("lk-meter", gradient ? "lk-meter--gradient" : toneClass(tone), className)}>
+    <div
+      className={cx("lk-meter", gradient ? "lk-meter--gradient" : toneClass(tone), className)}
+      role="meter"
+      aria-valuemin={0}
+      aria-valuemax={1}
+      aria-valuenow={Math.max(0, Math.min(1, value))}
+      aria-label={label ?? "value"}
+    >
       {label && <span className="lk-meter__lab">{label}</span>}
       <div className="lk-meter__track">
         <div className="lk-meter__fill" style={{ width: `${pct}%` }} />

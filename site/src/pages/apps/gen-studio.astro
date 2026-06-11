@@ -97,6 +97,15 @@ const frames = [
       overflow: auto;
     }
     @media (max-width: 1180px) { .canvas { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 1080px) {
+      .app-studio {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+        grid-template-areas: "top" "art" "stage" "intervene" "act";
+        height: auto;
+      }
+    }
+    @media (max-width: 600px) { .canvas { grid-template-columns: 1fr; } }
     .frame {
       aspect-ratio: 16 / 9;
       border-radius: 8px;

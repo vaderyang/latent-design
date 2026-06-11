@@ -12,6 +12,9 @@ import { useStrings } from "../i18n.ts";
 export type EpistemicState = "grounded" | "hypothesis" | "open" | "inflection" | "refuted";
 
 /* ---------- StateDot ---------- */
+/** Colour is never the only channel: the dot carries its epistemic-state word
+ *  for screen readers (and as a hover title). Pair it with visible text in the
+ *  surrounding UI — see "state is never colour-only" in docs/product. */
 export function StateDot({
   state,
   ring,
@@ -23,6 +26,8 @@ export function StateDot({
   size?: "sm" | "md" | "lg";
   className?: string;
 }) {
+  const t = useStrings();
+  const word = state === "neutral" ? undefined : t.state[state];
   return (
     <span
       className={cx(
@@ -33,7 +38,10 @@ export function StateDot({
         size === "lg" && "lk-dot--lg",
         className,
       )}
-    />
+      title={word}
+    >
+      {word && <span className="lk-sr">{word}</span>}
+    </span>
   );
 }
 

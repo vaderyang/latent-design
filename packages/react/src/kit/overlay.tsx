@@ -24,6 +24,39 @@ function Portal({ children }: { children: ReactNode }) {
   return createPortal(children, document.body);
 }
 
+const FOCUSABLE = 'a[href],button:not([disabled]),textarea,input,select,[tabindex]:not([tabindex="-1"])';
+
+/** Trap Tab inside the dialog while mounted; restore focus on unmount. */
+function useFocusTrap() {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const panel = ref.current;
+    if (!panel) return;
+    const prev = document.activeElement as HTMLElement | null;
+    (panel.querySelector<HTMLElement>(FOCUSABLE) ?? panel).focus();
+    const h = (e: KeyboardEvent) => {
+      if (e.key !== "Tab") return;
+      const els = [...panel.querySelectorAll<HTMLElement>(FOCUSABLE)];
+      if (!els.length) return;
+      const first = els[0]!;
+      const last = els[els.length - 1]!;
+      if (e.shiftKey && (document.activeElement === first || document.activeElement === panel)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    panel.addEventListener("keydown", h);
+    return () => {
+      panel.removeEventListener("keydown", h);
+      prev?.focus?.();
+    };
+  }, []);
+  return ref;
+}
+
 /* ---------- Modal ---------- */
 export function Modal({
   open,
@@ -42,10 +75,34 @@ export function Modal({
 }) {
   useEsc(open, onClose);
   if (!open) return null;
+  return <ModalInner {...{ onClose, title, footer, children, className }} />;
+}
+
+function ModalInner({
+  onClose,
+  title,
+  footer,
+  children,
+  className,
+}: {
+  onClose: () => void;
+  title?: ReactNode;
+  footer?: ReactNode;
+  children: ReactNode;
+  className?: string;
+}) {
+  const trap = useFocusTrap();
   return (
     <Portal>
       <div className="lk-scrim lk-scrim--center" onClick={onClose}>
-        <div className={cx("lk-modal", className)} role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
+        <div
+          ref={trap}
+          tabIndex={-1}
+          className={cx("lk-modal", className)}
+          role="dialog"
+          aria-modal="true"
+          onClick={(e) => e.stopPropagation()}
+        >
           <div className="lk-modal__head">
             <div className="lk-modal__title">{title}</div>
             <IconButton variant="ghost" size="sm" aria-label="close" onClick={onClose}>
@@ -78,10 +135,27 @@ export function Drawer({
 }) {
   useEsc(open, onClose);
   if (!open) return null;
+  return <DrawerInner {...{ onClose, side, title, children, className }} />;
+}
+
+function DrawerInner({
+  onClose,
+  side = "right",
+  title,
+  children,
+  className,
+}: {
+  onClose: () => void;
+  side?: "left" | "right";
+  title?: ReactNode;
+  children: ReactNode;
+  className?: string;
+}) {
+  const trap = useFocusTrap();
   return (
     <Portal>
       <div className="lk-scrim" onClick={onClose} />
-      <div className={cx("lk-drawer", `lk-drawer--${side}`, className)} role="dialog" aria-modal="true">
+      <div ref={trap} tabIndex={-1} className={cx("lk-drawer", `lk-drawer--${side}`, className)} role="dialog" aria-modal="true">
         <div className="lk-drawer__head">
           <div className="lk-drawer__title">{title}</div>
           <IconButton variant="ghost" size="sm" aria-label="close" onClick={onClose}>

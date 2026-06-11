@@ -283,3 +283,17 @@ footer p{margin:14px auto 0;color:var(--ink-500);font-size:13px;font-family:var(
 ::selection{background:var(--hypo-dim);color:var(--ink-100)}
 .fade{opacity:0;transform:translateY(20px);transition:opacity .8s ease, transform .8s cubic-bezier(.2,.7,.2,1)}
 .fade.in{opacity:1;transform:none}
+
+/* ---------- mobile legibility (≤600px) ----------
+   instrument text a reader must actually READ gains a step; decorative
+   uppercase labels gain half a step; the hero breathes less vertically */
+@media(max-width:600px){
+  .hero{min-height:auto;padding:64px 0 48px}
+  .hero .meta,.navlinks,.demo-back{font-size:13px}
+  .row{font-size:13px}
+  .req,.sw .nm{font-size:12.5px}
+  .kicker{font-size:12px;letter-spacing:.16em}
+  .panel .ptag,.gc-card .lbl{font-size:11.5px}
+  .contract-error{font-size:12.5px}
+  section{scroll-margin-top:12px}
+}
