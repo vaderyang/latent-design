@@ -27,6 +27,7 @@ skills/            latent-design/SKILL.md — 给 Claude Code 的设计语言 sk
 docs/product/      产品设计规范（设计师/PM）
 docs/training/      模型训练研究议程（硬门是真的；奖励/评测/数据是点名的开放问题）
 examples/          每个 demo 一份校验过的 CognitiveState 实例
+examples/adapter/  可运行的 agent trace → CognitiveState adapter（配 docs/MIGRATION.zh.md）
 DESIGN_LANGUAGE.html  原始自演示单页（tokens/组件/TraceForge 的真相源）
 MISSION.md            战略综述（论点、风险、技术纲领）
 ```
@@ -76,6 +77,7 @@ bun run preview       # 预览构建产物（纯静态）
 ## 进一步
 
 - 设计师/PM → `docs/product/README.zh.md`
+- 迁移现有 agentic UI → `docs/MIGRATION.zh.md` + `examples/adapter/`
 - 训练/Lab（研究议程）→ `docs/training/README.zh.md`
 - 用 AI 写 Latent UI → `skills/latent-design/SKILL.md`
 - 哲学与战略 → `MISSION.zh.md`

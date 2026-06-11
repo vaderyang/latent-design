@@ -24,6 +24,7 @@ skills/            latent-design/SKILL.md — the design-language skill for Clau
 docs/product/      product design spec (designers / PMs)
 docs/training/     model training research agenda (hard gate is real; rewards/eval/data are named open problems)
 examples/          one validated CognitiveState instance per demo
+examples/adapter/  runnable agent-trace → CognitiveState adapter (with docs/MIGRATION.md)
 DESIGN_LANGUAGE.html  the original self-demonstrating single page (source of truth for tokens/components/TraceForge)
 MISSION.md            strategic overview (thesis, risks, technical program)
 ```
@@ -73,6 +74,7 @@ The design language is more than components — the three-zone model scales up t
 ## Going further
 
 - Designers / PMs → `docs/product/README.md`
+- Migrating an existing agentic UI → `docs/MIGRATION.md` + `examples/adapter/`
 - Training / Lab (research agenda) → `docs/training/README.md`
 - Writing Latent UI with AI → `skills/latent-design/SKILL.md`
 - Philosophy and strategy → `MISSION.md`

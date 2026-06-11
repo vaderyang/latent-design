@@ -55,7 +55,9 @@ instance per archetype.
    and tag each node's `kind` (content role).
 2. **Validate before rendering:** `bun run validate <file.json>` (or
    `bun validator/src/cli.ts <file>`). It must pass. The validator mechanically
-   rejects reasoning theater — a green check is the contract holding.
+   rejects reasoning theater — a green check is the contract holding. Add
+   `--exec` to actually re-run every `verifiable` provenance command; mark
+   provenance `verifiable` only when that re-execution is genuinely possible.
 3. **Render only via `@latent/react`.** Import the styles once:
    ```ts
    import "@latent/tokens/css";
@@ -79,6 +81,19 @@ instance per archetype.
 
 Each card's badge shows the node's `kind` label (decision / plan / requirement /
 option / answer / risk …) when present; color always encodes `state`.
+
+Kit skin: `<NodeCard node={n} />` (`@latent/react/kit`) renders any schema node
+through the kit's `EpistemicCard`/`InflectionMark` — same contract, kit look.
+
+## Streaming — understanding forms, it doesn't appear
+
+A live agent should emit **StreamingEvents** (`@latent/schema`: `stream.init` /
+`primitive.add` / `toolcall.add` / `node.add` / `node.evidence` / `node.ground` /
+`node.refute` / `phase` / `outcome.settle`) as it works, and the client renders
+with `useLatentStream(subscribe)` — `stream.state` is the understanding formed
+so far. Canned demos are the special case: `stateToEvents(state)` turns any
+instance into a prerecorded stream; `useLatentClock` plays `steps` directly.
+`validateStream` holds the settled stream to the full Grounding Contract.
 
 ## Audience & default: plain language
 
@@ -176,6 +191,12 @@ semantic tokens — never hardcode a hex; theming is pure value substitution.
   (diagnosis), `planning` (decision), `writing` (authoring), `advisory` (Q&A),
   `action` (ambient agentic action), `rad-app` (RAD app-build), plus
   `proportionality/{low,mid,high}`.
-- `schema/cognitive-state.schema.json` — the machine-readable contract.
+- `schema/cognitive-state.schema.json` — the machine-readable contract (note:
+  cross-field Grounding-Contract rules live in Zod refinements and are NOT in
+  the JSON Schema — `@latent/validator` is the authority).
+- `examples/adapter/adapt.ts` — runnable trace → CognitiveState adapter
+  (mechanical scaffold vs model-parsed cognition, then the gate).
+- `docs/MIGRATION.md` — retrofitting an existing agentic UI, in three depths.
 - `packages/tokens/tokens.json` + `tokens.css` — tokens (3 themes).
-- `docs/product/` — full visual spec. `docs/training/` — the emit-target spec.
+- `docs/product/` — full visual spec. `docs/training/` — the training research
+  agenda (the hard gate is real; rewards/eval are named open problems).
