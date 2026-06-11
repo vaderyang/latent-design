@@ -22,7 +22,7 @@ validator/         @latent/validator  latent-validate CLI, mechanically enforces
 site/              Astro pitch site + 5 scenario demos + proportionality band
 skills/            latent-design/SKILL.md — the design-language skill for Claude Code
 docs/product/      product design spec (designers / PMs)
-docs/training/     model training spec (schema = training target · reward shaping · SFT · verifiable/asserted)
+docs/training/     model training research agenda (hard gate is real; rewards/eval/data are named open problems)
 examples/          one validated CognitiveState instance per demo
 DESIGN_LANGUAGE.html  the original self-demonstrating single page (source of truth for tokens/components/TraceForge)
 MISSION.md            strategic overview (thesis, risks, technical program)
@@ -73,7 +73,7 @@ The design language is more than components — the three-zone model scales up t
 ## Going further
 
 - Designers / PMs → `docs/product/README.md`
-- Training / Lab → `docs/training/README.md`
+- Training / Lab (research agenda) → `docs/training/README.md`
 - Writing Latent UI with AI → `skills/latent-design/SKILL.md`
 - Philosophy and strategy → `MISSION.md`
 
