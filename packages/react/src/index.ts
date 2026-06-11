@@ -35,8 +35,10 @@ export { useLang, getLang, useStrings, STRINGS, LANG_EVENT } from "./i18n.ts";
 export type { Lang, Strings } from "./i18n.ts";
 
 // Live playback — latent is a process, not a one-shot output.
-export { useLatentClock, LiveControls } from "./live.tsx";
-export type { LatentClock } from "./live.tsx";
+// useLatentStream consumes StreamingEvents (live or prerecorded);
+// useLatentClock is the canned-`steps` special case (see stateToEvents in @latent/schema).
+export { useLatentClock, useLatentStream, LiveControls } from "./live.tsx";
+export type { LatentClock, LatentStream, LatentStreamSource, PlaybackControls, PlaybackOpts } from "./live.tsx";
 
 // Re-export the schema types for convenience.
 export type {

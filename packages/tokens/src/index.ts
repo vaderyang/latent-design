@@ -76,6 +76,19 @@ export const motion = {
   surfaceIn: { keyframes: "surfaceIn", dur: ".5s", easing: "cubic-bezier(.2,.7,.2,1)", means: "new content enters (understanding-state step)" },
 } as const;
 
+/**
+ * Playback pacing for "understanding forming" — the SINGLE source of timing
+ * for the JS clock (`useLatentClock`), stream scheduling (`stateToEvents`),
+ * and any prerecorded demo. Distinct from `motion` (CSS keyframe durations):
+ * motion is how one transition LOOKS; playback is how fast the narrative MOVES.
+ */
+export const playback = {
+  /** ms per narrative phase (one `step` / `phase` event) */
+  stepMs: 3400,
+  /** settle beat after the last phase, ms */
+  tailMs: 1100,
+} as const;
+
 /** Layout. */
 export const layout = { maxWidth: "1080px" } as const;
 
@@ -97,6 +110,7 @@ export const flatTokens: Record<string, string> = {
   "epistemic.refuted": epistemic.refuted.base,
   "epistemic.activity": epistemic.activity.base,
   "type.voice": type.voice, "type.ui": type.ui, "type.mono": type.mono,
+  "playback.step": `${playback.stepMs}ms`, "playback.tail": `${playback.tailMs}ms`,
   "layout.maxWidth": layout.maxWidth,
 };
 
