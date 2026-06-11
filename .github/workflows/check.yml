@@ -1,0 +1,29 @@
+name: check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      # generated artifacts (JSON Schema, tokens.json) must not drift from
+      # their Zod/TS sources; then contract tests, gold examples, renders
+      - run: bun run check
+      # the contract holds from both sides: negative fixtures must be REJECTED
+      - run: |
+          if bun validator/src/cli.ts "validator/fixtures/negative/*.json"; then
+            echo "negative fixtures unexpectedly passed" && exit 1
+          fi
+      # --exec makes 'verifiable' mean something: the true claim re-executes,
+      # the confabulated one must be exposed
+      - run: bun validator/src/cli.ts --exec validator/fixtures/exec/reexec-passes.json
+      - run: |
+          if bun validator/src/cli.ts --exec validator/fixtures/exec/reexec-fails.json; then
+            echo "confabulated verifiable claim was not exposed" && exit 1
+          fi

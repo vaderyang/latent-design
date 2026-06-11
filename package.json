@@ -17,7 +17,10 @@
     "validate": "bun validator/src/cli.ts",
     "verify:render": "bun site/scripts/verify-render.tsx",
     "verify": "bun run validate \"examples/**/*.json\" && bun run verify:render",
-    "build": "bun run gen && bun run --filter @latent/site build",
+    "test": "bun test schema validator",
+    "check:gen": "bun run gen && git diff --exit-code -- schema/cognitive-state.schema.json packages/tokens/tokens.json",
+    "check": "bun run check:gen && bun run typecheck && bun run test && bun run verify",
+    "build": "bun run gen && bun run validate \"examples/**/*.json\" && bun run --filter @latent/site build",
     "dev": "bun run --filter @latent/site dev",
     "preview": "bun run --filter @latent/site preview",
     "typecheck": "tsc --noEmit -p tsconfig.base.json"
