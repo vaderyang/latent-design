@@ -1,16 +1,15 @@
-/** Low-level pieces shared by the cognitive-node cards. All schema-typed. */
+/** Low-level pieces shared by the cognitive-node cards. All schema-typed.
+ *  Tone vocabulary is the kit's (full epistemic-state names) — one language,
+ *  two skins. */
 import { useState } from "react";
 import type { Confidence, Evidence, Provenance } from "@latent/schema";
+import type { Tone as KitTone } from "../kit/types.ts";
+import { confidenceSourceLabel } from "../kit/fromSchema.ts";
 import { useStrings } from "../i18n.ts";
 
-type Tone = "g" | "h" | "o" | "r";
+type Tone = Extract<KitTone, "grounded" | "hypothesis" | "open" | "refuted">;
 
-const SRC_LABEL: Record<Confidence["source"], string> = {
-  logprob: "logprob",
-  self_consistency: "self-consist",
-  self_report: "self-report",
-  human: "human",
-};
+const SRC_LABEL = confidenceSourceLabel;
 
 export function Badge({ tone, children }: { tone: Tone; children: React.ReactNode }) {
   return <div className={`badge ${tone}`}>{children}</div>;
@@ -19,12 +18,12 @@ export function Badge({ tone, children }: { tone: Tone; children: React.ReactNod
 /** Confidence meter — a calibrated value with its source (never a vibe number). */
 export function ConfidenceMeter({
   confidence,
-  tone = "h",
+  tone = "hypothesis",
   label = "confidence",
   showSource = true,
 }: {
   confidence: Confidence;
-  tone?: "g" | "h";
+  tone?: "grounded" | "hypothesis";
   label?: string;
   showSource?: boolean;
 }) {
@@ -70,19 +69,19 @@ export function EvidenceChips({
 export function Falsification({
   text,
   label,
-  tone = "o",
+  tone = "open",
 }: {
   text: string;
   label?: string;
-  tone?: "o" | "h" | "r";
+  tone?: "open" | "hypothesis" | "refuted";
 }) {
   const t = useStrings();
   const lab = label ?? t.prim.whatWouldChange;
   const style =
-    tone === "r"
+    tone === "refuted"
       ? { background: "var(--refuted-dim)", borderColor: "var(--line)" }
       : undefined;
-  const bStyle = tone === "r" ? { color: "var(--refuted)" } : tone === "o" ? { color: "var(--open)" } : undefined;
+  const bStyle = tone === "refuted" ? { color: "var(--refuted)" } : tone === "open" ? { color: "var(--open)" } : undefined;
   return (
     <div className="falsify" style={style}>
       <b style={bStyle}>{lab}</b>

@@ -186,10 +186,12 @@ export interface EpistemicCardProps {
   provenance?: ProvenanceProps;
   /** the "what would change it" / "what it needs" text */
   falsification?: ReactNode;
+  /** overrides the FalsifyNote label (e.g. "to resolve" / "why it sank") */
+  falsificationLabel?: ReactNode;
   className?: string;
   children?: ReactNode;
 }
-export function EpistemicCard({ state, title, badge, confidence, evidence, provenance, falsification, className, children }: EpistemicCardProps) {
+export function EpistemicCard({ state, title, badge, confidence, evidence, provenance, falsification, falsificationLabel, className, children }: EpistemicCardProps) {
   const t = useStrings();
   const refuted = state === "refuted";
   const stateWord =
@@ -204,7 +206,7 @@ export function EpistemicCard({ state, title, badge, confidence, evidence, prove
       </div>
       {confidence && <ConfidenceMeter value={confidence.value} source={confidence.source} />}
       {evidence && evidence.length > 0 && <EvidenceList items={evidence} />}
-      {falsification && <FalsifyNote text={falsification} tone={falsifyTone} />}
+      {falsification && <FalsifyNote text={falsification} label={falsificationLabel} tone={falsifyTone} />}
       {provenance && <Provenance {...provenance} />}
       {children}
     </div>

@@ -16,16 +16,16 @@
 .hhead{display:flex;align-items:flex-start;gap:12px;justify-content:space-between}
 .htitle{font-family:var(--voice);font-size:19px;color:var(--ink-100);line-height:1.3;font-weight:360}
 .badge{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;padding:4px 9px;border-radius:20px;white-space:nowrap;flex:none}
-.badge.g{background:var(--grounded-dim);color:var(--grounded);border:1px solid var(--grounded-line)}
-.badge.h{background:var(--hypo-dim);color:var(--hypo);border:1px solid var(--hypo-line)}
-.badge.r{background:var(--refuted-dim);color:var(--refuted);border:1px solid var(--line)}
-.badge.o{background:var(--open-dim);color:var(--open);border:1px solid var(--open-line)}
+.badge.grounded{background:var(--grounded-dim);color:var(--grounded);border:1px solid var(--grounded-line)}
+.badge.hypothesis{background:var(--hypo-dim);color:var(--hypo);border:1px solid var(--hypo-line)}
+.badge.refuted{background:var(--refuted-dim);color:var(--refuted);border:1px solid var(--line)}
+.badge.open{background:var(--open-dim);color:var(--open);border:1px solid var(--open-line)}
 /* confidence meter */
 .conf{display:flex;align-items:center;gap:10px;margin:14px 0 6px}
 .conf .track{height:5px;flex:1;border-radius:3px;background:var(--d-850);overflow:hidden;border:1px solid var(--line)}
 .conf .fill{height:100%;border-radius:3px}
-.conf .fill.g{background:linear-gradient(90deg,var(--hypo),var(--grounded))}
-.conf .fill.h{background:linear-gradient(90deg,var(--open),var(--hypo))}
+.conf .fill.grounded{background:linear-gradient(90deg,var(--hypo),var(--grounded))}
+.conf .fill.hypothesis{background:linear-gradient(90deg,var(--open),var(--hypo))}
 .conf .val{font-family:var(--mono);font-size:11px;color:var(--ink-300);width:42px;text-align:right}
 .conf .lab{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-500)}
 .conf .src{font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-600);border:1px solid var(--line);border-radius:5px;padding:2px 6px}

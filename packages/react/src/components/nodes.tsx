@@ -27,9 +27,9 @@ export function GroundedClaimCard({ node }: { node: GroundedClaim }) {
     <div className="hcard grounded">
       <div className="hhead">
         <div className="htitle">{node.title}</div>
-        <Badge tone="g">{roleLabel(node.kind, t.state.grounded, t)}</Badge>
+        <Badge tone="grounded">{roleLabel(node.kind, t.state.grounded, t)}</Badge>
       </div>
-      <ConfidenceMeter confidence={node.confidence} tone="g" />
+      <ConfidenceMeter confidence={node.confidence} tone="grounded" />
       <EvidenceChips evidence={node.evidence} />
       <ProvenanceView provenance={node.provenance} />
     </div>
@@ -42,11 +42,11 @@ export function HypothesisCard({ node }: { node: Hypothesis }) {
     <div className="hcard hypo">
       <div className="hhead">
         <div className="htitle">{node.title}</div>
-        <Badge tone="h">{roleLabel(node.kind, t.state.hypothesis, t)}</Badge>
+        <Badge tone="hypothesis">{roleLabel(node.kind, t.state.hypothesis, t)}</Badge>
       </div>
-      <ConfidenceMeter confidence={node.confidence} tone="h" />
+      <ConfidenceMeter confidence={node.confidence} tone="hypothesis" />
       <EvidenceChips evidence={node.evidence} />
-      <Falsification text={node.falsification} tone="h" />
+      <Falsification text={node.falsification} tone="hypothesis" />
       {node.provenance && <ProvenanceView provenance={node.provenance} />}
     </div>
   );
@@ -60,9 +60,9 @@ export function OpenQuestionCard({ node }: { node: OpenQuestion }) {
         <div className="htitle" style={{ fontStyle: "italic" }}>
           {node.title}
         </div>
-        <Badge tone="o">{roleLabel(node.kind, t.state.open, t)}</Badge>
+        <Badge tone="open">{roleLabel(node.kind, t.state.open, t)}</Badge>
       </div>
-      <Falsification text={node.needs} label={t.open.toResolve} tone="o" />
+      <Falsification text={node.needs} label={t.open.toResolve} tone="open" />
     </div>
   );
 }
@@ -88,12 +88,12 @@ export function RefutedCard({ node }: { node: Refuted }) {
     <div className="hcard refuted">
       <div className="hhead">
         <div className="htitle">{node.title}</div>
-        <Badge tone="r">{roleLabel(node.kind, t.state.refuted, t)}</Badge>
+        <Badge tone="refuted">{roleLabel(node.kind, t.state.refuted, t)}</Badge>
       </div>
       <Falsification
         text={node.formerConfidence != null ? `${node.reason}${t.refuted.wasConf(node.formerConfidence.toFixed(2))}` : node.reason}
         label={t.refuted.whySank}
-        tone="r"
+        tone="refuted"
       />
     </div>
   );

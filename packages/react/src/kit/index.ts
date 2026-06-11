@@ -98,6 +98,11 @@ export type {
   EpistemicCardProps,
 } from "./semantic.tsx";
 
+// schema bindings — render CognitiveState data through the kit (type-only
+// schema imports; the kit stays runtime-free of zod for schema-less apps)
+export { confidenceSourceLabel, toConfidenceProps, toEvidenceItems, toProvenanceProps } from "./fromSchema.ts";
+export { NodeCard } from "./nodecard.tsx";
+
 // motion + voices
 export { Reveal, Voice, Mono, UIText } from "./motion.tsx";
 export type { Motion } from "./motion.tsx";
