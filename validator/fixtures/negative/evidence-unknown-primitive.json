@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "0.2",
+  "latentLevel": "low",
+  "task": { "title": "NEGATIVE: evidence pins to a primitive that was never declared" },
+  "observablePrimitives": [{ "id": "op:1", "kind": "tool-result", "label": "a measurement" }],
+  "toolCalls": [{ "id": "tc:1", "ts": "—", "fn": "measure" }],
+  "nodes": [
+    {
+      "id": "n:1",
+      "title": "Claim anchored to a phantom primitive",
+      "state": "grounded",
+      "confidence": { "value": 0.9, "source": "self_consistency" },
+      "evidence": [{ "id": "e:1", "label": "phantom", "primitives": ["op:does-not-exist"] }],
+      "provenance": {
+        "mode": "asserted",
+        "steps": [{ "toolCallId": "tc:1", "observed": "something", "primitives": ["op:1"] }]
+      }
+    }
+  ]
+}

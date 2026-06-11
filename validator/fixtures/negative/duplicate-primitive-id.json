@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "0.2",
+  "latentLevel": "low",
+  "task": { "title": "NEGATIVE: two observable primitives share one id — references become ambiguous" },
+  "observablePrimitives": [
+    { "id": "op:dup", "kind": "tool-result", "label": "first" },
+    { "id": "op:dup", "kind": "tool-result", "label": "second, silently shadowing the first" }
+  ],
+  "toolCalls": [{ "id": "tc:1", "ts": "—", "fn": "measure" }],
+  "nodes": [
+    {
+      "id": "n:1",
+      "title": "Which op:dup does this anchor to?",
+      "state": "grounded",
+      "confidence": { "value": 0.9, "source": "self_consistency" },
+      "evidence": [{ "id": "e:1", "label": "ambiguous anchor", "primitives": ["op:dup"] }],
+      "provenance": {
+        "mode": "asserted",
+        "steps": [{ "toolCallId": "tc:1", "observed": "something", "primitives": ["op:dup"] }]
+      }
+    }
+  ]
+}

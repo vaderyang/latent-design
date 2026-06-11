@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "0.2",
+  "latentLevel": "low",
+  "task": { "title": "NEGATIVE: grounded claim with no provenance at all" },
+  "observablePrimitives": [{ "id": "op:1", "kind": "tool-result", "label": "a measurement" }],
+  "toolCalls": [{ "id": "tc:1", "ts": "—", "fn": "measure" }],
+  "nodes": [
+    {
+      "id": "n:1",
+      "title": "A free-floating assertion dressed as grounded",
+      "state": "grounded",
+      "confidence": { "value": 0.95, "source": "self_report" },
+      "evidence": [{ "id": "e:1", "label": "trust me", "primitives": ["op:1"] }]
+    }
+  ]
+}

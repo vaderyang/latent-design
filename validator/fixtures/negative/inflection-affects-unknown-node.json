@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "0.2",
+  "latentLevel": "low",
+  "task": { "title": "NEGATIVE: an inflection claims to have moved a node that does not exist" },
+  "observablePrimitives": [],
+  "toolCalls": [],
+  "nodes": [
+    {
+      "id": "n:turn",
+      "title": "Changed direction",
+      "state": "inflection",
+      "inflectKind": "backtrack",
+      "from": "the old path",
+      "to": "the new path",
+      "rationale": "the old path was contradicted",
+      "affects": ["n:never-declared"]
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "0.2",
+  "latentLevel": "low",
+  "task": {
+    "title": "EXEC fixture: a genuinely re-executable grounding",
+    "goal": "demonstrate that --exec makes 'verifiable' mean something"
+  },
+  "observablePrimitives": [
+    { "id": "op:pkg", "kind": "code", "label": "package.json declares bun workspaces", "ref": "package.json" }
+  ],
+  "toolCalls": [
+    { "id": "tc:grep", "ts": "—", "fn": "grep", "summary": "searched package.json for the workspaces field", "producedPrimitives": ["op:pkg"] }
+  ],
+  "nodes": [
+    {
+      "id": "n:workspaces",
+      "title": "This repository is a bun workspaces monorepo",
+      "state": "grounded",
+      "kind": "claim",
+      "confidence": { "value": 0.99, "source": "self_consistency" },
+      "evidence": [{ "id": "e:pkg", "label": "workspaces field present", "primitives": ["op:pkg"] }],
+      "provenance": {
+        "mode": "verifiable",
+        "reExecCmd": "grep -q '\"workspaces\"' package.json",
+        "steps": [{ "toolCallId": "tc:grep", "observed": "workspaces: packages/*, schema, validator, site", "primitives": ["op:pkg"] }]
+      }
+    }
+  ],
+  "outcome": { "nodeId": "n:workspaces", "text": "Monorepo layout confirmed — and re-confirmable by anyone running --exec." }
+}

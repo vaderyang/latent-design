@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "0.2",
+  "latentLevel": "low",
+  "task": { "title": "NEGATIVE: open question that never says what would resolve it" },
+  "observablePrimitives": [],
+  "toolCalls": [],
+  "nodes": [
+    {
+      "id": "n:1",
+      "title": "An open question going nowhere",
+      "state": "open"
+    }
+  ]
+}

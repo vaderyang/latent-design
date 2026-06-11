@@ -23,7 +23,13 @@
  *   • a grounded node cannot exist without resolvable provenance,
  *   • a hypothesis cannot exist without a falsification condition,
  *   • verifiable provenance cannot exist without a re-executable command,
- *   • every evidence / provenance reference must resolve to a declared primitive.
+ *   • every evidence / provenance reference must resolve to a declared primitive,
+ *   • all referable ids (primitives, toolCalls, nodes, evidence) must be unique,
+ *   • the outcome cannot point at a refuted (sunk) node.
+ *
+ * NOTE the cross-field constraints live in Zod refinements and do NOT survive
+ * translation into cognitive-state.schema.json — passing the JSON Schema is
+ * necessary but not sufficient; @latent/validator is the authority.
  */
 import { z } from "zod";
 
@@ -280,6 +286,19 @@ export const CognitiveState = z
     const calls = new Set(s.toolCalls.map((c) => c.id));
     const nodeIds = new Set(s.nodes.map((n) => n.id));
 
+    // ids must be unique — duplicates make every reference silently ambiguous
+    const checkUnique = (ids: string[], what: string, path: (string | number)[]) => {
+      const seen = new Set<string>();
+      for (const id of ids) {
+        if (seen.has(id))
+          ctx.addIssue({ code: z.ZodIssueCode.custom, message: `duplicate ${what} id "${id}" — references cannot resolve unambiguously`, path });
+        seen.add(id);
+      }
+    };
+    checkUnique(s.observablePrimitives.map((p) => p.id), "observablePrimitive", ["observablePrimitives"]);
+    checkUnique(s.toolCalls.map((c) => c.id), "toolCall", ["toolCalls"]);
+    checkUnique(s.nodes.map((n) => n.id), "node", ["nodes"]);
+
     const checkPrim = (pid: string, where: string) => {
       if (!prims.has(pid))
         ctx.addIssue({ code: z.ZodIssueCode.custom, message: `${where} references unknown primitive "${pid}"` });
@@ -287,6 +306,7 @@ export const CognitiveState = z
 
     for (const n of s.nodes) {
       if (n.state === "grounded" || n.state === "hypothesis") {
+        checkUnique((n.evidence ?? []).map((e) => e.id), `node "${n.id}" evidence`, ["nodes"]);
         n.evidence?.forEach((e) => e.primitives.forEach((pid) => checkPrim(pid, `node "${n.id}" evidence "${e.id}"`)));
       }
       if (n.state === "grounded") {
@@ -304,8 +324,13 @@ export const CognitiveState = z
       }
     }
 
-    if (s.outcome && !nodeIds.has(s.outcome.nodeId))
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: `outcome references unknown node "${s.outcome.nodeId}"`, path: ["outcome", "nodeId"] });
+    if (s.outcome) {
+      const target = s.nodes.find((n) => n.id === s.outcome!.nodeId);
+      if (!target)
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: `outcome references unknown node "${s.outcome.nodeId}"`, path: ["outcome", "nodeId"] });
+      else if (target.state === "refuted")
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: `outcome references refuted node "${target.id}" — a sunk claim cannot be the settled result`, path: ["outcome", "nodeId"] });
+    }
 
     s.steps?.forEach((step, i) =>
       step.visibleNodeIds.forEach((nid) => {

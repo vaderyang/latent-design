@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "0.2",
+  "latentLevel": "low",
+  "task": { "title": "NEGATIVE: provenance step cites a tool call that never happened" },
+  "observablePrimitives": [{ "id": "op:1", "kind": "tool-result", "label": "a measurement" }],
+  "toolCalls": [{ "id": "tc:1", "ts": "—", "fn": "measure" }],
+  "nodes": [
+    {
+      "id": "n:1",
+      "title": "Claim whose audit trail points at a ghost",
+      "state": "grounded",
+      "confidence": { "value": 0.9, "source": "self_consistency" },
+      "evidence": [{ "id": "e:1", "label": "real evidence", "primitives": ["op:1"] }],
+      "provenance": {
+        "mode": "asserted",
+        "steps": [{ "toolCallId": "tc:ghost", "observed": "something", "primitives": ["op:1"] }]
+      }
+    }
+  ]
+}

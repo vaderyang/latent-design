@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "0.2",
+  "latentLevel": "low",
+  "task": { "title": "NEGATIVE: hypothesis without a falsification condition" },
+  "observablePrimitives": [{ "id": "op:1", "kind": "tool-result", "label": "a measurement" }],
+  "toolCalls": [{ "id": "tc:1", "ts": "—", "fn": "measure" }],
+  "nodes": [
+    {
+      "id": "n:1",
+      "title": "An unfalsifiable hunch occupying the main stage",
+      "state": "hypothesis",
+      "confidence": { "value": 0.7, "source": "self_report" }
+    }
+  ]
+}

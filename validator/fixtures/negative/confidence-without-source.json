@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "0.2",
+  "latentLevel": "low",
+  "task": { "title": "NEGATIVE: a vibe confidence number with no stated source" },
+  "observablePrimitives": [{ "id": "op:1", "kind": "tool-result", "label": "a measurement" }],
+  "toolCalls": [{ "id": "tc:1", "ts": "—", "fn": "measure" }],
+  "nodes": [
+    {
+      "id": "n:1",
+      "title": "87% confident, source: vibes",
+      "state": "hypothesis",
+      "confidence": { "value": 0.87 },
+      "falsification": "would change if the metric regresses on re-run"
+    }
+  ]
+}

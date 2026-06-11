@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "0.2",
+  "latentLevel": "low",
+  "task": { "title": "NEGATIVE: the settled outcome cites a claim that sank" },
+  "observablePrimitives": [],
+  "toolCalls": [],
+  "nodes": [
+    { "id": "n:sunk", "title": "It was the cache all along", "state": "refuted", "reason": "cache was cold during the incident window" }
+  ],
+  "outcome": { "nodeId": "n:sunk", "text": "Root cause: the cache." }
+}

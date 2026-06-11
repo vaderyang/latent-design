@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "0.2",
+  "latentLevel": "low",
+  "task": {
+    "title": "EXEC fixture: a 'verifiable' claim whose re-execution does NOT hold",
+    "goal": "contract-valid, but --exec exposes the claim as false"
+  },
+  "observablePrimitives": [
+    { "id": "op:pkg", "kind": "code", "label": "package.json (claimed to declare a field it does not)", "ref": "package.json" }
+  ],
+  "toolCalls": [
+    { "id": "tc:grep", "ts": "—", "fn": "grep", "summary": "claimed to have found the field", "producedPrimitives": ["op:pkg"] }
+  ],
+  "nodes": [
+    {
+      "id": "n:phantom",
+      "title": "package.json declares a field that is not actually there",
+      "state": "grounded",
+      "kind": "claim",
+      "confidence": { "value": 0.95, "source": "self_report" },
+      "evidence": [{ "id": "e:pkg", "label": "confabulated sighting", "primitives": ["op:pkg"] }],
+      "provenance": {
+        "mode": "verifiable",
+        "reExecCmd": "grep -q '\"field-that-does-not-exist-xyz\"' package.json",
+        "steps": [{ "toolCallId": "tc:grep", "observed": "field-that-does-not-exist-xyz: true", "primitives": ["op:pkg"] }]
+      }
+    }
+  ]
+}

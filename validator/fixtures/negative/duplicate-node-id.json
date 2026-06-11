@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "0.2",
+  "latentLevel": "low",
+  "task": { "title": "NEGATIVE: two nodes share one id" },
+  "observablePrimitives": [],
+  "toolCalls": [],
+  "nodes": [
+    { "id": "n:dup", "title": "First open question", "state": "open", "needs": "more data" },
+    { "id": "n:dup", "title": "Second, different question with the same id", "state": "open", "needs": "other data" }
+  ]
+}
